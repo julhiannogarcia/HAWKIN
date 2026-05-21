@@ -1,4 +1,6 @@
-@import "tailwindcss";
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
 
 :root {
   --background: #010101;
@@ -7,13 +9,6 @@
   --neon-purple: #bc13fe;
   --peru-red: #d91023;
   --ven-yellow: #ffcc00;
-}
-
-@theme {
-  --color-neon-blue: var(--neon-blue);
-  --color-neon-purple: var(--neon-purple);
-  --color-peru-red: var(--peru-red);
-  --color-ven-yellow: var(--ven-yellow);
 }
 
 body {
@@ -26,27 +21,17 @@ body {
     radial-gradient(circle at 90% 90%, rgba(188, 19, 254, 0.08) 0%, transparent 40%);
 }
 
-@utility btn-glow {
-  position: relative;
-  padding: 0.75rem 2rem;
-  border-radius: 9999px;
-  font-weight: 700;
-  text-transform: uppercase;
-  letter-spacing: 0.1em;
-  transition: all 0.3s;
+.btn-glow {
+  @apply relative px-8 py-3 rounded-full font-bold uppercase tracking-widest transition-all duration-300;
   background: linear-gradient(45deg, var(--neon-blue), var(--neon-purple));
   box-shadow: 0 0 20px rgba(0, 242, 255, 0.3);
-  
-  &:hover {
-    transform: translateY(-0.25rem);
-    box-shadow: 0 0 40px rgba(0, 242, 255, 0.6);
-  }
 }
 
-@utility glass-card {
-  background-color: rgba(255, 255, 255, 0.05);
-  border: 1px solid rgba(255, 255, 255, 0.1);
-  backdrop-filter: blur(12px);
-  border-radius: 1.5rem;
-  padding: 2rem;
+.btn-glow:hover {
+  @apply -translate-y-1;
+  box-shadow: 0 0 40px rgba(0, 242, 255, 0.6);
+}
+
+.glass-card {
+  @apply bg-white/5 border border-white/10 backdrop-blur-md rounded-3xl p-8;
 }
