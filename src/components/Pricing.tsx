@@ -1,12 +1,33 @@
 'use client';
 
 import { motion } from 'framer-motion';
+import { useState, useEffect } from 'react';
 
 export default function Pricing() {
+  const [geoData, setGeoData] = useState({
+    currencySymbol: '$',
+    monthlyPrice: '8.00',
+    annualPrice: '4.00',
+    currencyName: 'USD'
+  });
+
+  useEffect(() => {
+    const fetchGeo = async () => {
+      try {
+        const res = await fetch('/api/geo');
+        const data = await res.json();
+        setGeoData(data);
+      } catch (e) {
+        console.error("Error fetching geo pricing", e);
+      }
+    };
+    fetchGeo();
+  }, []);
+
   const plans = [
     {
       name: 'Suscripción Mensual',
-      price: '$8',
+      price: `${geoData.currencySymbol}${geoData.monthlyPrice}`,
       period: '/mes',
       description: 'Acceso total al radar global de IA y noticias Big Tech.',
       features: [
@@ -19,7 +40,7 @@ export default function Pricing() {
     },
     {
       name: 'Suscripción Anual',
-      price: '$4',
+      price: `${geoData.currencySymbol}${geoData.annualPrice}`,
       period: '/mes promed.',
       description: 'El mejor valor para los líderes del futuro digital.',
       features: [
@@ -28,7 +49,7 @@ export default function Pricing() {
         'Certificaciones HAWKIN',
         'Soporte Prioritario 24/7'
       ],
-      info: 'Facturado como $48 al año',
+      info: `Facturado en ${geoData.currencyName}`,
       popular: true
     }
   ];
@@ -37,7 +58,9 @@ export default function Pricing() {
     <section id="planes" className="max-w-6xl mx-auto px-4 py-32 w-full">
       <div className="text-center mb-20 space-y-4">
         <h2 className="text-4xl md:text-6xl font-black tracking-tighter">Únete a la Élite.</h2>
-        <p className="text-gray-500 uppercase tracking-[0.2em] text-xs font-black">Elige tu puerta de entrada al ecosistema HAWKIN</p>
+        <p className="text-gray-500 uppercase tracking-[0.2em] text-xs font-black">
+          Precios ajustados automáticamente a tu moneda local ({geoData.currencyName})
+        </p>
       </div>
 
       <div className="grid grid-cols-1 md:grid-cols-2 gap-8 max-w-4xl mx-auto">
