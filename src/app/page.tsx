@@ -10,18 +10,21 @@ import Pricing from '@/components/Pricing';
 export default function Home() {
   const sampleNews = [
     {
+      id: "gpt-5-leak",
       title: "OpenAI GPT-5: Filtraciones sobre la nueva arquitectura",
       excerpt: "Fuentes cercanas a la compañía indican que el nuevo modelo superará la capacidad de razonamiento humano en pruebas estándar...",
       category: "BIG TECH",
       isLocked: true
     },
     {
+      id: "sam-altman-ubr",
       title: "La visión de Sam Altman sobre la renta básica universal",
       excerpt: "En una reciente entrevista, el CEO de OpenAI explicó cómo la IA financiará el futuro de la sociedad...",
       category: "CEO RADAR",
       isLocked: true
     },
     {
+      id: "nvidia-record",
       title: "NVIDIA alcanza valoración récord gracias a nuevos chips",
       excerpt: "La demanda de infraestructura para IA no tiene precedentes, posicionando a la empresa como el motor del mundo...",
       category: "MERCADO",

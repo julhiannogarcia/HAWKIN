@@ -2,11 +2,23 @@
 
 import { motion, AnimatePresence } from 'framer-motion';
 import { useState, useEffect } from 'react';
+import { REGIONAL_EVENTS } from '@/lib/events';
 
 export default function Intro() {
   const [isVisible, setIsVisible] = useState(true);
+  const [currentEvent, setCurrentEvent] = useState<any>(null);
 
   useEffect(() => {
+    // Lógica para detectar la fecha actual (MM-DD)
+    const now = new Date();
+    const month = String(now.getMonth() + 1).padStart(2, '0');
+    const day = String(now.getDate()).padStart(2, '0');
+    const dateKey = `${month}-${day}`;
+
+    if (REGIONAL_EVENTS[dateKey]) {
+      setCurrentEvent(REGIONAL_EVENTS[dateKey]);
+    }
+
     const timer = setTimeout(() => {
       setIsVisible(false);
     }, 7000);
@@ -23,25 +35,45 @@ export default function Intro() {
           className="fixed inset-0 z-[10000] flex items-center justify-center bg-black overflow-hidden"
         >
           <div className="relative w-full max-w-4xl text-center px-4">
-            {/* Slide 1: Efeméride (Ejemplo Perú) */}
-            <motion.div
-              initial={{ opacity: 0, scale: 0.9, filter: 'blur(10px)' }}
-              animate={{ 
-                opacity: [0, 1, 1, 0],
-                scale: [0.95, 1, 1, 1.05],
-                filter: ['blur(10px)', 'blur(0px)', 'blur(0px)', 'blur(10px)']
-              }}
-              transition={{ duration: 4, times: [0, 0.2, 0.8, 1], ease: "easeInOut" }}
-              className="absolute inset-0 flex flex-col items-center justify-center"
-            >
-              <div className="mb-6 w-full h-64 rounded-2xl border border-red-500/30 bg-[url('https://upload.wikimedia.org/wikipedia/commons/thumb/1/1b/Proclamaci%C3%B3n_de_la_Independencia_del_Per%C3%BA.jpg/1200px-Proclamaci%C3%B3n_de_la_Independencia_del_Per%C3%BA.jpg')] bg-cover bg-center shadow-[0_0_50px_rgba(217,16,35,0.2)]" />
-              <h2 className="text-4xl md:text-6xl font-black tracking-[0.2em] text-white uppercase mb-2">
-                ¡Felices Fiestas Patrias!
-              </h2>
-              <p className="text-red-500 tracking-[0.4em] uppercase font-light">Perú • 28 de Julio</p>
-            </motion.div>
+            
+            {/* Si hay un evento regional HOY */}
+            {currentEvent ? (
+              <motion.div
+                initial={{ opacity: 0, scale: 0.9, filter: 'blur(10px)' }}
+                animate={{ 
+                  opacity: [0, 1, 1, 0],
+                  scale: [0.95, 1, 1, 1.05],
+                  filter: ['blur(10px)', 'blur(0px)', 'blur(0px)', 'blur(10px)']
+                }}
+                transition={{ duration: 4, times: [0, 0.2, 0.8, 1], ease: "easeInOut" }}
+                className="absolute inset-0 flex flex-col items-center justify-center"
+              >
+                <div 
+                  className="mb-6 w-full h-64 rounded-2xl border border-white/10 bg-cover bg-center shadow-[0_0_50px_rgba(255,255,255,0.1)]" 
+                  style={{ backgroundImage: `url(${currentEvent.image})` }}
+                />
+                <h2 className="text-3xl md:text-5xl font-black tracking-[0.2em] text-white uppercase mb-2">
+                  {currentEvent.title}
+                </h2>
+                <p className="text-cyan-400 tracking-[0.4em] uppercase font-light text-xs">
+                  {currentEvent.country} • {currentEvent.date}
+                </p>
+                <p className="mt-4 text-gray-500 text-[10px] tracking-[0.3em] uppercase">{currentEvent.subtitle}</p>
+              </motion.div>
+            ) : (
+              /* Intro Estándar si no hay evento */
+              <motion.div
+                initial={{ opacity: 0, scale: 0.9 }}
+                animate={{ opacity: [0, 1, 1, 0], scale: [0.9, 1, 1, 1.1] }}
+                transition={{ duration: 4, times: [0, 0.2, 0.8, 1] }}
+                className="absolute inset-0 flex flex-col items-center justify-center"
+              >
+                <h2 className="text-4xl md:text-6xl font-black tracking-[0.5em] text-white uppercase opacity-20">HAWKIN</h2>
+                <p className="mt-4 text-cyan-400 tracking-[1em] uppercase font-light text-sm">INTELIGENCIA GLOBAL</p>
+              </motion.div>
+            )}
 
-            {/* Slide 2: HAWKIN Reveal */}
+            {/* Slide Final: HAWKIN Reveal */}
             <motion.div
               initial={{ opacity: 0, scale: 0.9, filter: 'blur(10px)' }}
               animate={{ 
@@ -56,7 +88,9 @@ export default function Intro() {
                 HAWKIN
               </h1>
               <p className="mt-4 text-cyan-400 tracking-[0.5em] uppercase font-light">La Libertad del Futuro</p>
-              <div className="mt-12 text-gray-500 text-sm tracking-[0.3em] uppercase">Julhianno Garcia • Fundador</div>
+              <div className="mt-12 text-gray-500 text-[10px] text-gray-700 uppercase tracking-widest leading-loose">
+                Liderado por la visión de <span className="text-gray-500 font-bold">Julhianno Garcia</span>
+              </div>
             </motion.div>
           </div>
         </motion.div>
