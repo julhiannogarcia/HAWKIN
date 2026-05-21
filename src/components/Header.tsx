@@ -19,7 +19,7 @@ export default function Header() {
         <Link href="/news" className="hover:text-cyan-400 transition-colors">Radar</Link>
         <Link href="/academy" className="hover:text-cyan-400 transition-colors">Academia</Link>
         <Link href="/shield" className="hover:text-red-500 transition-colors">Shield</Link>
-        <Link href="/philanthropy" className="hover:text-amber-500 transition-colors">Impacto</Link>
+        <Link href="/philanthropy" className="hover:text-amber-500 transition-colors">Colaboración</Link>
         <Link href="/b2b" className="hover:text-purple-400 transition-colors">B2B</Link>
         <Link href="/auth/signin" className="px-6 py-2 bg-white/5 border border-white/10 rounded-full hover:bg-white/10 transition-colors text-white">
           Entrar

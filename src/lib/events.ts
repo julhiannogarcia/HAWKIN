@@ -4,20 +4,23 @@ export const REGIONAL_EVENTS: Record<string, any> = {
     subtitle: "HONRANDO NUESTROS PRECURSORES",
     date: "19 de Mayo",
     image: "https://upload.wikimedia.org/wikipedia/commons/thumb/e/e8/Manuel_Lorenzo_de_Vidaurre.jpg/800px-Manuel_Lorenzo_de_Vidaurre.jpg",
-    country: "Perú"
+    country: "Perú",
+    countryCode: "PE"
   },
-  "07-28": {
-    title: "¡Felices Fiestas Patrias!",
-    subtitle: "BICENTENARIO Y SOBERANÍA",
-    date: "28 de Julio",
-    image: "https://upload.wikimedia.org/wikipedia/commons/thumb/1/1b/Proclamaci%C3%B3n_de_la_Independencia_del_Per%C3%BA.jpg/1200px-Proclamaci%C3%B3n_de_la_Independencia_del_Per%C3%BA.jpg",
-    country: "Perú"
+  "07-04": {
+    title: "Independence Day",
+    subtitle: "FREEDOM & TECHNOLOGY",
+    date: "July 4th",
+    image: "https://upload.wikimedia.org/wikipedia/en/thumb/a/a4/Flag_of_the_United_States.svg/1200px-Flag_of_the_United_States.svg.png",
+    country: "United States",
+    countryCode: "US"
   },
-  "06-24": {
-    title: "Batalla de Carabobo",
-    subtitle: "EL HONOR DE NUESTRA HISTORIA",
-    date: "24 de Junio",
-    image: "https://upload.wikimedia.org/wikipedia/commons/thumb/e/e0/Batalla_de_Carabobo_Arturo_Michelena.jpg/1200px-Batalla_de_Carabobo_Arturo_Michelena.jpg",
-    country: "Venezuela"
+  "01-01": {
+    title: "¡Feliz Año Nuevo!",
+    subtitle: "EL FUTURO COMIENZA HOY",
+    date: "1 de Enero",
+    image: "https://images.unsplash.com/photo-1467810563316-b5476525c0f9?auto=format&fit=crop&q=80&w=1000",
+    country: "Global",
+    isGlobal: true
   }
 };

@@ -5,24 +5,46 @@ import { useState, useEffect } from 'react';
 import { REGIONAL_EVENTS } from '@/lib/events';
 
 export default function Intro() {
-  const [isVisible, setIsVisible] = useState(true);
+  const [isVisible, setIsVisible] = useState(false);
   const [currentEvent, setCurrentEvent] = useState<any>(null);
 
   useEffect(() => {
-    // Lógica para detectar la fecha actual (MM-DD)
-    const now = new Date();
-    const month = String(now.getMonth() + 1).padStart(2, '0');
-    const day = String(now.getDate()).padStart(2, '0');
-    const dateKey = `${month}-${day}`;
+    // 1. Verificamos si el usuario ya vio la intro en esta sesión para no molestarlo
+    const hasSeenIntro = sessionStorage.getItem('hawkin_intro_seen');
+    if (hasSeenIntro) return;
 
-    if (REGIONAL_EVENTS[dateKey]) {
-      setCurrentEvent(REGIONAL_EVENTS[dateKey]);
-    }
+    // 2. Iniciamos el proceso de detección inteligente
+    const initIntro = async () => {
+      try {
+        // Detectar país vía nuestra API de Geo (Detección real de IP)
+        const res = await fetch('/api/geo');
+        const { countryCode } = await res.json();
 
-    const timer = setTimeout(() => {
-      setIsVisible(false);
-    }, 7000);
-    return () => clearTimeout(timer);
+        // Lógica de fecha actual
+        const now = new Date();
+        const month = String(now.getMonth() + 1).padStart(2, '0');
+        const day = String(now.getDate()).padStart(2, '0');
+        const dateKey = `${month}-${day}`;
+
+        const event = REGIONAL_EVENTS[dateKey];
+
+        // SOBERANÍA NACIONAL: Solo mostramos efemérides si el país coincide
+        // O si es un evento GLOBAL (Año Nuevo, Navidad)
+        if (event && (event.countryCode === countryCode || event.isGlobal)) {
+          setCurrentEvent(event);
+        }
+
+        setIsVisible(true);
+        sessionStorage.setItem('hawkin_intro_seen', 'true');
+        
+        // La intro dura 7 segundos
+        setTimeout(() => setIsVisible(false), 7000);
+      } catch (e) {
+        console.error("Geo error", e);
+      }
+    };
+
+    initIntro();
   }, []);
 
   return (
@@ -36,7 +58,7 @@ export default function Intro() {
         >
           <div className="relative w-full max-w-4xl text-center px-4">
             
-            {/* Si hay un evento regional HOY */}
+            {/* Si hay un evento regional HOY que coincida con el país del usuario */}
             {currentEvent ? (
               <motion.div
                 initial={{ opacity: 0, scale: 0.9, filter: 'blur(10px)' }}
@@ -58,10 +80,9 @@ export default function Intro() {
                 <p className="text-cyan-400 tracking-[0.4em] uppercase font-light text-xs">
                   {currentEvent.country} • {currentEvent.date}
                 </p>
-                <p className="mt-4 text-gray-500 text-[10px] tracking-[0.3em] uppercase">{currentEvent.subtitle}</p>
               </motion.div>
             ) : (
-              /* Intro Estándar si no hay evento */
+              /* Intro Estándar HAWKIN si no es fecha especial en SU país */
               <motion.div
                 initial={{ opacity: 0, scale: 0.9 }}
                 animate={{ opacity: [0, 1, 1, 0], scale: [0.9, 1, 1, 1.1] }}
@@ -88,9 +109,6 @@ export default function Intro() {
                 HAWKIN
               </h1>
               <p className="mt-4 text-cyan-400 tracking-[0.5em] uppercase font-light">La Libertad del Futuro</p>
-              <div className="mt-12 text-gray-500 text-[10px] text-gray-700 uppercase tracking-widest leading-loose">
-                Liderado por la visión de <span className="text-gray-500 font-bold">Julhianno Garcia</span>
-              </div>
             </motion.div>
           </div>
         </motion.div>

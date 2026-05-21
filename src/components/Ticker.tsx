@@ -1,5 +1,7 @@
 'use client';
 
+import Link from 'next/link';
+
 export default function Ticker() {
   const news = [
     { label: 'OPENAI', text: 'Sam Altman anuncia nueva actualización de GPT-5...' },
@@ -16,10 +18,10 @@ export default function Ticker() {
       </div>
       <div className="flex whitespace-nowrap animate-ticker">
         {[...news, ...news].map((item, index) => (
-          <div key={index} className="px-12 text-sm text-gray-300">
+          <Link key={index} href="/news" className="px-12 text-sm text-gray-300 hover:text-cyan-400 transition-colors cursor-pointer">
             <span className="text-cyan-400 font-bold mr-2">{item.label}:</span>
             {item.text}
-          </div>
+          </Link>
         ))}
       </div>
       
