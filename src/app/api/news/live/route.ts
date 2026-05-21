@@ -1,4 +1,5 @@
-import { NextResponse } from 'next/server';
+import { prisma } from "@/lib/prisma";
+import { NextResponse } from "next/server";
 import Parser from 'rss-parser';
 
 const parser = new Parser();
@@ -15,50 +16,46 @@ export async function GET() {
 
     const getTimeAgo = (dateStr: string) => {
       const seconds = Math.floor((new Date().getTime() - new Date(dateStr).getTime()) / 1000);
-      let interval = seconds / 31536000;
-      if (interval > 1) return "Hace " + Math.floor(interval) + " años";
-      interval = seconds / 2592000;
-      if (interval > 1) return "Hace " + Math.floor(interval) + " meses";
-      interval = seconds / 86400;
-      if (interval > 1) return "Hace " + Math.floor(interval) + " días";
-      interval = seconds / 3600;
-      if (interval > 1) return "Hace " + Math.floor(interval) + " horas";
-      interval = seconds / 60;
-      if (interval > 1) return "Hace " + Math.floor(interval) + " min";
-      return "Ahora mismo";
+      if (seconds < 60) return "Ahora mismo";
+      const minutes = Math.floor(seconds / 60);
+      if (minutes < 60) return `Hace ${minutes} min`;
+      const hours = Math.floor(minutes / 60);
+      if (hours < 24) return `Hace ${hours} horas`;
+      return "Hace 1 día";
+    };
+
+    const extractImage = (content: string) => {
+      const imgReg = /<img src="([^"]+)"/;
+      const match = content.match(imgReg);
+      return match ? match[1] : null;
     };
 
     const formatItems = (items: any[], category: string) => items.slice(0, 9).map((item, index) => {
-      const techImages = [
-        "https://images.unsplash.com/photo-1677442136019-21780ecad995?auto=format&fit=crop&q=80&w=1000",
-        "https://images.unsplash.com/photo-1620712943543-bcc4688e7485?auto=format&fit=crop&q=80&w=1000",
-        "https://images.unsplash.com/photo-1485827404703-89b55fcc595e?auto=format&fit=crop&q=80&w=1000",
-        "https://images.unsplash.com/photo-1550751827-4bd374c3f58b?auto=format&fit=crop&q=80&w=1000",
-        "https://images.unsplash.com/photo-1518770660439-4636190af475?auto=format&fit=crop&q=80&w=1000",
-        "https://images.unsplash.com/photo-1507413245164-6160d8298b31?auto=format&fit=crop&q=80&w=1000"
-      ];
+      // Intentar sacar la imagen original de Google si está disponible
+      const originalImage = extractImage(item.content || "");
       
-      const shieldImages = [
-        "https://images.unsplash.com/photo-1563986768609-322da13575f3?auto=format&fit=crop&q=80&w=1000",
-        "https://images.unsplash.com/photo-1555066931-4365d14bab8c?auto=format&fit=crop&q=80&w=1000",
-        "https://images.unsplash.com/photo-1551808195-b9de136738a6?auto=format&fit=crop&q=80&w=1000",
-        "https://images.unsplash.com/photo-1544197150-b99a580bb7a8?auto=format&fit=crop&q=80&w=1000"
+      const techImages = [
+        "https://images.unsplash.com/photo-1677442136019-21780ecad995",
+        "https://images.unsplash.com/photo-1620712943543-bcc4688e7485",
+        "https://images.unsplash.com/photo-1485827404703-89b55fcc595e",
+        "https://images.unsplash.com/photo-1550751827-4bd374c3f58b",
+        "https://images.unsplash.com/photo-1518770660439-4636190af475"
       ];
 
-      // Creamos un ID seguro que no dependa de Date.now() para que la navegación no falle al refrescar
-      const cleanId = Buffer.from(item.link).toString('base64').replace(/[^a-zA-Z0-9]/g, '').substring(0, 15);
+      // ID ÚNICO REALMENTE BASADO EN EL ENLACE PARA QUE NO SE MEZCLEN
+      const uniqueId = Buffer.from(item.link).toString('base64').replace(/[^a-zA-Z0-9]/g, '').substring(0, 20);
 
       return {
-        id: cleanId,
-        title: item.title.split(' - ')[0], // Limpiamos el nombre de la fuente del título
+        id: uniqueId,
+        title: item.title.split(' - ')[0],
         category: category,
         excerpt: item.contentSnippet?.substring(0, 160) + "...",
-        isLocked: index > 2,
+        isLocked: index > 1,
         author: item.source?.name || item.source || "Google News",
         date: item.pubDate ? getTimeAgo(item.pubDate) : "Ahora",
-        image: category === "SHIELD" ? shieldImages[index % shieldImages.length] : techImages[index % techImages.length],
+        image: originalImage || `${techImages[index % techImages.length]}?auto=format&fit=crop&q=80&w=1000`,
         url: item.link,
-        hasVideo: index % 4 === 0 // Simulamos video cada 4 noticias
+        hasVideo: index % 3 === 0 // Simulamos video cada 3 noticias
       };
     });
 
