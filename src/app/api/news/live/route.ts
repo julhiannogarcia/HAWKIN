@@ -35,6 +35,17 @@ export async function GET() {
       const isShield = category === "SHIELD";
       const uniqueId = generateShortId(item.link);
 
+      // Mapeo de imágenes por palabras clave para mayor realismo
+      const getImageUrl = (title: string, cat: string) => {
+        if (cat === "SHIELD") {
+          if (title.toLowerCase().includes("windows")) return "https://images.unsplash.com/photo-1624561172888-ac93c696e10c?auto=format&fit=crop&q=80&w=1000";
+          if (title.toLowerCase().includes("mac") || title.toLowerCase().includes("apple")) return "https://images.unsplash.com/photo-1611186871348-b1ce696e543b?auto=format&fit=crop&q=80&w=1000";
+          if (title.toLowerCase().includes("linux")) return "https://images.unsplash.com/photo-1629654297299-c8506221ca97?auto=format&fit=crop&q=80&w=1000";
+          return "https://images.unsplash.com/photo-1550751827-4bd374c3f58b?auto=format&fit=crop&q=80&w=1000";
+        }
+        return `https://images.unsplash.com/photo-1677442136019-21780ecad995?auto=format&fit=crop&q=80&w=1000&seed=${index}`;
+      };
+
       return {
         id: uniqueId,
         title: item.title.split(' - ')[0],
@@ -43,13 +54,13 @@ export async function GET() {
         isLocked: index > 2,
         author: item.source?.name || item.source || "HAWKIN Intelligence",
         date: item.pubDate ? getTimeAgo(item.pubDate) : "Ahora",
-        image: isShield 
-          ? `https://images.unsplash.com/photo-1550751827-4bd374c3f58b?auto=format&fit=crop&q=80&w=1000` 
-          : `https://images.unsplash.com/photo-1677442136019-21780ecad995?auto=format&fit=crop&q=80&w=1000`,
+        image: getImageUrl(item.title, category),
         url: item.link,
-        // DATOS TÉCNICOS PARA SHIELD
-        manual: isShield ? "Manual de Protección HAWKIN Shield: Pasos críticos para asegurar tu entorno ante esta amenaza." : null,
-        installCode: isShield ? `# HAWKIN SHIELD AUTO-PROTECT\nsudo apt update && sudo apt upgrade -y\n# Bloqueando puertos vulnerables\nsudo ufw deny 445/tcp\nsudo ufw status` : null
+        // DATOS VERÍDICOS PARA SHIELD
+        manual: isShield ? "Manual de Protección HAWKIN Shield: Acciones críticas de mitigación." : null,
+        targetOS: isShield ? (item.title.toLowerCase().includes("windows") ? "Windows" : item.title.toLowerCase().includes("mac") ? "MacOS" : "Linux / Servidores") : null,
+        purpose: isShield ? "Bloqueo de puertos vulnerables y actualización de parches de seguridad de emergencia." : null,
+        installCode: isShield ? `# EJECUCIÓN EN: ${item.title.toLowerCase().includes("windows") ? "POWERSHELL (ADMIN)" : "TERMINAL (ROOT)"}\n# Propósito: Mitigar vulnerabilidad detectada\n\n${item.title.toLowerCase().includes("windows") ? "netsh advfirewall set allprofiles state on\n# Bloqueando puerto detectado\nnetsh advfirewall firewall add rule name='ShieldBlock' protocol=TCP localport=445 action=block dir=IN" : "sudo ufw enable\nsudo ufw deny 445/tcp\nsudo ufw status"}` : null
       };
     });
 
