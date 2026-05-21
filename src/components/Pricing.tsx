@@ -1,0 +1,83 @@
+'use client';
+
+import { motion } from 'framer-motion';
+
+export default function Pricing() {
+  const plans = [
+    {
+      name: 'Suscripción Mensual',
+      price: '$8',
+      period: '/mes',
+      description: 'Acceso total al radar global de IA y noticias Big Tech.',
+      features: [
+        'Noticias Big Tech en tiempo real',
+        'Resúmenes IA (Audio/Texto)',
+        'Efemérides Nacionales Animadas',
+        'Zona del Fundador Julhianno'
+      ],
+      popular: false
+    },
+    {
+      name: 'Suscripción Anual',
+      price: '$4',
+      period: '/mes promed.',
+      description: 'El mejor valor para los líderes del futuro digital.',
+      features: [
+        'Todo lo del Plan Mensual',
+        'Acceso a Todos los Cursos de IA',
+        'Certificaciones HAWKIN',
+        'Soporte Prioritario 24/7'
+      ],
+      info: 'Facturado como $48 al año',
+      popular: true
+    }
+  ];
+
+  return (
+    <section id="planes" className="max-w-6xl mx-auto px-4 py-32 w-full">
+      <div className="text-center mb-20 space-y-4">
+        <h2 className="text-4xl md:text-6xl font-black tracking-tighter">Únete a la Élite.</h2>
+        <p className="text-gray-500 uppercase tracking-[0.2em] text-xs font-black">Elige tu puerta de entrada al ecosistema HAWKIN</p>
+      </div>
+
+      <div className="grid grid-cols-1 md:grid-cols-2 gap-8 max-w-4xl mx-auto">
+        {plans.map((plan, index) => (
+          <motion.div
+            key={index}
+            whileHover={{ y: -10 }}
+            className={`glass-card flex flex-col justify-between relative overflow-hidden ${plan.popular ? 'border-cyan-500/40 shadow-[0_0_40px_rgba(0,242,255,0.1)]' : 'border-white/5'}`}
+          >
+            {plan.popular && (
+              <div className="absolute top-0 right-0 bg-cyan-500 text-black text-[10px] font-black px-4 py-1 uppercase tracking-widest rounded-bl-xl">
+                Ahorra 50%
+              </div>
+            )}
+
+            <div className="space-y-6">
+              <h3 className="text-xl font-black uppercase tracking-widest">{plan.name}</h3>
+              <div className="flex items-baseline gap-2">
+                <span className="text-5xl font-black text-white">{plan.price}</span>
+                <span className="text-gray-500 text-sm font-bold uppercase">{plan.period}</span>
+              </div>
+              {plan.info && <p className="text-cyan-400 text-[10px] font-black uppercase tracking-widest">{plan.info}</p>}
+              <p className="text-gray-400 text-sm leading-relaxed">{plan.description}</p>
+              
+              <ul className="space-y-4 pt-4">
+                {plan.features.map((feature, i) => (
+                  <li key={i} className="flex items-center gap-3 text-xs font-bold text-gray-300">
+                    <span className="text-cyan-400 text-lg">✦</span>
+                    {feature}
+                  </li>
+                ))}
+              </ul>
+            </div>
+
+            <button className={`mt-10 w-full py-4 rounded-2xl font-black uppercase tracking-widest text-xs transition-all ${plan.popular ? 'bg-cyan-500 text-black hover:bg-white' : 'bg-white/5 border border-white/10 hover:bg-white hover:text-black'}`}>
+              Elegir {plan.name.split(' ')[1]}
+            </button>
+          </motion.div>
+        ))}
+      </div>
+    </section>
+  );
+}
