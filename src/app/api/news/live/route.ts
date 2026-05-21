@@ -1,56 +1,41 @@
 import { NextResponse } from 'next/server';
+import Parser from 'rss-parser';
+
+const parser = new Parser();
 
 export async function GET() {
-  // MOTOR HAWKIN CRAWLER: Noticias reales extraídas de tu fuente de Google News
-  // Estas noticias se actualizan dinámicamente según lo que está pasando HOY.
-  
-  const liveNews = [
-    {
-      id: 'news-real-1',
-      title: "Sundar Pichai (Google) alerta sobre el 'cómputo al límite' y la competencia con modelos chinos",
-      category: "CEO RADAR",
-      excerpt: "En una entrevista histórica, el CEO de Google abordó los desafíos de seguridad y la carrera armamentista de IA con China...",
-      isLocked: true,
-      author: "Julhianno Garcia (Radar)",
-      date: "Recién publicado"
-    },
-    {
-      id: 'news-real-2',
-      title: "ALERTA SHIELD: La IA 'Claude Mythos' logra vulnerar el nuevo chip M5 de Apple",
-      category: "CIBERSEGURIDAD",
-      excerpt: "En menos de una semana, la IA demostró fallos críticos en el hardware más avanzado de Apple. Manual de protección incluido.",
-      isLocked: true,
-      author: "HAWKIN SHIELD",
-      date: "Hace 15 min"
-    },
-    {
-      id: 'news-real-3',
-      title: "NVIDIA IMPARABLE: Ingresos por IA suben un 85% y las acciones tocan máximos históricos",
-      category: "MERCADO",
-      excerpt: "Wall Street se rinde ante los resultados financieros de Jensen Huang. La demanda de chips Blackwell no tiene límites.",
-      isLocked: false,
-      author: "Investigación HAWKIN",
-      date: "Hace 40 min"
-    },
-    {
-      id: 'news-real-4',
-      title: "LA MINA DE ORO: Jensen Huang identifica un nuevo mercado de $200 mil millones para NVIDIA",
-      category: "RUMORES & NEGOCIOS",
-      excerpt: "Más allá de los centros de datos, HAWKIN analiza el nuevo nicho industrial que NVIDIA planea dominar este 2026.",
-      isLocked: true,
-      author: "Radar de Élite",
-      date: "Hace 1 hora"
-    },
-    {
-      id: 'news-real-5',
-      title: "SENTENCIA: Elon Musk pierde la demanda histórica contra Sam Altman y OpenAI",
-      category: "CHIMES & ESCÁNDALOS",
-      excerpt: "El tribunal falla a favor de la dirección actual de OpenAI. Altman se consolida como el líder absoluto tras la derrota de Musk.",
-      isLocked: true,
-      author: "Julhianno Garcia (Opiniuón)",
-      date: "Hace 2 horas"
-    }
-  ];
+  try {
+    // ESTE ES EL CANAL DE DATOS REAL DE GOOGLE NEWS PARA TU LINK
+    const FEED_URL = 'https://news.google.com/rss/topics/CAAqJQgKIh9DQkFTRVFvSEwyMHZNRzFyZWhJR1pYTXROREU1S0FBUAE?hl=es-419&gl=PE&ceid=PE:es-419';
+    
+    const feed = await parser.parseURL(FEED_URL);
+    
+    // Transformamos los datos de Google a nuestro formato HAWKIN
+    const liveNews = feed.items.slice(0, 12).map((item, index) => {
+      // Imagen por defecto futurista según la posición (ya que el RSS gratuito no trae la imagen)
+      const images = [
+        "https://images.unsplash.com/photo-1677442136019-21780ecad995?auto=format&fit=crop&q=80&w=1000",
+        "https://images.unsplash.com/photo-1620712943543-bcc4688e7485?auto=format&fit=crop&q=80&w=1000",
+        "https://images.unsplash.com/photo-1485827404703-89b55fcc595e?auto=format&fit=crop&q=80&w=1000",
+        "https://images.unsplash.com/photo-1550751827-4bd374c3f58b?auto=format&fit=crop&q=80&w=1000"
+      ];
 
-  return NextResponse.json(liveNews);
+      return {
+        id: `google-${index}-${Date.now()}`,
+        title: item.title || "Noticia en desarrollo",
+        category: "INTELIGENCIA GLOBAL",
+        excerpt: item.contentSnippet?.substring(0, 150) + "...",
+        isLocked: index > 2, // Las primeras 3 son libres, el resto bloqueadas
+        author: item.creator || item.source || "Radar HAWKIN",
+        date: item.pubDate ? new Date(item.pubDate).toLocaleTimeString() : "Recién publicado",
+        image: images[index % images.length],
+        url: item.link
+      };
+    });
+
+    return NextResponse.json(liveNews);
+  } catch (error) {
+    console.error("[CRAWLER_ERROR]", error);
+    return new NextResponse("Error al capturar noticias reales", { status: 500 });
+  }
 }
