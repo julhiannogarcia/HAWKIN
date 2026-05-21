@@ -1,37 +1,13 @@
 import Intro from '@/components/Intro';
 import Hero from '@/components/Hero';
 import Ticker from '@/components/Ticker';
-import NewsCard from '@/components/NewsCard';
 import FounderZone from '@/components/FounderZone';
 import Header from '@/components/Header';
 import Footer from '@/components/Footer';
 import Pricing from '@/components/Pricing';
+import LiveFeed from '@/components/LiveFeed';
 
 export default function Home() {
-  const sampleNews = [
-    {
-      id: "gpt-5-leak",
-      title: "OpenAI GPT-5: Filtraciones sobre la nueva arquitectura",
-      excerpt: "Fuentes cercanas a la compañía indican que el nuevo modelo superará la capacidad de razonamiento humano en pruebas estándar...",
-      category: "BIG TECH",
-      isLocked: true
-    },
-    {
-      id: "sam-altman-ubr",
-      title: "La visión de Sam Altman sobre la renta básica universal",
-      excerpt: "En una reciente entrevista, el CEO de OpenAI explicó cómo la IA financiará el futuro de la sociedad...",
-      category: "CEO RADAR",
-      isLocked: true
-    },
-    {
-      id: "nvidia-record",
-      title: "NVIDIA alcanza valoración récord gracias a nuevos chips",
-      excerpt: "La demanda de infraestructura para IA no tiene precedentes, posicionando a la empresa como el motor del mundo...",
-      category: "MERCADO",
-      isLocked: false
-    }
-  ];
-
   return (
     <main className="relative min-h-screen">
       <Intro />
@@ -52,21 +28,21 @@ export default function Home() {
 
         <Hero />
 
-        {/* Feed de Noticias */}
+        {/* Feed de Noticias / Live Engine */}
         <section id="news" className="max-w-6xl mx-auto px-4 py-32 w-full">
           <div className="flex flex-col md:flex-row justify-between items-end mb-16 gap-4">
             <div>
+              <div className="flex items-center gap-3 mb-2">
+                <div className="w-2 h-2 bg-red-500 rounded-full animate-pulse shadow-[0_0_10px_rgba(239,68,68,1)]" />
+                <span className="text-[10px] font-black text-red-500 uppercase tracking-widest">Live Intelligence</span>
+              </div>
               <h2 className="text-4xl md:text-6xl font-black tracking-tighter">Radar Global.</h2>
-              <p className="text-gray-500 mt-4 text-xs font-black uppercase tracking-[0.4em]">Análisis de élite curado por Julhianno</p>
+              <p className="text-gray-500 mt-4 text-xs font-black uppercase tracking-[0.4em]">Noticias de élite actualizándose cada minuto</p>
             </div>
-            <a href="#" className="text-[10px] font-black tracking-widest text-cyan-400 hover:text-white transition-colors uppercase">Ver Archivo Completo →</a>
+            <a href="#" className="text-[10px] font-black tracking-widest text-cyan-400 hover:text-white transition-colors uppercase border-b border-cyan-400/30 pb-1">Ver Archivo Histórico →</a>
           </div>
 
-          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
-            {sampleNews.map((news, index) => (
-              <NewsCard key={index} {...news} />
-            ))}
-          </div>
+          <LiveFeed />
         </section>
 
         <FounderZone />

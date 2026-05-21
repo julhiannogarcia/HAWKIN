@@ -1,46 +1,50 @@
 import { NextResponse } from 'next/server';
 
 export async function GET() {
-  // En un sistema real, aquí llamaríamos a NewsAPI o Bing News API
-  // Simulamos el motor inteligente con noticias frescas según tus criterios
-  const liveNews = [
+  // Simulador de Motor de Búsqueda Global (HAWKIN Crawler)
+  // En producción, aquí conectamos con NewsAPI, Bing o un Scraper avanzado
+  
+  const categories = ["CEO RADAR", "BIG TECH", "SHIELD", "HARDWARE", "CHIMES & RUMORES"];
+  
+  // Estas noticias se generan dinámicamente con datos de tendencia
+  const liveFeed = [
     {
-      id: 'news-1',
-      title: "RUMOR: Sam Altman planea alianza secreta con NVIDIA para chips de 2nm",
+      id: `live-${Date.now()}-1`,
+      title: "ULTIMO MINUTO: Sam Altman confirma que GPT-5 ha logrado razonamiento 'Nivel Humano'",
       category: "CEO RADAR",
-      excerpt: "Fuentes internas indican que OpenAI busca independencia total de la infraestructura actual...",
+      excerpt: "En una filtración de hace 10 minutos, el CEO de OpenAI asegura que la nueva arquitectura cambia las reglas...",
       isLocked: true,
-      author: "Radar HAWKIN",
-      date: "Recién publicado"
+      author: "HAWKIN LIVE",
+      date: "AHORA"
     },
     {
-      id: 'news-2',
-      title: "ESCÁNDALO: Filtración masiva en Meta expone planes de Zuckerberg para IA militar",
-      category: "CHIMES & RUMORES",
-      excerpt: "Documentos confidenciales sugieren una dirección agresiva en el desarrollo de agentes autónomos...",
-      isLocked: true,
-      author: "Investigación HAWKIN",
-      date: "Hace 5 minutos"
-    },
-    {
-      id: 'news-3',
-      title: "NUEVO HARDWARE: Razer lanza laptop con procesador de IA dedicado de 1000 TOPS",
-      category: "TENDENCIAS",
-      excerpt: "La nueva era de las computadoras personales ha llegado. Mira el manual de instalación abajo...",
-      isLocked: false,
-      author: "Hardware Desk",
-      date: "Hace 12 minutos"
-    },
-    {
-      id: 'news-4',
-      title: "CIBERSEGURIDAD: Detectado nuevo virus que roba llaves de criptomonedas usando IA",
+      id: `live-${Date.now()}-2`,
+      title: "ALERTA HACKER: Nueva vulnerabilidad en procesadores Intel afecta a laptops de gama alta",
       category: "SHIELD",
-      excerpt: "Los hackers están usando modelos de lenguaje para crear correos de phishing perfectos. Guía paso a paso incluida.",
+      excerpt: "El equipo de HAWKIN Shield ha verificado un exploit que permite el robo de datos por temperatura...",
       isLocked: true,
-      author: "HAWKIN SHIELD",
-      date: "Hace 1 hora"
+      author: "Shield Team",
+      date: "Hace 2 min"
+    },
+    {
+      id: `live-${Date.now()}-3`,
+      title: "RUMOR: Apple y Google preparan una alianza histórica para integrar Gemini en el iPhone 17",
+      category: "CHIMES & RUMORES",
+      excerpt: "Fuentes de Silicon Valley confirman reuniones secretas entre Tim Cook y Sundar Pichai...",
+      isLocked: false,
+      author: "Investigación HAWKIN",
+      date: "Hace 5 min"
+    },
+    {
+      id: `live-${Date.now()}-4`,
+      title: "TENDENCIA: La nueva laptop de NVIDIA con GPU 'Super-AI' agota preventa en 30 segundos",
+      category: "HARDWARE",
+      excerpt: "Es la computadora más potente jamás creada para correr modelos locales de IA. Mira el manual aquí.",
+      isLocked: true,
+      author: "Hardware Desk",
+      date: "Hace 15 min"
     }
   ];
 
-  return NextResponse.json(liveNews);
+  return NextResponse.json(liveFeed);
 }
