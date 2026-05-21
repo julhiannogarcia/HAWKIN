@@ -37,7 +37,23 @@ const ALL_NEWS: Record<string, any> = {
 export default function ArticlePage() {
   const params = useParams();
   const id = params.id as string;
-  const article = ALL_NEWS[id] || ALL_NEWS['gpt-5-leak']; // Default por si no encuentra
+  const article = ALL_NEWS[id] || ALL_NEWS['gpt-5-leak'];
+
+  const speakSummary = () => {
+    if ('speechSynthesis' in window) {
+      // Cancelamos cualquier voz anterior
+      window.speechSynthesis.cancel();
+      
+      const summary = `Análisis de HAWKIN. Este artículo analiza los movimientos más recientes de ${article.category === 'BIG TECH' ? 'OpenAI' : 'el mercado'} y su impacto en la soberanía tecnológica global.`;
+      const utterance = new SpeechSynthesisUtterance(summary);
+      utterance.lang = 'es-ES';
+      utterance.rate = 0.95;
+      utterance.pitch = 1;
+      window.speechSynthesis.speak(utterance);
+    } else {
+      alert("Tu navegador no soporta lectura de voz.");
+    }
+  };
 
   return (
     <main className="min-h-screen bg-[#010101] text-white">
@@ -59,16 +75,19 @@ export default function ArticlePage() {
         </header>
 
         {/* Sección de Resumen IA */}
-        <div className="p-8 rounded-3xl bg-gradient-to-br from-cyan-500/10 to-purple-600/10 border border-cyan-500/20 mb-12 relative overflow-hidden">
+        <div className="p-8 rounded-3xl bg-gradient-to-br from-cyan-500/10 to-purple-600/10 border border-cyan-500/20 mb-12 relative overflow-hidden group">
           <span className="absolute top-4 right-6 text-[8px] font-black text-cyan-400 uppercase tracking-widest">✨ Resumen IA</span>
           <p className="text-gray-300 italic text-lg leading-relaxed">
             "Este artículo analiza los movimientos más recientes de {article.category === 'BIG TECH' ? 'OpenAI' : 'el mercado'} y su impacto en la soberanía tecnológica global."
           </p>
           <div className="mt-6 flex items-center gap-4">
-            <button className="w-10 h-10 rounded-full border border-cyan-500/40 flex items-center justify-center text-cyan-400 hover:bg-cyan-400 hover:text-black transition-all">
+            <button 
+              onClick={speakSummary}
+              className="w-12 h-12 rounded-full border border-cyan-500/40 flex items-center justify-center text-cyan-400 hover:bg-cyan-400 hover:text-black transition-all active:scale-95 shadow-[0_0_15px_rgba(0,242,255,0.2)]"
+            >
               ▶
             </button>
-            <span className="text-[10px] font-black uppercase tracking-widest text-gray-400">Escuchar Análisis (3:20)</span>
+            <span className="text-[10px] font-black uppercase tracking-widest text-gray-400 group-hover:text-cyan-400 transition-colors">Activar Voz de IA</span>
           </div>
         </div>
 
