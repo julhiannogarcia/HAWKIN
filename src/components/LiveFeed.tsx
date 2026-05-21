@@ -4,14 +4,14 @@ import { useState, useEffect } from 'react';
 import NewsCard from '@/components/NewsCard';
 
 export default function LiveFeed() {
-  const [news, setNews] = useState<any[]>([]);
+  const [data, setData] = useState<{news: any[], shield: any[]}>({news: [], shield: []});
   const [loading, setLoading] = useState(true);
 
   const fetchLiveNews = async () => {
     try {
       const res = await fetch('/api/news/live');
-      const data = await res.json();
-      setNews(data);
+      const json = await res.json();
+      setData(json);
       setLoading(false);
     } catch (e) {
       console.error("Error fetching live news", e);
@@ -20,7 +20,6 @@ export default function LiveFeed() {
 
   useEffect(() => {
     fetchLiveNews();
-    // AUTO-ACTUALIZACIÓN CADA 60 SEGUNDOS
     const interval = setInterval(fetchLiveNews, 60000);
     return () => clearInterval(interval);
   }, []);
@@ -36,10 +35,26 @@ export default function LiveFeed() {
   }
 
   return (
-    <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
-      {news.map((item) => (
-        <NewsCard key={item.id} {...item} />
-      ))}
+    <div className="space-y-24">
+      {/* Sección IA */}
+      <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
+        {data.news.map((item) => (
+          <NewsCard key={item.id} {...item} />
+        ))}
+      </div>
+
+      {/* Sección SHIELD (Ciberseguridad en vivo) */}
+      <div>
+        <div className="flex items-center gap-3 mb-12">
+           <div className="w-3 h-3 bg-red-600 rounded-full animate-ping" />
+           <h2 className="text-3xl font-black tracking-tight text-white uppercase italic">Radar Shield: Ciberseguridad en vivo</h2>
+        </div>
+        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
+          {data.shield.map((item) => (
+            <NewsCard key={item.id} {...item} />
+          ))}
+        </div>
+      </div>
     </div>
   );
 }
