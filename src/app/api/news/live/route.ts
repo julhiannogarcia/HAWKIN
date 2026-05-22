@@ -15,12 +15,20 @@ function generateShortId(text: string) {
 
 export async function GET() {
   try {
-    const AI_FEED = 'https://news.google.com/rss/topics/CAAqJQgKIh9DQkFTRVFvSEwyMHZNRzFyZWhJR1pYTXROREU1S0FBUAE?hl=es-419&gl=PE&ceid=PE:es-419';
-    const SHIELD_FEED = 'https://news.google.com/rss/search?q=cybersecurity+hacking+vulnerability+exploit&hl=es-419&gl=PE&ceid=PE:es-419';
+    // FILTROS DE ÉLITE HAWKIN - RASTREO MULTIDIMENSIONAL
+    const FEEDS = {
+      ELITE: 'https://news.google.com/rss/search?q=CEO+founder+millionaire+billionaire+artificial+intelligence+IA&hl=es-419&gl=PE&ceid=PE:es-419',
+      BUSINESS: 'https://news.google.com/rss/search?q=tech+acquisition+bankruptcy+scandal+layoffs+fusión+IA&hl=es-419&gl=PE&ceid=PE:es-419',
+      SHIELD: 'https://news.google.com/rss/search?q=cybersecurity+hacking+vulnerability+exploit+ransomware&hl=es-419&gl=PE&ceid=PE:es-419',
+      HARDWARE: 'https://news.google.com/rss/search?q=laptop+gaming+IA+processor+chip+nvidia+amd&hl=es-419&gl=PE&ceid=PE:es-419'
+    };
 
-    const [aiFeed, shieldFeed] = await Promise.all([
-      parser.parseURL(AI_FEED),
-      parser.parseURL(SHIELD_FEED)
+    // Lanzamos los 4 cazadores simultáneamente
+    const [eliteRes, businessRes, shieldRes, hardwareRes] = await Promise.all([
+      parser.parseURL(FEEDS.ELITE),
+      parser.parseURL(FEEDS.BUSINESS),
+      parser.parseURL(FEEDS.SHIELD),
+      parser.parseURL(FEEDS.HARDWARE)
     ]);
 
     const getTimeAgo = (dateStr: string) => {
@@ -28,47 +36,48 @@ export async function GET() {
       if (seconds < 60) return "Ahora";
       const minutes = Math.floor(seconds / 60);
       if (minutes < 60) return `Hace ${minutes} min`;
-      return `Hace ${Math.floor(minutes / 60)} h`;
+      if (minutes < 1440) return `Hace ${Math.floor(minutes / 60)} h`;
+      return "Hace 1 día";
     };
 
-    const formatItems = (items: any[], category: string) => items.slice(0, 9).map((item, index) => {
-      const isShield = category === "SHIELD";
+    const formatItems = (items: any[], category: string) => items.slice(0, 10).map((item, index) => {
       const uniqueId = generateShortId(item.link);
-
-      // Mapeo de imágenes por palabras clave para mayor realismo
-      const getImageUrl = (title: string, cat: string) => {
-        if (cat === "SHIELD") {
-          if (title.toLowerCase().includes("windows")) return "https://images.unsplash.com/photo-1624561172888-ac93c696e10c?auto=format&fit=crop&q=80&w=1000";
-          if (title.toLowerCase().includes("mac") || title.toLowerCase().includes("apple")) return "https://images.unsplash.com/photo-1611186871348-b1ce696e543b?auto=format&fit=crop&q=80&w=1000";
-          if (title.toLowerCase().includes("linux")) return "https://images.unsplash.com/photo-1629654297299-c8506221ca97?auto=format&fit=crop&q=80&w=1000";
-          return "https://images.unsplash.com/photo-1550751827-4bd374c3f58b?auto=format&fit=crop&q=80&w=1000";
-        }
-        return `https://images.unsplash.com/photo-1677442136019-21780ecad995?auto=format&fit=crop&q=80&w=1000&seed=${index}`;
+      
+      // Inteligencia de Imágenes: Mapeamos fotos de alta fidelidad según palabras clave
+      const getProfessionalImage = (title: string, cat: string) => {
+        const t = title.toLowerCase();
+        if (cat === "SHIELD") return "https://images.unsplash.com/photo-1550751827-4bd374c3f58b";
+        if (cat === "HARDWARE") return "https://images.unsplash.com/photo-1518770660439-4636190af475";
+        if (t.includes("musk")) return "https://images.unsplash.com/photo-1570126618983-224422391cf1"; // Inversor/CEO
+        if (t.includes("altman") || t.includes("openai")) return "https://images.unsplash.com/photo-1677442136019-21780ecad995";
+        if (t.includes("nvidia") || t.includes("huang")) return "https://images.unsplash.com/photo-1620712943543-bcc4688e7485";
+        return `https://images.unsplash.com/photo-1485827404703-89b55fcc595e?auto=format&fit=crop&q=80&w=1000&id=${index}`;
       };
 
       return {
         id: uniqueId,
         title: item.title.split(' - ')[0],
         category: category,
-        excerpt: item.contentSnippet?.substring(0, 160) + "...",
+        excerpt: item.contentSnippet?.substring(0, 180) + "...",
+        content: item.contentSnippet || "Contenido bajo análisis de la red HAWKIN.",
         isLocked: index > 2,
-        author: item.source?.name || item.source || "HAWKIN Intelligence",
+        author: item.source?.name || "HAWKIN Global Intelligence",
         date: item.pubDate ? getTimeAgo(item.pubDate) : "Ahora",
-        image: getImageUrl(item.title, category),
+        image: getProfessionalImage(item.title, category),
         url: item.link,
-        // DATOS VERÍDICOS PARA SHIELD
-        manual: isShield ? "Manual de Protección HAWKIN Shield: Acciones críticas de mitigación." : null,
-        targetOS: isShield ? (item.title.toLowerCase().includes("windows") ? "Windows" : item.title.toLowerCase().includes("mac") ? "MacOS" : "Linux / Servidores") : null,
-        purpose: isShield ? "Bloqueo de puertos vulnerables y actualización de parches de seguridad de emergencia." : null,
-        installCode: isShield ? `# EJECUCIÓN EN: ${item.title.toLowerCase().includes("windows") ? "POWERSHELL (ADMIN)" : "TERMINAL (ROOT)"}\n# Propósito: Mitigar vulnerabilidad detectada\n\n${item.title.toLowerCase().includes("windows") ? "netsh advfirewall set allprofiles state on\n# Bloqueando puerto detectado\nnetsh advfirewall firewall add rule name='ShieldBlock' protocol=TCP localport=445 action=block dir=IN" : "sudo ufw enable\nsudo ufw deny 445/tcp\nsudo ufw status"}` : null
+        manual: category === "SHIELD" ? "Guía de protección HAWKIN Shield activa para esta vulnerabilidad." : null,
+        targetOS: category === "SHIELD" ? "Universal (Windows/Mac/Linux)" : null,
+        installCode: category === "SHIELD" ? "# HAWKIN SHIELD AUTO-PROTECT\nsudo apt update && sudo apt upgrade -y\n# Bloqueando puertos de riesgo\nsudo ufw deny 445/tcp" : null
       };
     });
 
     return NextResponse.json({
-      news: formatItems(aiFeed.items, "INTELIGENCIA"),
-      shield: formatItems(shieldFeed.items, "SHIELD")
+      news: [...formatItems(eliteRes.items, "ÉLITE CEO"), ...formatItems(businessRes.items, "NEGOCIOS & IA")],
+      shield: formatItems(shieldRes.items, "SHIELD"),
+      hardware: formatItems(hardwareRes.items, "TENDENCIAS")
     });
   } catch (error) {
-    return new NextResponse("Error al sincronizar", { status: 500 });
+    console.error("[SUPREME_ENGINE_ERROR]", error);
+    return new NextResponse("Error en el Motor Supremo", { status: 500 });
   }
 }
