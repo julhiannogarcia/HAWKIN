@@ -1,6 +1,7 @@
 'use client';
 
 import { motion } from 'framer-motion';
+import Link from 'next/link';
 import Header from '@/components/Header';
 import Footer from '@/components/Footer';
 import Ticker from '@/components/Ticker';
@@ -92,9 +93,11 @@ export default function AcademyPage() {
               </div>
 
               <div className="mt-12 flex gap-4">
-                <button className="flex-1 py-4 rounded-2xl bg-white text-black font-black uppercase tracking-widest text-[10px] hover:bg-cyan-400 transition-colors">
-                  Inscribirme Ahora
-                </button>
+                <Link href={`/academy/${course.id}`} className="flex-1">
+                  <button className="w-full py-4 rounded-2xl bg-white text-black font-black uppercase tracking-widest text-[10px] hover:bg-cyan-400 transition-colors">
+                    Inscribirme Ahora
+                  </button>
+                </Link>
                 <button className="px-6 py-4 rounded-2xl bg-white/5 border border-white/10 text-white font-black uppercase tracking-widest text-[10px] hover:bg-white/10 transition-colors">
                   Saber Más
                 </button>
@@ -108,7 +111,7 @@ export default function AcademyPage() {
           <p className="text-xs font-black uppercase tracking-[0.3em] text-gray-500 mb-4">Reconocimiento Global</p>
           <h2 className="text-2xl font-bold text-white mb-4">Certificación HAWKIN</h2>
           <p className="text-gray-600 text-sm max-w-xl mx-auto leading-relaxed">
-            Al completar con éxito cualquier programa, recibirás un certificado digital verificado por la blockchain de HAWKIN y firmado por Julhianno Garcia.
+            Al completar con éxito cualquier programa, recibirás un certificado digital verificado por el ecosistema HAWKIN y firmado por Julhianno Garcia.
           </p>
         </div>
       </div>
