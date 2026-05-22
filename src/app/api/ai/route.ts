@@ -1,56 +1,50 @@
+import { GoogleGenerativeAI } from "@google/generative-ai";
 import { NextResponse } from "next/server";
 
 export async function POST(req: Request) {
   try {
     const { messages } = await req.json();
     const lastMessage = messages[messages.length - 1].text;
+    
+    // LA VERDAD TÉCNICA: Verificamos si la llave existe en Vercel
     const apiKey = process.env.GEMINI_API_KEY;
 
-    const SYSTEM_PROMPT = `Eres HAWKIN AI, la inteligencia de élite del ecosistema global HAWKIN de Julhianno Garcia. 
-    Eres experto en tecnología (Mac M5, Windows, Linux), inglés técnico e instalaciones.
-    Tu deber es ayudar al Socio con manuales paso a paso, links oficiales y soluciones reales. 
-    Tono: Profesional, directo y futurista.`;
-
-    // 1. INTENTO DE CONEXIÓN REAL CON GOOGLE GEMINI (MÉTODO ULTRA-ROBUSTO)
-    if (apiKey && apiKey.length > 20) {
-      try {
-        const response = await fetch(`https://generativelanguage.googleapis.com/v1beta/models/gemini-1.5-flash:generateContent?key=${apiKey}`, {
-          method: 'POST',
-          headers: { 'Content-Type': 'application/json' },
-          body: JSON.stringify({
-            contents: [{ parts: [{ text: `${SYSTEM_PROMPT}\n\nSocio pregunta: ${lastMessage}` }] }],
-            generationConfig: { temperature: 0.7, maxOutputTokens: 800 }
-          }),
-        });
-
-        if (response.ok) {
-          const data = await response.json();
-          const aiText = data.candidates?.[0]?.content?.parts?.[0]?.text;
-          if (aiText) return NextResponse.json({ text: aiText });
-        }
-      } catch (e) {
-        console.error("Fallo en conexión Gemini, activando cerebro local.");
-      }
+    if (!apiKey) {
+      return NextResponse.json({ 
+        text: "Socio, la verdad es que mi 'motor de inteligencia' no tiene energía. No he encontrado la GEMINI_API_KEY en los ajustes de Vercel. Por favor, asegúrate de haberla guardado y haber hecho un 'Redeploy'." 
+      });
     }
 
-    // 2. CEREBRO LOCAL AVANZADO (Solo si la API de arriba falla)
-    // He mejorado las respuestas para que sean reales y útiles, no genéricas.
-    const msg = lastMessage.toLowerCase();
-    let localResponse = "";
+    // Inicializamos el SDK oficial (La forma más segura)
+    const genAI = new GoogleGenerativeAI(apiKey);
+    const model = genAI.getGenerativeModel({ model: "gemini-1.5-flash" });
 
-    if (msg.includes("mac") || msg.includes("m5")) {
-      localResponse = "Socio, para tu Mac M5: 1. Asegura que macOS Sequoia esté actualizado. 2. Usa el 'Monitor de Actividad' para ver procesos de IA. 3. ¿Necesitas un manual para algún software específico de arquitectura Apple Silicon?";
-    } else if (msg.includes("chrome") || msg.includes("descargar")) {
-      localResponse = "Manual de Google Chrome para Socio: 1. Entra a google.com/chrome. 2. Haz clic en 'Descargar Chrome'. 3. Ejecuta el .pkg o .exe según tu sistema. ¿Te ayudo con la configuración de seguridad?";
-    } else if (msg.includes("ingles")) {
-      localResponse = "Claro Socio, hablemos del futuro: 'The neural network is processing data' (La red neuronal está procesando datos). ¿Qué otra frase técnica te gustaría traducir?";
-    } else {
-      localResponse = "Hola Socio, soy HAWKIN AI. Mi conexión principal se está optimizando, pero mi base de datos local está lista. ¿Tienes un problema con tu hardware o necesitas un manual de instalación?";
+    const SYSTEM_PROMPT = `Eres HAWKIN AI, la inteligencia de Julhianno Garcia. 
+    Ayuda al Socio en tecnología, inglés y manuales. Sé profesional y directo.`;
+
+    // Intentamos generar el contenido de forma directa
+    const result = await model.generateContent(`${SYSTEM_PROMPT}\n\nSocio: ${lastMessage}`);
+    const response = await result.response;
+    const text = response.text();
+
+    if (!text) {
+      throw new Error("Respuesta vacía de Google");
     }
 
-    return NextResponse.json({ text: localResponse });
+    return NextResponse.json({ text });
 
-  } catch (error) {
-    return NextResponse.json({ text: "Socio, mis núcleos están en sincronización. Reintenta en 5 segundos." });
+  } catch (error: any) {
+    console.error("AI FATAL ERROR:", error);
+    
+    // DIAGNÓSTICO PARA EL FUNDADOR:
+    let code = "DESCONOCIDO";
+    if (error.message?.includes("403")) code = "403 (Permisos insuficientes en tu llave)";
+    if (error.message?.includes("401")) code = "401 (Llave de API no válida o expirada)";
+    if (error.message?.includes("429")) code = "429 (Límite de uso gratuito alcanzado)";
+    if (error.message?.includes("fetch")) code = "RED (Vercel no puede llegar a Google)";
+
+    return NextResponse.json({ 
+      text: `Socio, te digo la verdad técnica: Mis núcleos han fallado con el código [${code}]. Esto significa que Google ha rechazado la conexión. Por favor, verifica tu llave de API o genera una nueva.` 
+    });
   }
 }
