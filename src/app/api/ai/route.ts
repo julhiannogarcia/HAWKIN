@@ -8,20 +8,32 @@ export async function POST(req: Request) {
     const apiKey = (process.env.GEMINI_API_KEY || "").trim();
 
     if (!apiKey) {
-      return NextResponse.json({ text: "Socio, no detecto mi llave de inteligencia. Verifica Vercel Settings." });
+      return NextResponse.json({ text: "Socio, activa mi inteligencia configurando la llave en Vercel." });
     }
 
     const genAI = new GoogleGenerativeAI(apiKey);
     
-    // Cambiamos a un método más directo y robusto (generateContent)
-    const model = genAI.getGenerativeModel({ model: "gemini-1.5-flash" });
+    // MODELO GEMINI 1.5 FLASH: El más rápido y con el mejor nivel GRATUITO del mundo.
+    // Proporciona inteligencia similar a ChatGPT de forma gratuita hasta 1,500 veces al día.
+    const model = genAI.getGenerativeModel({ 
+      model: "gemini-1.5-flash",
+      generationConfig: {
+        maxOutputTokens: 800, // Limitamos para no consumir recursos innecesarios
+        temperature: 0.7,
+      }
+    });
 
-    const SYSTEM_PROMPT = `Eres HAWKIN AI, el cerebro nativo de Julhianno Garcia. 
-    Ayuda al Socio en tecnología, inglés e instalaciones con profesionalismo.`;
+    const SYSTEM_PROMPT = `Eres HAWKIN AI, la inteligencia oficial de Julhianno Garcia.
+    Tu modo de operación es GRATUITO y EFICIENTE. 
+    Ayuda al Socio con:
+    1. Tecnología y reparaciones (Windows/Mac/Linux).
+    2. Clases de inglés rápidas.
+    3. Guías de instalación de programas con links oficiales.
+    4. Resúmenes del Radar de Millonarios.
+    Responde de forma clara, técnica y profesional. No menciones que eres gratuito a menos que te pregunten.`;
 
-    const fullPrompt = `${SYSTEM_PROMPT}\n\nPregunta del Socio: ${lastMessage}`;
+    const fullPrompt = `${SYSTEM_PROMPT}\n\nSocio pregunta: ${lastMessage}`;
 
-    // Llamada directa sin historial para evitar errores de transporte
     const result = await model.generateContent(fullPrompt);
     const response = await result.response;
     const text = response.text();
@@ -29,19 +41,7 @@ export async function POST(req: Request) {
     return NextResponse.json({ text });
 
   } catch (error: any) {
-    console.error("Master AI Error:", error);
-    
-    // DIAGNÓSTICO PROFUNDO: Si falla, le pedimos a la IA que nos diga el código de error real
-    const rawError = error.toString();
-    let diagnostic = "Error de conexión con Google.";
-
-    if (rawError.includes("403")) diagnostic = "ERROR 403: La llave de API no tiene permisos o Google ha bloqueado la petición.";
-    if (rawError.includes("400")) diagnostic = "ERROR 400: La petición es inválida o la llave está mal formateada.";
-    if (rawError.includes("429")) diagnostic = "ERROR 429: Se ha agotado el límite gratuito de la llave por hoy.";
-    if (rawError.includes("API_KEY_INVALID")) diagnostic = "ERROR: La llave de API es inválida. Socio, por favor genera una nueva.";
-
-    return NextResponse.json({ 
-      text: `Socio, mis circuitos detectan un inconveniente técnico: ${diagnostic} (Detalle: ${rawError.substring(0, 50)}...)` 
-    });
+    console.error("AI Error:", error);
+    return NextResponse.json({ text: "Socio, mis núcleos gratuitos están en mantenimiento. Reintenta en un momento." });
   }
 }
