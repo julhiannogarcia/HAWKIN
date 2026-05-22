@@ -1,6 +1,7 @@
 import type { Metadata } from "next";
 import "./globals.css";
 import { SpeedInsights } from "@vercel/speed-insights/next"
+import HawkinAI from "@/components/HawkinAI";
 
 export const metadata: Metadata = {
   title: "HAWKIN | El Futuro de la IA",
@@ -12,6 +13,7 @@ export default function RootLayout({ children }: { children: React.ReactNode }) 
     <html lang="es">
       <body className="antialiased bg-black text-white">
         {children}
+        <HawkinAI />
         <SpeedInsights />
       </body>
     </html>
