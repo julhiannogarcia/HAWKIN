@@ -4,7 +4,7 @@ import { useState, useEffect } from 'react';
 import NewsCard from '@/components/NewsCard';
 
 export default function LiveFeed() {
-  const [data, setData] = useState<{news: any[], shield: any[]}>({news: [], shield: []});
+  const [data, setData] = useState<{news: any[], shield: any[], hardware: any[]}>({news: [], shield: [], hardware: []});
   const [loading, setLoading] = useState(true);
 
   const fetchLiveNews = async () => {
@@ -35,19 +35,38 @@ export default function LiveFeed() {
   }
 
   return (
-    <div className="space-y-24">
-      {/* Sección IA */}
-      <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
-        {data.news.map((item) => (
-          <NewsCard key={item.id} {...item} />
-        ))}
-      </div>
-
-      {/* Sección SHIELD (Ciberseguridad en vivo) */}
+    <div className="space-y-32">
+      {/* SECCIÓN 1: ÉLITE CORPORATIVA & IA */}
       <div>
         <div className="flex items-center gap-3 mb-12">
-           <div className="w-3 h-3 bg-red-600 rounded-full animate-ping" />
-           <h2 className="text-3xl font-black tracking-tight text-white uppercase italic">Radar Shield: Ciberseguridad en vivo</h2>
+           <div className="w-2 h-2 bg-cyan-400 rounded-full animate-pulse shadow-[0_0_10px_cyan]" />
+           <h2 className="text-2xl font-black uppercase tracking-[0.3em] text-white italic">Radar de la Élite: CEOs & Millonarios</h2>
+        </div>
+        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
+          {data.news.map((item) => (
+            <NewsCard key={item.id} {...item} />
+          ))}
+        </div>
+      </div>
+
+      {/* SECCIÓN 2: TENDENCIAS HARDWARE */}
+      <div>
+        <div className="flex items-center gap-3 mb-12">
+           <div className="w-2 h-2 bg-purple-500 rounded-full animate-pulse shadow-[0_0_10px_purple]" />
+           <h2 className="text-2xl font-black uppercase tracking-[0.3em] text-white italic">Hardware del Futuro: Laptops & Chips</h2>
+        </div>
+        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
+          {data.hardware.map((item) => (
+            <NewsCard key={item.id} {...item} />
+          ))}
+        </div>
+      </div>
+
+      {/* SECCIÓN 3: SHIELD (Ciberseguridad) */}
+      <div>
+        <div className="flex items-center gap-3 mb-12">
+           <div className="w-2 h-2 bg-red-600 rounded-full animate-pulse shadow-[0_0_10px_red]" />
+           <h2 className="text-2xl font-black uppercase tracking-[0.3em] text-white italic">HAWKIN Shield: Alertas Hacker Globales</h2>
         </div>
         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
           {data.shield.map((item) => (
