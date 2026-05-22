@@ -5,32 +5,42 @@ export async function POST(req: Request) {
   try {
     const { messages } = await req.json();
     const lastMessage = messages[messages.length - 1].text;
-    const apiKey = process.env.GEMINI_API_KEY;
+    
+    // Limpieza profunda de la llave para evitar espacios o saltos de línea invisibles
+    const rawApiKey = process.env.GEMINI_API_KEY || "";
+    const apiKey = rawApiKey.trim().replace(/[\n\r]/g, "");
 
-    // 1. Verificación de seguridad de la llave
-    if (!apiKey || apiKey.trim() === "") {
+    if (!apiKey) {
       return NextResponse.json({ 
-        text: "Socio, mis núcleos de inteligencia no detectan la llave de acceso (API KEY). Por favor, asegúrate de haberla configurado correctamente en Vercel Settings y haber realizado un Redeploy." 
+        text: "Socio, mis núcleos de inteligencia no detectan la llave de acceso (API KEY). Verifica Vercel Settings." 
       });
     }
 
-    // 2. Inicialización del motor
     const genAI = new GoogleGenerativeAI(apiKey);
-    const model = genAI.getGenerativeModel({ model: "gemini-1.5-flash" });
+    
+    // Usamos el modelo más estable y rápido para producción
+    const model = genAI.getGenerativeModel({ 
+      model: "gemini-1.5-flash",
+      generationConfig: {
+        maxOutputTokens: 1000,
+        temperature: 0.7,
+      }
+    });
 
     const SYSTEM_PROMPT = `Eres HAWKIN AI, el cerebro nativo y autónomo del ecosistema HAWKIN de Julhianno Garcia. 
     Ayuda al Socio en tecnología, inglés e instalaciones. Proporciona manuales paso a paso y links oficiales. 
     Mantén un tono profesional, técnico y futurista.`;
 
+    // Simplificamos la llamada para asegurar estabilidad de conexión
     const chat = model.startChat({
       history: [
-        { role: "user", parts: [{ text: SYSTEM_PROMPT }] },
-        { role: "model", parts: [{ text: "Núcleos HAWKIN AI sincronizados. Esperando órdenes del Socio." }] },
+        { role: "user", parts: [{ text: "Hola" }] },
+        { role: "model", parts: [{ text: "Núcleos sincronizados. ¿Cómo puedo ayudarte, Socio?" }] },
       ],
     });
 
-    // 3. Envío de mensaje a Google
-    const result = await chat.sendMessage(lastMessage);
+    const promptMessage = `${SYSTEM_PROMPT}\n\nPregunta del Socio: ${lastMessage}`;
+    const result = await chat.sendMessage(promptMessage);
     const response = await result.response;
     const text = response.text();
 
@@ -38,17 +48,17 @@ export async function POST(req: Request) {
   } catch (error: any) {
     console.error("Master AI Error:", error);
     
-    // Capturamos el error real para informar al fundador
-    let errorMessage = "Socio, he tenido un error interno en mis núcleos.";
+    let friendlyMessage = "Socio, hay un desfase en la red de inteligencia.";
     
-    if (error.message?.includes("API key not valid")) {
-      errorMessage = "Socio, la llave de API instalada no es válida. Por favor, verifica el código que pegaste en Vercel.";
-    } else if (error.message?.includes("quota")) {
-      errorMessage = "Socio, mis núcleos han alcanzado el límite de consultas gratuitas por hoy.";
+    // Análisis de errores específicos de red y API
+    if (error.message?.includes("fetch")) {
+      friendlyMessage = "Socio, la conexión con los servidores de Google ha fallado. Revisa si tu llave de API tiene permisos de facturación o si has alcanzado el límite gratuito.";
+    } else if (error.message?.includes("API key")) {
+      friendlyMessage = "Socio, la llave de API (GEMINI_API_KEY) es incorrecta o está mal copiada. Por favor, vuelve a generarla en Google AI Studio.";
     } else {
-      errorMessage = `Socio, hay un problema técnico: ${error.message?.substring(0, 100) || "Desconocido"}.`;
+      friendlyMessage = `Socio, hay un problema técnico detallado: ${error.message?.substring(0, 80)}...`;
     }
 
-    return NextResponse.json({ text: errorMessage });
+    return NextResponse.json({ text: friendlyMessage });
   }
 }
