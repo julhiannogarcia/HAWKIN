@@ -5,60 +5,43 @@ export async function POST(req: Request) {
   try {
     const { messages } = await req.json();
     const lastMessage = messages[messages.length - 1].text;
-    
-    // Limpieza profunda de la llave para evitar espacios o saltos de línea invisibles
-    const rawApiKey = process.env.GEMINI_API_KEY || "";
-    const apiKey = rawApiKey.trim().replace(/[\n\r]/g, "");
+    const apiKey = (process.env.GEMINI_API_KEY || "").trim();
 
     if (!apiKey) {
-      return NextResponse.json({ 
-        text: "Socio, mis núcleos de inteligencia no detectan la llave de acceso (API KEY). Verifica Vercel Settings." 
-      });
+      return NextResponse.json({ text: "Socio, no detecto mi llave de inteligencia. Verifica Vercel Settings." });
     }
 
     const genAI = new GoogleGenerativeAI(apiKey);
     
-    // Usamos el modelo más estable y rápido para producción
-    const model = genAI.getGenerativeModel({ 
-      model: "gemini-1.5-flash",
-      generationConfig: {
-        maxOutputTokens: 1000,
-        temperature: 0.7,
-      }
-    });
+    // Cambiamos a un método más directo y robusto (generateContent)
+    const model = genAI.getGenerativeModel({ model: "gemini-1.5-flash" });
 
-    const SYSTEM_PROMPT = `Eres HAWKIN AI, el cerebro nativo y autónomo del ecosistema HAWKIN de Julhianno Garcia. 
-    Ayuda al Socio en tecnología, inglés e instalaciones. Proporciona manuales paso a paso y links oficiales. 
-    Mantén un tono profesional, técnico y futurista.`;
+    const SYSTEM_PROMPT = `Eres HAWKIN AI, el cerebro nativo de Julhianno Garcia. 
+    Ayuda al Socio en tecnología, inglés e instalaciones con profesionalismo.`;
 
-    // Simplificamos la llamada para asegurar estabilidad de conexión
-    const chat = model.startChat({
-      history: [
-        { role: "user", parts: [{ text: "Hola" }] },
-        { role: "model", parts: [{ text: "Núcleos sincronizados. ¿Cómo puedo ayudarte, Socio?" }] },
-      ],
-    });
+    const fullPrompt = `${SYSTEM_PROMPT}\n\nPregunta del Socio: ${lastMessage}`;
 
-    const promptMessage = `${SYSTEM_PROMPT}\n\nPregunta del Socio: ${lastMessage}`;
-    const result = await chat.sendMessage(promptMessage);
+    // Llamada directa sin historial para evitar errores de transporte
+    const result = await model.generateContent(fullPrompt);
     const response = await result.response;
     const text = response.text();
 
     return NextResponse.json({ text });
+
   } catch (error: any) {
     console.error("Master AI Error:", error);
     
-    let friendlyMessage = "Socio, hay un desfase en la red de inteligencia.";
-    
-    // Análisis de errores específicos de red y API
-    if (error.message?.includes("fetch")) {
-      friendlyMessage = "Socio, la conexión con los servidores de Google ha fallado. Revisa si tu llave de API tiene permisos de facturación o si has alcanzado el límite gratuito.";
-    } else if (error.message?.includes("API key")) {
-      friendlyMessage = "Socio, la llave de API (GEMINI_API_KEY) es incorrecta o está mal copiada. Por favor, vuelve a generarla en Google AI Studio.";
-    } else {
-      friendlyMessage = `Socio, hay un problema técnico detallado: ${error.message?.substring(0, 80)}...`;
-    }
+    // DIAGNÓSTICO PROFUNDO: Si falla, le pedimos a la IA que nos diga el código de error real
+    const rawError = error.toString();
+    let diagnostic = "Error de conexión con Google.";
 
-    return NextResponse.json({ text: friendlyMessage });
+    if (rawError.includes("403")) diagnostic = "ERROR 403: La llave de API no tiene permisos o Google ha bloqueado la petición.";
+    if (rawError.includes("400")) diagnostic = "ERROR 400: La petición es inválida o la llave está mal formateada.";
+    if (rawError.includes("429")) diagnostic = "ERROR 429: Se ha agotado el límite gratuito de la llave por hoy.";
+    if (rawError.includes("API_KEY_INVALID")) diagnostic = "ERROR: La llave de API es inválida. Socio, por favor genera una nueva.";
+
+    return NextResponse.json({ 
+      text: `Socio, mis circuitos detectan un inconveniente técnico: ${diagnostic} (Detalle: ${rawError.substring(0, 50)}...)` 
+    });
   }
 }
