@@ -1,3 +1,4 @@
+// --- ACTIVACIÓN DE EMERGENCIA HAWKIN AI v5.1 ---
 import { NextResponse } from "next/server";
 
 export async function POST(req: Request) {
