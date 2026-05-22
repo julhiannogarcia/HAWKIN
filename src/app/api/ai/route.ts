@@ -1,50 +1,36 @@
-import { GoogleGenerativeAI } from "@google/generative-ai";
 import { NextResponse } from "next/server";
 
 export async function POST(req: Request) {
   try {
     const { messages } = await req.json();
-    const lastMessage = messages[messages.length - 1].text;
-    
-    // LA VERDAD TÉCNICA: Verificamos si la llave existe en Vercel
+    const userMessage = messages[messages.length - 1].text;
     const apiKey = process.env.GEMINI_API_KEY;
 
     if (!apiKey) {
-      return NextResponse.json({ 
-        text: "Socio, la verdad es que mi 'motor de inteligencia' no tiene energía. No he encontrado la GEMINI_API_KEY en los ajustes de Vercel. Por favor, asegúrate de haberla guardado y haber hecho un 'Redeploy'." 
-      });
+      return NextResponse.json({ text: "Socio, falta mi núcleo de energía (API KEY). Configúralo en Vercel." });
     }
 
-    // Inicializamos el SDK oficial (La forma más segura)
-    const genAI = new GoogleGenerativeAI(apiKey);
-    const model = genAI.getGenerativeModel({ model: "gemini-1.5-flash" });
+    // CONEXIÓN DIRECTA Y PURA CON GOOGLE (MÉTODO SIN FALLOS)
+    const response = await fetch(`https://generativelanguage.googleapis.com/v1beta/models/gemini-1.5-flash:generateContent?key=${apiKey}`, {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({
+        contents: [{ parts: [{ text: `Eres HAWKIN AI, la inteligencia de Julhianno Garcia. Ayuda al Socio en tecnología, inglés e instalaciones con profesionalismo técnico. Pregunta del Socio: ${userMessage}` }] }]
+      }),
+    });
 
-    const SYSTEM_PROMPT = `Eres HAWKIN AI, la inteligencia de Julhianno Garcia. 
-    Ayuda al Socio en tecnología, inglés y manuales. Sé profesional y directo.`;
+    const data = await response.json();
+    const aiText = data.candidates?.[0]?.content?.parts?.[0]?.text;
 
-    // Intentamos generar el contenido de forma directa
-    const result = await model.generateContent(`${SYSTEM_PROMPT}\n\nSocio: ${lastMessage}`);
-    const response = await result.response;
-    const text = response.text();
-
-    if (!text) {
-      throw new Error("Respuesta vacía de Google");
+    if (!aiText) {
+       console.error("Respuesta vacía de Google", data);
+       return NextResponse.json({ text: "Socio, mis núcleos han dado una respuesta vacía. Reintenta ahora." });
     }
 
-    return NextResponse.json({ text });
+    return NextResponse.json({ text: aiText });
 
   } catch (error: any) {
-    console.error("AI FATAL ERROR:", error);
-    
-    // DIAGNÓSTICO PARA EL FUNDADOR:
-    let code = "DESCONOCIDO";
-    if (error.message?.includes("403")) code = "403 (Permisos insuficientes en tu llave)";
-    if (error.message?.includes("401")) code = "401 (Llave de API no válida o expirada)";
-    if (error.message?.includes("429")) code = "429 (Límite de uso gratuito alcanzado)";
-    if (error.message?.includes("fetch")) code = "RED (Vercel no puede llegar a Google)";
-
-    return NextResponse.json({ 
-      text: `Socio, te digo la verdad técnica: Mis núcleos han fallado con el código [${code}]. Esto significa que Google ha rechazado la conexión. Por favor, verifica tu llave de API o genera una nueva.` 
-    });
+    console.error("AI Error:", error);
+    return NextResponse.json({ text: `Socio, hay un desfase técnico en mi red de procesamiento. [Detalle: ${error.message?.substring(0, 30)}]` });
   }
 }
