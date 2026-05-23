@@ -10,6 +10,7 @@ export default function Pricing() {
     annualPrice: '4.00',
     currencyName: 'USD'
   });
+  const [loading, setLoading] = useState<string | null>(null);
 
   useEffect(() => {
     const fetchGeo = async () => {
@@ -24,8 +25,30 @@ export default function Pricing() {
     fetchGeo();
   }, []);
 
+  const handleCheckout = async (plan: 'monthly' | 'annual') => {
+    setLoading(plan);
+    try {
+      const res = await fetch('/api/stripe/checkout', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ plan }),
+      });
+      
+      const data = await res.json();
+      if (data.url) {
+        window.location.href = data.url;
+      }
+    } catch (e) {
+      console.error("Stripe redirect error", e);
+      alert("Error al conectar con la pasarela de pago.");
+    } finally {
+      setLoading(null);
+    }
+  };
+
   const plans = [
     {
+      id: 'monthly',
       name: 'Suscripción Mensual',
       price: `${geoData.currencySymbol}${geoData.monthlyPrice}`,
       period: '/mes',
@@ -39,6 +62,7 @@ export default function Pricing() {
       popular: false
     },
     {
+      id: 'annual',
       name: 'Suscripción Anual',
       price: `${geoData.currencySymbol}${geoData.annualPrice}`,
       period: '/mes promed.',
@@ -55,7 +79,7 @@ export default function Pricing() {
   ];
 
   return (
-    <section id="planes" className="max-w-6xl mx-auto px-4 py-32 w-full">
+    <section id="planes" className="max-w-6xl mx-auto px-4 py-32 w-full text-white">
       <div className="text-center mb-20 space-y-4">
         <h2 className="text-4xl md:text-6xl font-black tracking-tighter">Únete a la Élite.</h2>
         <p className="text-gray-500 uppercase tracking-[0.2em] text-xs font-black">
@@ -95,8 +119,12 @@ export default function Pricing() {
               </ul>
             </div>
 
-            <button className={`mt-10 w-full py-4 rounded-2xl font-black uppercase tracking-widest text-xs transition-all ${plan.popular ? 'bg-cyan-500 text-black hover:bg-white' : 'bg-white/5 border border-white/10 hover:bg-white hover:text-black'}`}>
-              Elegir {plan.name.split(' ')[1]}
+            <button 
+              onClick={() => handleCheckout(plan.id as any)}
+              disabled={loading !== null}
+              className={`mt-10 w-full py-4 rounded-2xl font-black uppercase tracking-widest text-xs transition-all ${plan.popular ? 'bg-cyan-500 text-black hover:bg-white' : 'bg-white/5 border border-white/10 hover:bg-white hover:text-black'} disabled:opacity-50`}
+            >
+              {loading === plan.id ? 'Conectando...' : `Elegir ${plan.name.split(' ')[1]}`}
             </button>
           </motion.div>
         ))}
