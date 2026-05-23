@@ -51,7 +51,21 @@ export default function ArticlePage() {
   const [isSpeaking, setIsSpeaking] = useState(false);
   const [likes, setLikes] = useState(1240);
   const [showCopyAlert, setShowCopyAlert] = useState(false);
-  const [lang, setLang] = useState('es-MX');
+  const [geoData, setGeoData] = useState<any>(null);
+
+  useEffect(() => {
+    // 1. Obtener datos de moneda por IP
+    const fetchGeo = async () => {
+      try {
+        const res = await fetch('/api/geo');
+        const data = await res.json();
+        setGeoData(data);
+      } catch (e) {
+        console.error("Error fetching geo pricing", e);
+      }
+    };
+    fetchGeo();
+  }, []);
 
   useEffect(() => {
     if (!id) return;
@@ -80,6 +94,24 @@ export default function ArticlePage() {
     loadData();
   }, [id]);
 
+  const handleCheckout = async (plan: 'monthly' | 'annual') => {
+    try {
+      const res = await fetch('/api/stripe/checkout', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ plan }),
+      });
+      
+      const data = await res.json();
+      if (data.url) {
+        window.location.href = data.url;
+      }
+    } catch (e) {
+      console.error("Stripe redirect error", e);
+      alert("Error al conectar con la pasarela de pago. Por favor, inicia sesión primero.");
+    }
+  };
+
   const toggleVoice = () => {
     if ('speechSynthesis' in window && article) {
       if (isSpeaking) {
@@ -96,7 +128,7 @@ export default function ArticlePage() {
         );
         
         if (female) utterance.voice = female;
-        utterance.lang = 'es-MX';
+        utterance.lang = geoData?.countryCode === 'US' ? 'en-US' : 'es-MX';
         utterance.rate = 0.95;
         
         utterance.onend = () => setIsSpeaking(false);
@@ -147,6 +179,7 @@ export default function ArticlePage() {
               </div>
             </header>
 
+            {/* ASISTENTE DE VOZ MAESTRO */}
             <div className="bg-white/5 border border-white/10 rounded-[35px] p-8 mb-12 flex flex-col md:flex-row items-center justify-between gap-6 shadow-2xl">
               <div className="flex items-center gap-5">
                 <div className={`w-14 h-14 rounded-full flex items-center justify-center bg-white/5 border border-white/10 ${isSpeaking ? 'animate-pulse border-cyan-400 shadow-[0_0_20px_rgba(0,242,255,0.2)]' : ''}`}>
@@ -183,7 +216,12 @@ export default function ArticlePage() {
                 <p className="text-sm text-gray-600 mb-8 leading-relaxed max-w-sm mx-auto">
                   El análisis profundo y los manuales técnicos son exclusivos para socios de élite.
                 </p>
-                <button className="btn-glow text-[10px] w-full max-w-xs py-5">DESBLOQUEAR POR $8/MES</button>
+                <button 
+                  onClick={() => handleCheckout('monthly')}
+                  className="btn-glow text-[10px] w-full max-w-xs py-5"
+                >
+                  DESBLOQUEAR POR {geoData?.currencySymbol || '$'}{geoData?.monthlyPrice || '8.00'}/MES
+                </button>
               </div>
             </div>
 
