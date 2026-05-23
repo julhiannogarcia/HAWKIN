@@ -28,6 +28,7 @@ export default function Pricing() {
   const handleCheckout = async (plan: 'monthly' | 'annual') => {
     setLoading(plan);
     try {
+      console.log("Solicitando pago para el plan:", plan);
       const res = await fetch('/api/stripe/checkout', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
@@ -35,12 +36,16 @@ export default function Pricing() {
       });
       
       const data = await res.json();
+      
       if (data.url) {
+        console.log("Redirigiendo a Stripe...");
         window.location.href = data.url;
+      } else {
+        throw new Error(data.error || data.details || "No se recibió URL de pago");
       }
-    } catch (e) {
-      console.error("Stripe redirect error", e);
-      alert("Error al conectar con la pasarela de pago.");
+    } catch (e: any) {
+      console.error("Error detallado de Stripe:", e);
+      alert(`Error financiero: ${e.message}. Verifica que tus llaves de Stripe en Vercel sean correctas.`);
     } finally {
       setLoading(null);
     }
@@ -122,9 +127,9 @@ export default function Pricing() {
             <button 
               onClick={() => handleCheckout(plan.id as any)}
               disabled={loading !== null}
-              className={`mt-10 w-full py-4 rounded-2xl font-black uppercase tracking-widest text-xs transition-all ${plan.popular ? 'bg-cyan-500 text-black hover:bg-white' : 'bg-white/5 border border-white/10 hover:bg-white hover:text-black'} disabled:opacity-50`}
+              className={`mt-10 w-full py-4 rounded-2xl font-black uppercase tracking-widest text-xs transition-all ${plan.popular ? 'bg-cyan-500 text-black hover:bg-white' : 'bg-white/5 border border-white/10 hover:bg-white hover:text-black'} disabled:opacity-50 cursor-pointer`}
             >
-              {loading === plan.id ? 'Conectando...' : `Elegir ${plan.name.split(' ')[1]}`}
+              {loading === plan.id ? 'Sincronizando Pago...' : `Elegir ${plan.name.split(' ')[1]}`}
             </button>
           </motion.div>
         ))}
