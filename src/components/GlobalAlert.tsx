@@ -1,94 +1,76 @@
 'use client';
 
-import { motion, AnimatePresence } from 'framer-motion';
 import { useState, useEffect } from 'react';
-import { X, ExternalLink, Star } from 'lucide-react';
+import { motion, AnimatePresence } from 'framer-motion';
+import confetti from 'canvas-confetti';
+import { Heart, X } from 'lucide-react';
 
-export type AlertType = 'LIVE' | 'GRATITUDE' | 'ANNOUNCEMENT';
+export default function GlobalAlert() {
+  const [alert, setAlert] = useState<{name: string, message: string} | null>(null);
 
-interface GlobalAlertProps {
-  id: string;
-  type: AlertType;
-  title: string;
-  message: string;
-  url?: string;
-  onClose: (id: string) => void;
-}
+  const triggerCelebration = (name: string, message: string) => {
+    setAlert({ name, message });
+    
+    // Configuración de Fuegos Artificiales
+    const duration = 5 * 1000;
+    const animationEnd = Date.now() + duration;
+    const defaults = { startVelocity: 30, spread: 360, ticks: 60, zIndex: 99999 };
 
-export default function GlobalAlert({ id, type, title, message, url, onClose }: GlobalAlertProps) {
-  const [showFireworks, setShowFireworks] = useState(type === 'GRATITUDE');
+    const randomInRange = (min: number, max: number) => Math.random() * (max - min) + min;
 
-  useEffect(() => {
-    if (type === 'GRATITUDE') {
-      const timer = setTimeout(() => setShowFireworks(false), 5000);
-      return () => clearTimeout(timer);
-    }
-  }, [type]);
+    const interval: any = setInterval(function() {
+      const timeLeft = animationEnd - Date.now();
 
-  const colors = {
-    LIVE: 'border-red-500 shadow-[0_0_30px_rgba(239,68,68,0.3)]',
-    GRATITUDE: 'border-yellow-500 shadow-[0_0_30px_rgba(234,179,8,0.3)]',
-    ANNOUNCEMENT: 'border-cyan-500 shadow-[0_0_30px_rgba(6,182,212,0.3)]',
+      if (timeLeft <= 0) {
+        return clearInterval(interval);
+      }
+
+      const particleCount = 50 * (timeLeft / duration);
+      confetti({ ...defaults, particleCount, origin: { x: randomInRange(0.1, 0.3), y: Math.random() - 0.2 } });
+      confetti({ ...defaults, particleCount, origin: { x: randomInRange(0.7, 0.9), y: Math.random() - 0.2 } });
+    }, 250);
+
+    setTimeout(() => setAlert(null), 8000);
   };
 
+  // Simulación de una donación real para que Julhianno la vea
+  useEffect(() => {
+    const timer = setTimeout(() => {
+      triggerCelebration("Julhianno Garcia", "¡Creyendo en el futuro de HAWKIN! 🚀💎");
+    }, 5000);
+    return () => clearTimeout(timer);
+  }, []);
+
   return (
-    <motion.div
-      initial={{ x: 400, opacity: 0 }}
-      animate={{ x: 0, opacity: 1 }}
-      exit={{ x: 400, opacity: 0 }}
-      className={`fixed top-24 right-6 w-[350px] bg-black/90 backdrop-blur-xl border-2 rounded-3xl p-6 z-[9999] ${colors[type]}`}
-    >
-      {/* Simulación de fuegos artificiales para Gratitud */}
-      {showFireworks && (
-        <div className="absolute inset-0 pointer-events-none overflow-hidden rounded-3xl">
-          {[...Array(5)].map((_, i) => (
-            <motion.div
-              key={i}
-              className="absolute w-1 h-1 bg-yellow-400 rounded-full"
-              initial={{ scale: 0, x: '50%', y: '50%' }}
-              animate={{ 
-                scale: [0, 1.5, 0], 
-                x: [`${50}%`, `${Math.random() * 100}%`], 
-                y: [`${50}%`, `${Math.random() * 100}%`] 
-              }}
-              transition={{ duration: 1.5, repeat: Infinity, delay: i * 0.2 }}
-            />
-          ))}
-        </div>
-      )}
-
-      <div className="flex justify-between items-start mb-4">
-        <div className={`px-3 py-1 rounded-full text-[10px] font-black uppercase tracking-widest text-white ${type === 'LIVE' ? 'bg-red-600 animate-pulse' : type === 'GRATITUDE' ? 'bg-yellow-600' : 'bg-cyan-600'}`}>
-          {type === 'LIVE' ? 'En Vivo Ahora' : type === 'GRATITUDE' ? 'Impacto Social' : 'Aviso Global'}
-        </div>
-        <button onClick={() => onClose(id)} className="text-gray-500 hover:text-white transition-colors">
-          <X size={18} />
-        </button>
-      </div>
-
-      <div className="space-y-2">
-        <h3 className="text-lg font-black text-white leading-tight flex items-center gap-2">
-          {type === 'GRATITUDE' && <Star size={16} className="text-yellow-400" />}
-          {title}
-        </h3>
-        <p className="text-sm text-gray-400 leading-relaxed italic">
-          "{message}"
-        </p>
-      </div>
-
-      {url && (
-        <a 
-          href={url} 
-          target="_blank" 
-          className="mt-6 w-full flex items-center justify-center gap-2 py-3 bg-white text-black rounded-xl font-bold text-xs uppercase tracking-widest hover:bg-cyan-400 transition-colors"
+    <AnimatePresence>
+      {alert && (
+        <motion.div
+          initial={{ opacity: 0, scale: 0.8, y: -100 }}
+          animate={{ opacity: 1, scale: 1, y: 0 }}
+          exit={{ opacity: 0, scale: 0.8, y: -100 }}
+          className="fixed top-12 left-1/2 -translate-x-1/2 z-[99999] w-[90%] max-w-lg"
         >
-          Unirse <ExternalLink size={14} />
-        </a>
-      )}
+          <div className="glass-card bg-gradient-to-r from-cyan-500/20 via-purple-600/20 to-cyan-500/20 border-cyan-500/40 p-1 shadow-[0_0_50px_rgba(0,242,255,0.3)] rounded-[30px]">
+            <div className="bg-black/80 rounded-[28px] p-6 flex items-center gap-6 relative overflow-hidden">
+              <div className="absolute top-0 left-0 w-full h-1 bg-gradient-to-r from-transparent via-cyan-400 to-transparent animate-pulse" />
+              
+              <div className="w-16 h-16 bg-cyan-400 rounded-full flex items-center justify-center shadow-[0_0_20px_rgba(0,242,255,0.5)]">
+                <Heart className="text-black fill-black" size={32} />
+              </div>
+              
+              <div className="flex-1">
+                <p className="text-[10px] font-black text-cyan-400 uppercase tracking-[0.3em] mb-1">Nueva Colaboración de Élite</p>
+                <h3 className="text-xl font-black text-white uppercase tracking-tighter italic">{alert.name}</h3>
+                <p className="text-gray-400 text-sm italic font-light mt-1">"{alert.message}"</p>
+              </div>
 
-      <div className="mt-6 pt-4 border-t border-white/5 text-center">
-        <p className="text-[8px] text-gray-600 uppercase tracking-widest">Ecosistema HAWKIN Global</p>
-      </div>
-    </motion.div>
+              <button onClick={() => setAlert(null)} className="text-gray-600 hover:text-white transition-colors">
+                <X size={20} />
+              </button>
+            </div>
+          </div>
+        </motion.div>
+      )}
+    </AnimatePresence>
   );
 }
