@@ -5,6 +5,7 @@ import { useParams, useRouter } from 'next/navigation';
 import Header from '@/components/Header';
 import Footer from '@/components/Footer';
 import Ticker from '@/components/Ticker';
+import AdSpace from '@/components/AdSpace';
 import { Bookmark, BookmarkCheck, Share2, ThumbsUp, ThumbsDown, MessageSquare, Volume2, ArrowLeft, ShieldAlert, CheckCircle2, Lock } from 'lucide-react';
 
 // BASE DE DATOS MAESTRA PARA ENLACES PERMANENTES
@@ -52,9 +53,9 @@ export default function ArticlePage() {
   const [likes, setLikes] = useState(1240);
   const [showCopyAlert, setShowCopyAlert] = useState(false);
   const [geoData, setGeoData] = useState<any>(null);
+  const [isPremium, setIsPremium] = useState(false); // Simulación de socio premium
 
   useEffect(() => {
-    // 1. Obtener datos de moneda por IP
     const fetchGeo = async () => {
       try {
         const res = await fetch('/api/geo');
@@ -158,7 +159,7 @@ export default function ArticlePage() {
       <Header />
       
       <article className="max-w-4xl mx-auto px-6 pt-40 pb-32">
-        <button onClick={() => router.back()} className="flex items-center gap-2 text-gray-600 hover:text-white transition-colors mb-12 text-[10px] font-black uppercase tracking-widest group">
+        <button onClick={() => router.back()} className="flex items-center gap-2 text-gray-500 hover:text-white transition-colors mb-12 text-[10px] font-black uppercase tracking-widest group">
           <ArrowLeft size={14} className="group-hover:-translate-x-1 transition-transform" /> Volver al Radar
         </button>
 
@@ -210,6 +211,9 @@ export default function ArticlePage() {
               <div className="space-y-10 text-gray-400 leading-relaxed font-light">
                  {article.content}
               </div>
+
+              {/* ANUNCIO DINÁMICO (Se oculta si es premium) */}
+              <AdSpace isPremium={isPremium} type="inline" />
               
               <div className="p-12 rounded-[50px] border border-cyan-500/10 bg-gradient-to-b from-white/[0.03] to-transparent text-center space-y-8 mt-20">
                 <h3 className="text-3xl font-black uppercase tracking-tighter text-white italic underline decoration-cyan-400">Análisis Protegido</h3>
