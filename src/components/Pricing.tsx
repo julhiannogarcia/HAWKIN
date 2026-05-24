@@ -1,7 +1,41 @@
 'use client';
 
 import { motion } from 'framer-motion';
-import { useState, useEffect } from 'react';
+import { useState, useEffect, useRef } from 'react';
+
+// Componente de botón seguro para evitar colapsos
+function PaypalButton({ planId, amount, isLoaded }: { planId: string, amount: string, isLoaded: boolean }) {
+  const containerRef = useRef<HTMLDivElement>(null);
+
+  useEffect(() => {
+    if (isLoaded && containerRef.current && window.paypal) {
+      // Limpiar contenedor previo
+      containerRef.current.innerHTML = '';
+      
+      window.paypal.Buttons({
+        style: { layout: 'vertical', color: 'blue', shape: 'pill', label: 'pay' },
+        createOrder: (data: any, actions: any) => {
+          return actions.order.create({
+            purchase_units: [{
+              description: `Suscripción HAWKIN - ${planId}`,
+              amount: { value: amount }
+            }]
+          });
+        },
+        onApprove: async (data: any, actions: any) => {
+          const order = await actions.order.capture();
+          alert(`¡Éxito Socio! Pago procesado. ID: ${order.id}`);
+          window.location.href = "/dashboard?success=true";
+        },
+        onError: (err: any) => {
+          console.error("Paypal Render Error", err);
+        }
+      }).render(containerRef.current);
+    }
+  }, [isLoaded, planId, amount]);
+
+  return <div ref={containerRef} className="mt-8 min-h-[150px]" />;
+}
 
 export default function Pricing() {
   const [geoData, setGeoData] = useState({
@@ -25,38 +59,18 @@ export default function Pricing() {
     };
     fetchGeo();
 
-    // 2. Cargar el SDK de PayPal dinámicamente
-    const script = document.createElement('script');
-    // USAMOS EL MODO SANDBOX POR DEFECTO PARA PRUEBAS
-    script.src = `https://www.paypal.com/sdk/js?client-id=test&currency=USD`;
-    script.addEventListener('load', () => setIsPaypalLoaded(true));
-    document.body.appendChild(script);
+    // 2. Cargar el SDK de PayPal de forma SEGURA
+    if (!document.getElementById('paypal-sdk')) {
+      const script = document.createElement('script');
+      script.id = 'paypal-sdk';
+      script.src = `https://www.paypal.com/sdk/js?client-id=test&currency=USD`;
+      script.async = true;
+      script.onload = () => setIsPaypalLoaded(true);
+      document.body.appendChild(script);
+    } else {
+      setIsPaypalLoaded(true);
+    }
   }, []);
-
-  const renderPaypalButtons = (planId: string, amount: string) => {
-    if (!isPaypalLoaded || !window.paypal) return null;
-
-    return (
-      <div className="mt-8">
-        <window.paypal.Buttons
-          style={{ layout: 'vertical', color: 'blue', shape: 'pill', label: 'pay' }}
-          createOrder={(data: any, actions: any) => {
-            return actions.order.create({
-              purchase_units: [{
-                description: `Suscripción HAWKIN - ${planId}`,
-                amount: { value: amount }
-              }]
-            });
-          }}
-          onApprove={async (data: any, actions: any) => {
-            const order = await actions.order.capture();
-            alert(`¡Éxito Socio! Pago procesado por PayPal. ID: ${order.id}`);
-            window.location.href = "/dashboard?success=true";
-          }}
-        />
-      </div>
-    );
-  };
 
   const plans = [
     {
@@ -110,10 +124,13 @@ export default function Pricing() {
               </ul>
             </div>
 
-            {/* BOTONES DE PAYPAL REALES */}
-            <div className="mt-10 min-h-[150px]">
+            <div className="mt-10">
               {isPaypalLoaded ? (
-                renderPaypalButtons(plan.id, plan.id === 'monthly' ? '8.00' : '48.00')
+                <PaypalButton 
+                  planId={plan.id} 
+                  amount={plan.id === 'monthly' ? '8.00' : '48.00'} 
+                  isLoaded={isPaypalLoaded} 
+                />
               ) : (
                 <div className="w-full h-12 bg-white/5 animate-pulse rounded-full flex items-center justify-center text-[10px] text-gray-600 font-black uppercase">
                   Cargando Pasarela Global...
