@@ -112,13 +112,7 @@ export default function B2BPage() {
 
         <section className="mt-40 text-center space-y-12 pb-20">
            <h2 className="text-4xl font-black uppercase italic leading-none">Publicidad para <br /><span className="text-cyan-400 text-6xl md:text-8xl">Cualquier Negocio</span></h2>
-           <div className="flex flex-wrap justify-center gap-12 pt-8">
-              <span className="text-xl md:text-3xl font-black uppercase tracking-widest text-white hover:text-cyan-400 transition-colors">Tiendas de Ropa</span>
-              <span className="text-xl md:text-3xl font-black uppercase tracking-widest text-white hover:text-purple-400 transition-colors">Computadoras</span>
-              <span className="text-xl md:text-3xl font-black uppercase tracking-widest text-white hover:text-green-400 transition-colors">Smartphones</span>
-              <span className="text-xl md:text-3xl font-black uppercase tracking-widest text-white hover:text-cyan-400 transition-colors">Servicios</span>
-           </div>
-           <p className="text-gray-500 text-sm font-black uppercase tracking-[0.4em]">Sin excepciones. Tu marca merece estar aquí.</p>
+           <p className="text-gray-500 text-sm font-black uppercase tracking-[0.4em] pt-8">Sin excepciones. Tu marca merece estar aquí.</p>
         </section>
 
       </div>
