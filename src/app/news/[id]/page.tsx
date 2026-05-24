@@ -255,14 +255,17 @@ export default function ArticlePage() {
               </div>
             </div>
 
+            {/* SECCIÓN DE DEBATE LIMPIA */}
             <div className="mt-24 space-y-12 text-left">
                <h3 className="text-sm font-black uppercase tracking-[0.5em] text-gray-700 flex items-center gap-4 italic">
                  <MessageSquare size={20} className="text-cyan-400" /> Conversación Global
                </h3>
-               <div className="p-12 rounded-[45px] bg-white/[0.01] border border-white/5 space-y-8 relative overflow-hidden group hover:border-cyan-500/20 transition-all">
-                  <p className="text-gray-400 text-lg leading-relaxed font-light italic pl-10 border-l border-white/10">
-                    "HAWKIN es la única fuente transparente. El análisis de Julhianno es impecable." - Socio_Premium_Alpha
-                  </p>
+               
+               <div className="p-12 rounded-[45px] border-2 border-dashed border-white/5 bg-black/40 text-center">
+                  <p className="text-[10px] text-gray-600 uppercase font-black tracking-[0.3em] mb-6">Sé el primero en iniciar el debate de élite</p>
+                  <button className="text-[9px] font-black text-white border border-white/10 px-10 py-3 rounded-full hover:bg-white hover:text-black transition-all uppercase">
+                    Iniciar Sesión para Comentar
+                  </button>
                </div>
             </div>
           </>
