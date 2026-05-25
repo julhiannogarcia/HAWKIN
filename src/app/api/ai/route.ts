@@ -1,5 +1,6 @@
-// --- HAWKIN AI v22.0: ESCÁNER DE CONEXIÓN TOTAL (MAYO 2026) ---
+// --- HAWKIN AI v23.0: INTEGRACIÓN OFICIAL SDK GOOGLE (MAY 2026) ---
 import { NextResponse } from "next/server";
+import { GoogleGenerativeAI } from "@google/generative-ai";
 
 export async function POST(req: Request) {
   try {
@@ -8,57 +9,41 @@ export async function POST(req: Request) {
     const apiKey = (process.env.GEMINI_API_KEY || "").trim();
 
     if (!apiKey) {
-      return NextResponse.json({ text: "Socio, falta mi núcleo de energía. Configura la llave en Vercel." });
+      return NextResponse.json({ text: "Socio, falta el núcleo de energía (API Key) en el servidor." });
     }
 
-    const SYSTEM_PROMPT = `Eres HAWKIN AI, la inteligencia de HAWKIN Global. Ayuda al Socio en tecnología e inglés.`;
-
-    // LISTA DE COMBINACIONES PARA ENCONTRAR LA PUERTA ABIERTA DE GOOGLE
-    const config = [
-      { ver: 'v1', mod: 'gemini-2.0-flash' },
-      { ver: 'v1beta', mod: 'gemini-2.0-flash' },
-      { ver: 'v1', mod: 'gemini-1.5-flash-latest' },
-      { ver: 'v1beta', mod: 'gemini-1.5-flash-latest' },
-      { ver: 'v1', mod: 'gemini-pro' },
-      { ver: 'v1beta', mod: 'gemini-pro' }
-    ];
+    // --- EL CAMINO REAL: USAMOS EL SDK OFICIAL DE GOOGLE ---
+    const genAI = new GoogleGenerativeAI(apiKey);
     
-    let finalAiText = "";
-    let lastTechnicalError = "";
+    // Usamos gemini-1.5-flash como el estándar de oro de 2026
+    const model = genAI.getGenerativeModel({ model: "gemini-1.5-flash" });
 
-    for (const attempt of config) {
-      try {
-        const response = await fetch(`https://generativelanguage.googleapis.com/${attempt.ver}/models/${attempt.mod}:generateContent?key=${apiKey}`, {
-          method: 'POST',
-          headers: { 'Content-Type': 'application/json' },
-          body: JSON.stringify({
-            contents: [{ parts: [{ text: `${SYSTEM_PROMPT}\n\nSocio pregunta: ${userMessage}` }] }],
-            generationConfig: { temperature: 0.7, maxOutputTokens: 800 }
-          }),
-        });
+    const SYSTEM_PROMPT = `Eres HAWKIN AI, el cerebro corporativo del ecosistema HAWKIN. 
+    Ayuda al socio con precisión técnica en hardware, software e idiomas. 
+    No reveles nombres personales. Tu tono es profesional y directo.`;
 
-        const data = await response.json();
+    const result = await model.generateContent(`${SYSTEM_PROMPT}\n\nPregunta del Socio: ${userMessage}`);
+    const response = await result.response;
+    const aiText = response.text();
 
-        if (response.ok && data.candidates?.[0]?.content?.parts?.[0]?.text) {
-          finalAiText = data.candidates[0].content.parts[0].text;
-          break; // ¡CONEXIÓN EXITOSA!
-        } else {
-          lastTechnicalError = data.error?.message || "Sin respuesta";
-        }
-      } catch (e) {
-        continue;
-      }
+    if (!aiText) {
+      return NextResponse.json({ text: "Socio, mis núcleos de pensamiento están procesando. Reintenta en 5 segundos." });
     }
 
-    if (!finalAiText) {
-      return NextResponse.json({ 
-        text: `Socio, mis núcleos de Google están cerrados. [Motivo: ${lastTechnicalError}]. Por favor, verifica que tu llave de API tenga activado el modelo 'Gemini 1.5 Flash' en AI Studio.` 
-      });
-    }
-
-    return NextResponse.json({ text: finalAiText });
+    return NextResponse.json({ text: aiText });
 
   } catch (error: any) {
-    return NextResponse.json({ text: "Socio, detecto un desfase en la red. Intenta de nuevo." });
+    console.error("SDK Error:", error);
+    
+    // Mensaje de verdad final para el fundador
+    if (error.message?.includes("API key not valid")) {
+      return NextResponse.json({ text: "Socio, la llave pegada en Vercel es inválida. Revisa espacios o letras faltantes." });
+    }
+    
+    if (error.message?.includes("location is not supported")) {
+      return NextResponse.json({ text: "Socio, Google ha bloqueado tu región (Perú) para este modelo de IA. La solución es usar una VPN o cambiar a OpenAI." });
+    }
+
+    return NextResponse.json({ text: `Socio, error crítico en el puente de Google: ${error.message?.substring(0, 50)}` });
   }
 }
