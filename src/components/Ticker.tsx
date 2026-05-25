@@ -13,11 +13,11 @@ export default function Ticker() {
 
   return (
     <div className="fixed bottom-0 left-0 w-full bg-black/90 backdrop-blur-md border-t border-cyan-500/30 py-3 z-[2000] overflow-hidden flex">
-      <div className="bg-cyan-500 text-black px-6 font-black uppercase text-xs flex items-center z-10">
+      <div className="bg-cyan-500 text-black px-6 font-black uppercase text-xs flex items-center z-10 shadow-[5px_0_15px_rgba(0,0,0,0.5)]">
         Live Radar
       </div>
-      <div className="flex whitespace-nowrap animate-ticker">
-        {[...news, ...news].map((item, index) => (
+      <div className="flex whitespace-nowrap animate-ticker-scroll">
+        {[...news, ...news, ...news].map((item, index) => (
           <Link key={index} href="/news" className="px-12 text-sm text-gray-300 hover:text-cyan-400 transition-colors cursor-pointer">
             <span className="text-cyan-400 font-bold mr-2">{item.label}:</span>
             {item.text}
@@ -25,13 +25,13 @@ export default function Ticker() {
         ))}
       </div>
       
-      <style jsx>{`
-        @keyframes ticker {
+      <style>{`
+        @keyframes ticker-scroll {
           0% { transform: translateX(0); }
-          100% { transform: translateX(-50%); }
+          100% { transform: translateX(-33.33%); }
         }
-        .animate-ticker {
-          animation: ticker 40s linear infinite;
+        .animate-ticker-scroll {
+          animation: ticker-scroll 60s linear infinite;
         }
       `}</style>
     </div>
