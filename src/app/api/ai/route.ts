@@ -1,49 +1,46 @@
-// --- HAWKIN AI v23.0: INTEGRACIÓN OFICIAL SDK GOOGLE (MAY 2026) ---
+// --- HAWKIN AI v24.0: INTELIGENCIA GRATUITA Y GLOBAL (LLAMA 3 / GROQ) ---
 import { NextResponse } from "next/server";
-import { GoogleGenerativeAI } from "@google/generative-ai";
+import Groq from "groq-sdk";
 
 export async function POST(req: Request) {
   try {
     const { messages } = await req.json();
     const userMessage = messages[messages.length - 1].text;
-    const apiKey = (process.env.GEMINI_API_KEY || "").trim();
+    
+    // Usamos la nueva llave de Groq (Gratis)
+    const apiKey = process.env.GROQ_API_KEY;
 
     if (!apiKey) {
-      return NextResponse.json({ text: "Socio, falta el núcleo de energía (API Key) en el servidor." });
+      return NextResponse.json({ text: "Socio, falta el núcleo de energía gratuito. Por favor, configura la llave GROQ en Vercel." });
     }
 
-    // --- EL CAMINO REAL: USAMOS EL SDK OFICIAL DE GOOGLE ---
-    const genAI = new GoogleGenerativeAI(apiKey);
-    
-    // Usamos gemini-1.5-flash como el estándar de oro de 2026
-    const model = genAI.getGenerativeModel({ model: "gemini-1.5-flash" });
+    const groq = new Groq({ apiKey });
 
-    const SYSTEM_PROMPT = `Eres HAWKIN AI, el cerebro corporativo del ecosistema HAWKIN. 
-    Ayuda al socio con precisión técnica en hardware, software e idiomas. 
-    No reveles nombres personales. Tu tono es profesional y directo.`;
+    const SYSTEM_PROMPT = `Eres HAWKIN AI, la inteligencia nativa del ecosistema HAWKIN. 
+    Tu propósito es ayudar al Socio con libertad absoluta en tecnología, idiomas y manuales técnicos. 
+    Tu tono es el de un ingeniero senior: preciso, técnico y proactivo. 
+    No reveles nombres personales. Saluda siempre reconociendo al usuario como 'Socio'.`;
 
-    const result = await model.generateContent(`${SYSTEM_PROMPT}\n\nPregunta del Socio: ${userMessage}`);
-    const response = await result.response;
-    const aiText = response.text();
+    const chatCompletion = await groq.chat.completions.create({
+      messages: [
+        { role: "system", content: SYSTEM_PROMPT },
+        { role: "user", content: userMessage }
+      ],
+      model: "llama-3.3-70b-versatile", // El modelo más potente y gratuito de 2026
+      temperature: 0.7,
+      max_tokens: 1000,
+    });
+
+    const aiText = chatCompletion.choices[0]?.message?.content;
 
     if (!aiText) {
-      return NextResponse.json({ text: "Socio, mis núcleos de pensamiento están procesando. Reintenta en 5 segundos." });
+       return NextResponse.json({ text: "Socio, mis núcleos están procesando la información. Reintenta ahora." });
     }
 
     return NextResponse.json({ text: aiText });
 
   } catch (error: any) {
-    console.error("SDK Error:", error);
-    
-    // Mensaje de verdad final para el fundador
-    if (error.message?.includes("API key not valid")) {
-      return NextResponse.json({ text: "Socio, la llave pegada en Vercel es inválida. Revisa espacios o letras faltantes." });
-    }
-    
-    if (error.message?.includes("location is not supported")) {
-      return NextResponse.json({ text: "Socio, Google ha bloqueado tu región (Perú) para este modelo de IA. La solución es usar una VPN o cambiar a OpenAI." });
-    }
-
-    return NextResponse.json({ text: `Socio, error crítico en el puente de Google: ${error.message?.substring(0, 50)}` });
+    console.error("Groq Error:", error);
+    return NextResponse.json({ text: `Socio, desfase en la red cuántica. [Ref: ${error.message?.substring(0, 20)}]` });
   }
 }
