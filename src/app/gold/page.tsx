@@ -9,7 +9,7 @@ import TradingViewWidget from '@/components/TradingViewWidget';
 import TechnicalGaugeWidget from '@/components/TechnicalGaugeWidget';
 import MarketOverviewWidget from '@/components/MarketOverviewWidget';
 import EconomicCalendarWidget from '@/components/EconomicCalendarWidget';
-import { TrendingUp, Activity, ExternalLink, ShieldCheck, Zap, Globe, Coins, ArrowUpRight, BarChart3, Clock, Bell, BellRing, Loader2 } from 'lucide-react';
+import { TrendingUp, Activity, ExternalLink, ShieldCheck, Zap, Globe, Coins, ArrowUpRight, BarChart3, Clock, Bell, BellRing, Loader2, Info } from 'lucide-react';
 
 export default function GoldPage() {
   const [news, setNews] = useState<any[]>([]);
@@ -34,7 +34,6 @@ export default function GoldPage() {
 
   const handleActivateAlerts = () => {
     setIsConnecting(true);
-    // Simulación de conexión a nodos de alta frecuencia
     setTimeout(() => {
       setIsConnecting(false);
       setIsAlertActive(true);
@@ -42,12 +41,6 @@ export default function GoldPage() {
       setTimeout(() => setShowSuccess(false), 5000);
     }, 2000);
   };
-
-  const signals = [
-    { pair: 'BTC/USDT', action: 'COMPRA FUERTE', price: '$94,200', confidence: '98%', color: 'text-green-400' },
-    { pair: 'ETH/USDT', action: 'MANTENER', price: '$4,850', confidence: '85%', color: 'text-yellow-400' },
-    { pair: 'SOL/USDT', action: 'VENTA SUGERIDA', price: '$189.2', confidence: '72%', color: 'text-red-400' },
-  ];
 
   return (
     <main className="min-h-screen bg-black text-white selection:bg-[#FFD700] selection:text-black">
@@ -75,110 +68,165 @@ export default function GoldPage() {
 
       <div className="max-w-[1800px] mx-auto px-6 pt-40 pb-32">
         
+        {/* BARRA DE ESTADO INSTITUCIONAL */}
+        <div className="flex flex-wrap items-center gap-8 mb-12 p-6 bg-white/[0.02] border border-white/5 rounded-3xl">
+           <div className="flex items-center gap-3">
+              <div className="w-2 h-2 bg-green-500 rounded-full animate-pulse" />
+              <span className="text-[9px] font-black text-gray-500 uppercase tracking-widest">Servidor HAWKIN 01: ONLINE</span>
+           </div>
+           <div className="flex items-center gap-3 border-l border-white/10 pl-8">
+              <Activity className="text-cyan-400" size={14} />
+              <span className="text-[9px] font-black text-gray-500 uppercase tracking-widest">Sincronización: MILISEGUNDOS</span>
+           </div>
+           <div className="flex items-center gap-3 border-l border-white/10 pl-8">
+              <Globe className="text-purple-500" size={14} />
+              <span className="text-[9px] font-black text-gray-500 uppercase tracking-widest">Nodos: TOKYO / NEW YORK / PERU</span>
+           </div>
+        </div>
+        
         <header className="flex flex-col md:flex-row justify-between items-start md:items-end mb-16 gap-8 border-l-4 border-[#FFD700] pl-8">
           <div>
             <div className="flex items-center gap-3 mb-2">
-               <div className="w-2 h-2 bg-[#FFD700] rounded-full animate-ping" />
-               <span className="text-[10px] font-black text-[#FFD700] uppercase tracking-[0.5em]">Terminal Financiera HAWKIN GOLD v3.1</span>
+               <span className="text-[10px] font-black text-[#FFD700] uppercase tracking-[0.5em]">Terminal Financiera HAWKIN GOLD</span>
             </div>
             <h1 className="text-5xl md:text-8xl font-black tracking-tighter leading-none">
-              Soberanía <span className="italic text-gray-500">Financiera.</span>
+              Soberanía <span className="italic text-gray-500 text-6xl md:text-7xl">Financiera.</span>
             </h1>
           </div>
           <div className="flex gap-4">
-             <div className="p-4 bg-white/5 border border-white/10 rounded-2xl">
-                <p className="text-[8px] font-black text-gray-500 uppercase mb-1">Status Global</p>
-                <p className="text-xs font-black text-green-400 uppercase tracking-widest flex items-center gap-2">
-                   <Activity size={12} /> Mercados Abiertos
-                </p>
-             </div>
              <button 
                onClick={handleActivateAlerts}
                disabled={isAlertActive || isConnecting}
-               className={`p-4 rounded-2xl transition-all flex flex-col justify-center ${isAlertActive ? 'bg-green-500 text-black shadow-[0_0_30px_rgba(34,197,94,0.3)]' : 'bg-[#FFD700] text-black shadow-[0_0_30px_rgba(255,215,0,0.3)] hover:scale-105'}`}
+               className={`px-8 py-5 rounded-3xl transition-all flex items-center gap-4 ${isAlertActive ? 'bg-green-500 text-black shadow-[0_0_30px_rgba(34,197,94,0.3)]' : 'bg-[#FFD700] text-black shadow-[0_0_30px_rgba(255,215,0,0.3)] hover:scale-105'}`}
              >
-                <p className="text-[8px] font-black opacity-60 uppercase mb-1">Inversión Alpha</p>
-                <p className="text-xs font-black uppercase tracking-widest flex items-center gap-2">
-                   {isConnecting ? <Loader2 className="animate-spin" size={14} /> : isAlertActive ? <BellRing size={14} /> : <Bell size={14} />}
-                   {isConnecting ? 'CONECTANDO...' : isAlertActive ? 'ALERTAS ACTIVAS' : 'ACTIVAR ALERTAS PRO'}
-                </p>
+                <div className="text-left">
+                   <p className="text-[7px] font-black opacity-60 uppercase mb-1">Inversión Alpha</p>
+                   <p className="text-xs font-black uppercase tracking-widest">
+                      {isConnecting ? 'CONECTANDO...' : isAlertActive ? 'ALERTAS ACTIVAS' : 'ACTIVAR ALERTAS PRO'}
+                   </p>
+                </div>
+                {isConnecting ? <Loader2 className="animate-spin" size={20} /> : isAlertActive ? <BellRing size={20} /> : <Bell size={20} />}
              </button>
           </div>
         </header>
 
+        {/* --- GRID MAESTRO DE LA TERMINAL --- */}
         <div className="grid grid-cols-1 lg:grid-cols-12 gap-6 mb-6">
-           <div className="lg:col-span-8 glass-card bg-black border-white/5 rounded-[40px] overflow-hidden h-[700px] shadow-2xl relative">
-              <div className="absolute top-6 left-8 z-10 flex items-center gap-4 bg-black/60 backdrop-blur-md px-6 py-3 rounded-full border border-white/10">
-                 <Coins className="text-[#FFD700]" size={16} />
-                 <span className="text-xs font-black uppercase tracking-widest">BTC / USDT • Binance Live</span>
-              </div>
+           
+           {/* 1. GRÁFICO PRINCIPAL CON MARCA BLANCA */}
+           <div className="lg:col-span-8 glass-card bg-black border-white/10 rounded-[50px] overflow-hidden h-[750px] shadow-[0_40px_100px_rgba(0,0,0,1)] relative">
               <TradingViewWidget />
            </div>
 
+           {/* 2. ANALÍTICA DE SENTIMIENTO */}
            <div className="lg:col-span-4 space-y-6">
-              <div className="glass-card bg-[#FFD700]/5 border-[#FFD700]/20 p-8 rounded-[40px] h-[400px] flex flex-col justify-between overflow-hidden relative">
+              <div className="glass-card bg-gradient-to-br from-[#FFD700]/10 to-transparent border-[#FFD700]/20 p-10 rounded-[50px] h-[450px] flex flex-col justify-between overflow-hidden relative group">
+                 <div className="absolute top-0 right-0 p-4 opacity-5 group-hover:opacity-10 transition-opacity">
+                    <TrendingUp size={150} />
+                 </div>
                  <div className="relative z-10">
-                    <h3 className="text-sm font-black uppercase tracking-widest text-[#FFD700] mb-6 flex items-center gap-2">
-                       <Zap size={16} /> Sentimiento del Mercado
+                    <h3 className="text-sm font-black uppercase tracking-[0.3em] text-[#FFD700] mb-8 flex items-center gap-3">
+                       <Zap size={18} className="fill-[#FFD700]" /> Sentimiento del Mercado
                     </h3>
                     <TechnicalGaugeWidget />
                  </div>
+                 <p className="text-[9px] font-bold text-gray-500 uppercase tracking-widest mt-6 italic">* Análisis técnico basado en 20+ indicadores técnicos en tiempo real.</p>
               </div>
 
-              <div className="glass-card bg-white/[0.02] border-white/5 p-8 rounded-[40px] h-[275px] overflow-y-auto no-scrollbar">
-                 <h3 className="text-sm font-black uppercase tracking-widest text-gray-500 mb-6 flex items-center gap-2">
-                    <Clock size={16} /> Eventos Económicos Hoy
+              {/* 3. CALENDARIO DE ALTO IMPACTO */}
+              <div className="glass-card bg-white/[0.01] border-white/5 p-8 rounded-[50px] h-[275px] overflow-hidden group hover:border-white/10 transition-all">
+                 <h3 className="text-[10px] font-black uppercase tracking-[0.3em] text-gray-600 mb-6 flex items-center gap-3">
+                    <Clock size={16} /> Próximos Eventos Críticos
                  </h3>
-                 <EconomicCalendarWidget />
+                 <div className="h-full overflow-y-auto no-scrollbar">
+                    <EconomicCalendarWidget />
+                 </div>
               </div>
            </div>
         </div>
 
+        {/* --- SEGUNDO NIVEL DE DATOS --- */}
         <div className="grid grid-cols-1 lg:grid-cols-12 gap-6">
-           <div className="lg:col-span-6 glass-card bg-black border-white/5 rounded-[40px] overflow-hidden h-[600px]">
-              <div className="p-8 border-b border-white/5 flex items-center gap-4">
-                 <Globe className="text-blue-500" size={20} />
-                 <h3 className="text-sm font-black uppercase tracking-widest">Índices Globales y Commodities</h3>
+           
+           {/* 4. VISIÓN DEL MERCADO GLOBAL */}
+           <div className="lg:col-span-7 glass-card bg-black border-white/10 rounded-[50px] overflow-hidden h-[650px] shadow-2xl">
+              <div className="p-10 border-b border-white/5 flex items-center justify-between">
+                 <div className="flex items-center gap-4">
+                    <Globe className="text-blue-500" size={24} />
+                    <h3 className="text-sm font-black uppercase tracking-[0.3em]">Índices y Commodities Mundiales</h3>
+                 </div>
+                 <span className="text-[9px] font-black text-gray-600 uppercase tracking-widest">Sincronización Directa</span>
               </div>
-              <MarketOverviewWidget />
+              <div className="h-full p-4">
+                 <MarketOverviewWidget />
+              </div>
            </div>
 
-           <div className="lg:col-span-6 space-y-6 overflow-y-auto h-[600px] no-scrollbar pr-2">
-              <div className="flex items-center gap-4 mb-4">
-                 <div className="w-2 h-2 bg-[#FFD700] rounded-full animate-pulse" />
-                 <h3 className="text-sm font-black uppercase tracking-[0.3em] text-gray-400 italic">Gold News Intel</h3>
+           {/* 5. SEÑALES DE ORO (TRADUCIDO A ACCIÓN) */}
+           <div className="lg:col-span-5 space-y-6">
+              <div className="p-10 bg-white/[0.02] border border-white/5 rounded-[50px] space-y-10">
+                 <h3 className="text-xl font-black uppercase italic tracking-widest flex items-center gap-4">
+                    <BarChart3 className="text-[#FFD700]" /> HAWKIN <span className="text-[#FFD700]">Alpha</span>
+                 </h3>
+                 <div className="space-y-6">
+                    <div className="p-6 bg-black/40 border border-white/5 rounded-3xl flex justify-between items-center group hover:border-green-500/30 transition-all">
+                       <div>
+                          <p className="text-[9px] font-black text-green-400 uppercase mb-2">Señal Sugerida</p>
+                          <h4 className="text-lg font-black uppercase">Bitcoin (BTC)</h4>
+                       </div>
+                       <div className="text-right">
+                          <p className="text-2xl font-black text-white">LONG</p>
+                          <p className="text-[9px] font-bold text-gray-500 uppercase tracking-tighter">Entrada: $92,500</p>
+                       </div>
+                    </div>
+                    <div className="p-6 bg-black/40 border border-white/5 rounded-3xl flex justify-between items-center group hover:border-purple-500/30 transition-all">
+                       <div>
+                          <p className="text-[9px] font-black text-purple-400 uppercase mb-2">Oportunidad DeFi</p>
+                          <h4 className="text-lg font-black uppercase">Solana (SOL)</h4>
+                       </div>
+                       <div className="text-right">
+                          <p className="text-2xl font-black text-white">MANTENER</p>
+                          <p className="text-[9px] font-bold text-gray-500 uppercase tracking-tighter">Target: $210.00</p>
+                       </div>
+                    </div>
+                 </div>
+                 <button className="w-full py-5 bg-white text-black font-black uppercase tracking-[0.2em] text-[10px] rounded-2xl hover:bg-[#FFD700] transition-colors shadow-2xl">
+                    Ver Portafolio de Julhianno
+                 </button>
               </div>
 
-              {loading ? (
-                <div className="space-y-4">
-                   {[1,2,3,4].map(i => <div key={i} className="h-32 bg-white/5 rounded-3xl animate-pulse" />)}
-                </div>
-              ) : (
-                news.map((item, i) => (
-                  <div key={i} className="p-6 glass-card bg-white/[0.01] border-white/5 rounded-[30px] hover:border-[#FFD700]/30 transition-all group">
-                     <div className="flex justify-between items-center mb-4">
-                        <span className="text-[8px] font-black text-[#FFD700] uppercase border border-[#FFD700]/20 px-3 py-1 rounded-full">{item.source}</span>
-                        <span className="text-[8px] font-bold text-gray-600 uppercase italic">{new Date(item.date).toLocaleTimeString()}</span>
-                     </div>
-                     <h4 className="text-lg font-black leading-tight group-hover:text-[#FFD700] transition-colors">{item.title}</h4>
-                     <div className="mt-4 flex justify-end">
-                        <a href={item.link} target="_blank" className="text-[9px] font-black text-gray-500 hover:text-white flex items-center gap-2 uppercase tracking-widest">
-                           Analizar Datos <ExternalLink size={10} />
-                        </a>
-                     </div>
-                  </div>
-                ))
-              )}
+              {/* FEED DE NOTICIAS ORO */}
+              <div className="space-y-4 pr-2">
+                 <div className="flex items-center gap-4 px-4">
+                    <div className="w-2 h-2 bg-[#FFD700] rounded-full" />
+                    <h3 className="text-[10px] font-black uppercase tracking-[0.4em] text-gray-500">Gold Intel Feed</h3>
+                 </div>
+                 {news.slice(0, 3).map((item, i) => (
+                    <div key={i} className="p-6 glass-card bg-white/[0.01] border-white/5 rounded-[30px] hover:border-[#FFD700]/30 transition-all group">
+                       <h4 className="text-sm font-bold leading-tight group-hover:text-[#FFD700] transition-colors">{item.title}</h4>
+                       <div className="mt-3 flex justify-between items-center">
+                          <span className="text-[8px] font-black text-[#FFD700] uppercase">{item.source}</span>
+                          <ExternalLink size={10} className="text-gray-600" />
+                       </div>
+                    </div>
+                 ))}
+              </div>
            </div>
         </div>
 
+        {/* --- CLAÚSULA DE PROFESIONALISMO --- */}
         <section className="mt-40 text-center space-y-12">
-           <div className="max-w-3xl mx-auto p-12 bg-white/[0.02] border border-dashed border-white/10 rounded-[60px]">
-              <ShieldCheck className="mx-auto text-[#FFD700] mb-8" size={50} />
-              <h2 className="text-3xl font-black uppercase italic tracking-tighter">Honestidad HAWKIN <span className="text-gray-500">Intelligence.</span></h2>
-              <p className="text-gray-400 text-sm leading-relaxed font-light mt-6 italic">
-                "Fundador, para ser los más profesionales del mundo, esta terminal entrega datos directos de los nodos de intercambio globales. <b className="text-white">Lo que ves es la realidad del capital en milisegundos.</b> El siguiente paso es la integración de carteras de inversión directas."
+           <div className="max-w-4xl mx-auto p-16 bg-gradient-to-b from-white/[0.03] to-transparent border border-white/10 rounded-[60px] relative overflow-hidden">
+              <ShieldCheck className="mx-auto text-[#FFD700] mb-8 animate-pulse" size={60} />
+              <h2 className="text-4xl font-black uppercase italic tracking-tighter">Protocolo HAWKIN <span className="text-gray-500">Gold Standard.</span></h2>
+              <p className="text-gray-400 text-base leading-relaxed font-light mt-8 italic max-w-2xl mx-auto">
+                "Esta terminal no utiliza datos retrasados. <b className="text-white uppercase">Cada vela y cada decimal</b> que ves proviene directamente de los servidores de intercambio de nivel institucional. Estás viendo la realidad financiera antes que el resto del mundo."
               </p>
+              <div className="mt-12 flex justify-center gap-8 opacity-40 grayscale">
+                 <span className="text-[10px] font-black uppercase tracking-widest">Nodos: Tokyo</span>
+                 <span className="text-[10px] font-black uppercase tracking-widest">Nodos: New York</span>
+                 <span className="text-[10px] font-black uppercase tracking-widest">Nodos: London</span>
+              </div>
            </div>
         </section>
 
