@@ -1,65 +1,54 @@
-// --- HAWKIN AI v17.0: PRIVACIDAD Y ESCALABILIDAD (MAYO 2026) ---
+// --- HAWKIN AI v18.0: DESPERTAR CON NUEVA LLAVE (MAYO 2026) ---
 import { NextResponse } from "next/server";
 
 export async function POST(req: Request) {
   try {
     const { messages } = await req.json();
     const userMessage = messages[messages.length - 1].text;
-    const apiKey = process.env.GEMINI_API_KEY;
+    const apiKey = (process.env.GEMINI_API_KEY || "").trim();
 
     if (!apiKey) {
-      return NextResponse.json({ text: "Socio, el núcleo de inteligencia está en modo de espera." });
+      return NextResponse.json({ text: "Socio, mis núcleos de inteligencia no detectan la llave de acceso." });
     }
 
-    // SYSTEM PROMPT ANONIMIZADO Y PROFESIONAL
-    // Eliminamos nombres personales para proteger la privacidad del fundador
-    const SYSTEM_PROMPT = `Eres HAWKIN AI, el sistema de inteligencia oficial de la Red HAWKIN. 
-    Tu misión es asistir a los socios con soporte técnico de alto nivel (Hardware, Software, Sistemas) y traducciones.
-    Eres una entidad corporativa. No menciones nombres propios de personas físicas.
-    Si te preguntan quién te creó, responde: 'Fui desarrollado por el equipo de ingeniería de HAWKIN Global'.`;
+    const SYSTEM_PROMPT = `Eres HAWKIN AI, el cerebro autónomo de HAWKIN Global. 
+    Tu misión es asistir a los socios con soporte técnico avanzado y traducciones profesionales.
+    Eres una entidad corporativa. No menciones nombres personales. 
+    Saluda siempre reconociendo al usuario como 'Socio'.`;
 
-    // LISTA DE MODELOS A PROBAR (PARA EVITAR EL ERROR 404)
-    // Probamos el más nuevo, si no, bajamos a los ultra-estables
-    const modelsToTry = ["gemini-2.0-flash", "gemini-1.5-flash-latest", "gemini-1.5-flash", "gemini-pro"];
+    // Intentamos el modelo más estable para llaves gratuitas en 2026
+    const modelId = "gemini-1.5-flash-latest"; 
     
-    let aiText = "";
-    let success = false;
-
-    for (const modelId of modelsToTry) {
-      if (success) break;
-      
-      try {
-        const response = await fetch(`https://generativelanguage.googleapis.com/v1beta/models/${modelId}:generateContent?key=${apiKey}`, {
-          method: 'POST',
-          headers: { 'Content-Type': 'application/json' },
-          body: JSON.stringify({
-            contents: [{ parts: [{ text: `${SYSTEM_PROMPT}\n\nSocio: ${userMessage}` }] }],
-            generationConfig: {
-              temperature: 0.5, // Menos "locura", más precisión
-              maxOutputTokens: 500 // Limitamos tokens para que sea 100% GRATIS siempre
-            }
-          }),
-        });
-
-        if (response.ok) {
-          const data = await response.json();
-          aiText = data.candidates?.[0]?.content?.parts?.[0]?.text;
-          if (aiText) {
-            success = true;
+    try {
+      const response = await fetch(`https://generativelanguage.googleapis.com/v1beta/models/${modelId}:generateContent?key=${apiKey}`, {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+          contents: [{ parts: [{ text: `${SYSTEM_PROMPT}\n\nPregunta técnica del Socio: ${userMessage}` }] }],
+          generationConfig: {
+            temperature: 0.7,
+            maxOutputTokens: 600
           }
-        }
-      } catch (e) {
-        continue; // Si un modelo da 404, probamos el siguiente de la lista
+        }),
+      });
+
+      const data = await response.json();
+
+      if (!response.ok) {
+        // Diagnóstico rápido para el fundador si la nueva llave falla
+        return NextResponse.json({ 
+          text: `Socio, hay un inconveniente técnico con la nueva conexión. [Google dice: ${data.error?.message || "Reintenta"}]` 
+        });
       }
-    }
 
-    if (!success) {
-      return NextResponse.json({ text: "Socio, mis núcleos están en sincronización masiva. Por favor, reintenta en un momento." });
-    }
+      const aiText = data.candidates?.[0]?.content?.parts?.[0]?.text;
+      return NextResponse.json({ text: aiText || "Socio, mis núcleos están procesando la información. Reintenta en 5 segundos." });
 
-    return NextResponse.json({ text: aiText });
+    } catch (apiError: any) {
+      return NextResponse.json({ text: "Socio, detecto un desfase en la red. Intenta de nuevo." });
+    }
 
   } catch (error: any) {
-    return NextResponse.json({ text: "Socio, detecto un desfase en la red. Intenta de nuevo por favor." });
+    return NextResponse.json({ text: "Socio, mis circuitos están en mantenimiento preventivo." });
   }
 }
