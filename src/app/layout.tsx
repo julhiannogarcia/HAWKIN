@@ -1,13 +1,8 @@
 import type { Metadata } from "next";
 import "./globals.css";
-import { Suspense } from "react";
 import { SpeedInsights } from "@vercel/speed-insights/next"
 import Providers from "@/components/Providers";
-import dynamic from 'next/dynamic';
-
-// Cargamos los componentes pesados de forma dinámica para NO bloquear la carga
-const HawkinAI = dynamic(() => import("@/components/HawkinAI"), { ssr: false });
-const GlobalAlert = dynamic(() => import("@/components/GlobalAlert"), { ssr: false });
+import ClientSideComponents from "@/components/ClientSideComponents";
 
 export const metadata: Metadata = {
   title: {
@@ -33,10 +28,7 @@ export default function RootLayout({ children }: { children: React.ReactNode }) 
             {children}
           </div>
           
-          <Suspense fallback={null}>
-            <GlobalAlert />
-            <HawkinAI />
-          </Suspense>
+          <ClientSideComponents />
           
           <SpeedInsights />
         </Providers>
