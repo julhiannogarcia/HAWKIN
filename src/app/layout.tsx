@@ -51,7 +51,6 @@ export default function RootLayout({ children }: { children: React.ReactNode }) 
           <GlobalAlert />
         </Suspense>
         {children}
-        <HawkinAI />
         <SpeedInsights />
       </body>
     </html>
