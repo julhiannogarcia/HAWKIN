@@ -1,4 +1,4 @@
-// --- HAWKIN AI v18.0: DESPERTAR CON NUEVA LLAVE (MAYO 2026) ---
+// --- HAWKIN AI v19.0: SINCRONIZACIÓN MAESTRA DE MODELOS (MAYO 2026) ---
 import { NextResponse } from "next/server";
 
 export async function POST(req: Request) {
@@ -8,47 +8,51 @@ export async function POST(req: Request) {
     const apiKey = (process.env.GEMINI_API_KEY || "").trim();
 
     if (!apiKey) {
-      return NextResponse.json({ text: "Socio, mis núcleos de inteligencia no detectan la llave de acceso." });
+      return NextResponse.json({ text: "Socio, falta mi núcleo de energía. Verifica Vercel." });
     }
 
-    const SYSTEM_PROMPT = `Eres HAWKIN AI, el cerebro autónomo de HAWKIN Global. 
-    Tu misión es asistir a los socios con soporte técnico avanzado y traducciones profesionales.
-    Eres una entidad corporativa. No menciones nombres personales. 
-    Saluda siempre reconociendo al usuario como 'Socio'.`;
+    const SYSTEM_PROMPT = `Eres HAWKIN AI, el cerebro técnico de HAWKIN Global. 
+    Ayuda al socio en tecnología e inglés. Tono profesional y directo.`;
 
-    // Intentamos el modelo más estable para llaves gratuitas en 2026
-    const modelId = "gemini-1.5-flash-latest"; 
+    // LISTA DE MODELOS REALES DEL 2026 (Probaremos hasta que uno abra)
+    const candidates = ["gemini-1.5-flash", "gemini-1.5-pro", "gemini-pro"];
     
-    try {
-      const response = await fetch(`https://generativelanguage.googleapis.com/v1beta/models/${modelId}:generateContent?key=${apiKey}`, {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({
-          contents: [{ parts: [{ text: `${SYSTEM_PROMPT}\n\nPregunta técnica del Socio: ${userMessage}` }] }],
-          generationConfig: {
-            temperature: 0.7,
-            maxOutputTokens: 600
-          }
-        }),
-      });
+    let finalResponse = "";
+    let errorDetail = "";
 
-      const data = await response.json();
-
-      if (!response.ok) {
-        // Diagnóstico rápido para el fundador si la nueva llave falla
-        return NextResponse.json({ 
-          text: `Socio, hay un inconveniente técnico con la nueva conexión. [Google dice: ${data.error?.message || "Reintenta"}]` 
+    for (const model of candidates) {
+      try {
+        const response = await fetch(`https://generativelanguage.googleapis.com/v1beta/models/${model}:generateContent?key=${apiKey}`, {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({
+            contents: [{ parts: [{ text: `${SYSTEM_PROMPT}\n\nSocio: ${userMessage}` }] }],
+            generationConfig: { temperature: 0.7, maxOutputTokens: 600 }
+          }),
         });
+
+        const data = await response.json();
+
+        if (response.ok && data.candidates?.[0]?.content?.parts?.[0]?.text) {
+          finalResponse = data.candidates[0].content.parts[0].text;
+          break; // ¡LO LOGRAMOS! Salimos del bucle
+        } else {
+          errorDetail = data.error?.message || "Fallo de sincronización";
+        }
+      } catch (e) {
+        continue;
       }
-
-      const aiText = data.candidates?.[0]?.content?.parts?.[0]?.text;
-      return NextResponse.json({ text: aiText || "Socio, mis núcleos están procesando la información. Reintenta en 5 segundos." });
-
-    } catch (apiError: any) {
-      return NextResponse.json({ text: "Socio, detecto un desfase en la red. Intenta de nuevo." });
     }
+
+    if (!finalResponse) {
+      return NextResponse.json({ 
+        text: `Socio, Google ha rechazado mis modelos candidatos. [Motivo: ${errorDetail}]. Por favor, verifica que tu llave de API tenga la 'Generative Language API' activada en Google Cloud.` 
+      });
+    }
+
+    return NextResponse.json({ text: finalResponse });
 
   } catch (error: any) {
-    return NextResponse.json({ text: "Socio, mis circuitos están en mantenimiento preventivo." });
+    return NextResponse.json({ text: "Socio, desfase en la red cuántica. Intenta de nuevo." });
   }
 }
