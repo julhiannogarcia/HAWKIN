@@ -10,7 +10,7 @@ import TechnicalGaugeWidget from '@/components/TechnicalGaugeWidget';
 import MarketOverviewWidget from '@/components/MarketOverviewWidget';
 import EconomicCalendarWidget from '@/components/EconomicCalendarWidget';
 import CryptoHeatMapWidget from '@/components/CryptoHeatMapWidget';
-import { Activity, ShieldCheck, Zap, Globe, Coins, Clock, Bell, BellRing, Loader2, BarChart3, TrendingUp, LayoutGrid } from 'lucide-react';
+import { Activity, ShieldCheck, Zap, Globe, Clock, Bell, BellRing, Loader2, BarChart3, TrendingUp, LayoutGrid, Radio } from 'lucide-react';
 
 export default function GoldPage() {
   const [isAlertActive, setIsAlertActive] = useState(false);
@@ -31,8 +31,8 @@ export default function GoldPage() {
     <main className="min-h-screen bg-black text-white selection:bg-[#FFD700] selection:text-black overflow-x-hidden">
       <Header />
       
-      {/* 1. TICKER TAPE INSTITUCIONAL (SCROLLING PRECIOS LIVE) */}
-      <div className="fixed top-[88px] left-0 w-full z-[900] bg-black/60 backdrop-blur-md border-y border-white/5 h-12 overflow-hidden">
+      {/* 1. TICKER TAPE LIVE (FIJO SUPERIOR) */}
+      <div className="fixed top-[88px] left-0 w-full z-[900] bg-black/80 backdrop-blur-xl border-y border-white/5 h-12 flex items-center overflow-hidden">
          <TickerTapeWidget />
       </div>
 
@@ -43,8 +43,8 @@ export default function GoldPage() {
             <div className="bg-[#FFD700] text-black p-6 rounded-[30px] flex items-center gap-6 shadow-[0_20px_60px_rgba(255,215,0,0.4)] border-4 border-black">
                <BellRing className="animate-bounce" size={24} />
                <div>
-                  <h4 className="font-black uppercase text-sm italic">HAWKIN ALPHA ACTIVO</h4>
-                  <p className="text-[10px] font-bold uppercase opacity-80">Nodos de alta frecuencia sincronizados.</p>
+                  <h4 className="font-black uppercase text-sm italic tracking-tighter">SISTEMA ALPHA SINCRONIZADO</h4>
+                  <p className="text-[10px] font-bold uppercase opacity-80">Recibiendo datos de alta frecuencia.</p>
                </div>
             </div>
           </motion.div>
@@ -53,107 +53,101 @@ export default function GoldPage() {
 
       <div className="max-w-[1900px] mx-auto px-6 pt-56 pb-32">
         
-        {/* HEADER DE MANDO MUNDIAL */}
+        {/* CABECERA DE MANDO INSTITUCIONAL */}
         <header className="flex flex-col xl:flex-row justify-between items-start xl:items-end mb-16 gap-12">
           <div className="space-y-6">
             <div className="flex items-center gap-4">
-               <div className="px-4 py-1.5 bg-[#FFD700]/10 border border-[#FFD700]/30 rounded-full">
-                  <span className="text-[10px] font-black text-[#FFD700] uppercase tracking-[0.4em]">HAWKIN GOLD v4.0 • LIVE DATA</span>
+               <div className="px-4 py-1.5 bg-red-500/10 border border-red-500/30 rounded-full flex items-center gap-3">
+                  <Radio className="text-red-500 animate-pulse" size={14} />
+                  <span className="text-[10px] font-black text-red-500 uppercase tracking-[0.4em]">Transmisión en Vivo</span>
                </div>
-               <div className="flex items-center gap-2">
-                  <div className="w-2 h-2 bg-green-500 rounded-full animate-pulse" />
-                  <span className="text-[9px] font-black text-gray-500 uppercase">Binance Socket: Online</span>
+               <div className="flex items-center gap-3">
+                  <div className="w-2 h-2 bg-[#FFD700] rounded-full animate-ping" />
+                  <span className="text-[9px] font-black text-gray-500 uppercase">HAWKIN GOLD v4.1</span>
                </div>
             </div>
             <h1 className="text-6xl md:text-9xl font-black tracking-tighter leading-[0.8] uppercase italic">
-              Terminal de <br /><span className="bg-gradient-to-r from-[#FFD700] via-[#FDB931] to-[#FFD700] bg-clip-text text-transparent">Inversión.</span>
+              Soberanía <br /><span className="bg-gradient-to-r from-[#FFD700] via-[#FDB931] to-[#FFD700] bg-clip-text text-transparent">Financiera.</span>
             </h1>
+            <p className="text-gray-500 text-lg max-w-xl font-light italic">
+              "En el mundo del capital, la información lenta es pérdida. Bienvenida a la terminal de latencia cero."
+            </p>
           </div>
           
-          <div className="flex flex-wrap gap-4">
-             <button onClick={handleActivateAlerts} disabled={isAlertActive || isConnecting}
-               className={`px-10 py-6 rounded-[30px] transition-all flex items-center gap-6 ${isAlertActive ? 'bg-green-500 text-black' : 'bg-[#FFD700] text-black hover:scale-105 shadow-[0_20px_50px_rgba(255,215,0,0.2)]'}`}>
-                <div className="text-left">
-                   <p className="text-[8px] font-black opacity-60 uppercase">Estatus Alpha</p>
-                   <p className="text-sm font-black uppercase tracking-widest">{isConnecting ? 'SINCRONIZANDO...' : isAlertActive ? 'ALERTAS EN VIVO' : 'ACTIVAR SEÑALES PRO'}</p>
-                </div>
-                {isConnecting ? <Loader2 className="animate-spin" /> : <Zap className={isAlertActive ? 'fill-black' : ''} />}
-             </button>
-          </div>
+          <button onClick={handleActivateAlerts} disabled={isAlertActive || isConnecting}
+            className={`px-12 py-8 rounded-[40px] transition-all flex items-center gap-8 ${isAlertActive ? 'bg-green-500 text-black shadow-[0_0_50px_rgba(34,197,94,0.4)]' : 'bg-[#FFD700] text-black hover:scale-105 shadow-[0_20px_50px_rgba(255,215,0,0.2)]'}`}>
+             <div className="text-left">
+                <p className="text-[8px] font-black opacity-60 uppercase mb-1">Estatus del Terminal</p>
+                <p className="text-lg font-black uppercase tracking-widest">{isConnecting ? 'CONECTANDO...' : isAlertActive ? 'ALPHA LIVE' : 'ACTIVAR SEÑALES PRO'}</p>
+             </div>
+             {isConnecting ? <Loader2 className="animate-spin" size={32} /> : <Zap className={isAlertActive ? 'fill-black' : ''} size={32} />}
+          </button>
         </header>
 
         {/* --- GRID DE LA SUPER TERMINAL --- */}
-        <div className="grid grid-cols-1 lg:grid-cols-12 gap-8">
+        <div className="grid grid-cols-1 lg:grid-cols-12 gap-8 mb-8">
            
-           {/* COLUMNA IZQUIERDA: GRÁFICO PRINCIPAL */}
-           <div className="lg:col-span-8 space-y-8">
-              <div className="glass-card bg-black border-white/10 rounded-[60px] overflow-hidden h-[800px] shadow-[0_50px_100px_rgba(0,0,0,0.8)] relative group">
-                 <TradingViewWidget />
-              </div>
-              
-              {/* MAPA DE CALOR (MERCADO GLOBAL DE UN VISTAZO) */}
-              <div className="grid grid-cols-1 md:grid-cols-2 gap-8">
-                 <div className="glass-card bg-white/[0.01] border-white/5 rounded-[50px] p-10">
-                    <div className="flex items-center gap-4 mb-8">
-                       <LayoutGrid className="text-[#FFD700]" size={20} />
-                       <h3 className="text-sm font-black uppercase tracking-widest">Mapa de Calor Cripto</h3>
-                    </div>
-                    <CryptoHeatMapWidget />
-                 </div>
-                 <div className="glass-card bg-white/[0.01] border-white/5 rounded-[50px] p-10 flex flex-col justify-center text-center space-y-6">
-                    <TrendingUp className="mx-auto text-green-500" size={50} />
-                    <h3 className="text-2xl font-black uppercase italic italic">Sugerencia de Capital</h3>
-                    <p className="text-gray-400 text-sm font-light leading-relaxed">
-                       "Fundador, los datos sugieren una acumulación masiva de ballenas en los niveles actuales de BTC. <b className="text-white">Probabilidad de ruptura: 85%.</b>"
-                    </p>
-                    <button className="px-8 py-4 border border-white/10 rounded-full text-[10px] font-black uppercase tracking-[0.3em] hover:bg-white hover:text-black transition-all">Ver Estrategia Completa</button>
-                 </div>
-              </div>
+           {/* CENTRO DE MANDO: GRÁFICO PRINCIPAL */}
+           <div className="lg:col-span-8 glass-card bg-black border-white/10 rounded-[60px] overflow-hidden h-[850px] shadow-[0_60px_120px_rgba(0,0,0,1)] relative">
+              <TradingViewWidget />
            </div>
 
-           {/* COLUMNA DERECHA: ANALÍTICA Y EVENTOS */}
+           {/* LATERAL DERECHO: ANALÍTICA Y EVENTOS */}
            <div className="lg:col-span-4 space-y-8">
-              {/* SENTIMIENTO TÉCNICO */}
-              <div className="glass-card bg-gradient-to-br from-[#FFD700]/10 to-transparent border-[#FFD700]/20 p-12 rounded-[60px] shadow-2xl relative overflow-hidden group">
+              <div className="glass-card bg-gradient-to-br from-[#FFD700]/5 to-transparent border-[#FFD700]/20 p-12 rounded-[60px] shadow-2xl relative h-[450px] flex flex-col justify-between overflow-hidden">
                  <div className="relative z-10">
                     <h3 className="text-xs font-black uppercase tracking-[0.4em] text-[#FFD700] mb-10 flex items-center gap-3">
-                       <Activity size={18} className="text-[#FFD700]" /> Sentimiento Real-Time
+                       <BarChart3 size={18} /> Sentimiento Técnico
                     </h3>
                     <TechnicalGaugeWidget />
                  </div>
+                 <p className="text-[9px] font-bold text-gray-600 uppercase tracking-widest mt-6">Sincronización: 100% Real Time</p>
               </div>
 
-              {/* CALENDARIO ECONÓMICO */}
-              <div className="glass-card bg-white/[0.02] border-white/5 p-10 rounded-[60px] h-[400px] overflow-hidden group hover:border-white/10 transition-all">
-                 <h3 className="text-xs font-black uppercase tracking-[0.4em] text-gray-600 mb-8 flex items-center gap-3">
-                    <Clock size={16} /> Agenda de Mercados (FED/Global)
+              <div className="glass-card bg-white/[0.01] border-white/5 p-10 rounded-[60px] h-[375px] overflow-hidden group hover:border-white/10 transition-all">
+                 <h3 className="text-xs font-black uppercase tracking-[0.4em] text-gray-500 mb-8 flex items-center gap-3">
+                    <Clock size={16} /> Calendario Económico (FED/ECB)
                  </h3>
                  <div className="h-full overflow-y-auto no-scrollbar">
                     <EconomicCalendarWidget />
                  </div>
               </div>
+           </div>
+        </div>
 
-              {/* MERCADO GLOBAL (SP500, ORO, NASDAQ) */}
-              <div className="glass-card bg-black border-white/5 rounded-[60px] overflow-hidden h-[500px]">
-                 <div className="p-8 border-b border-white/5 flex items-center gap-4">
-                    <Globe className="text-blue-500" size={20} />
-                    <h3 className="text-[10px] font-black uppercase tracking-widest text-gray-500">Commodities & Indices</h3>
-                 </div>
-                 <div className="h-full">
-                    <MarketOverviewWidget />
-                 </div>
+        {/* --- SEGUNDA FILA: MAPA Y MERCADOS --- */}
+        <div className="grid grid-cols-1 lg:grid-cols-12 gap-8">
+           
+           {/* MAPA DE CALOR CRIPTO */}
+           <div className="lg:col-span-6 glass-card bg-black border-white/5 rounded-[60px] overflow-hidden h-[600px] shadow-2xl">
+              <div className="p-10 border-b border-white/5 flex items-center gap-4 bg-white/[0.01]">
+                 <LayoutGrid className="text-[#FFD700]" size={20} />
+                 <h3 className="text-sm font-black uppercase tracking-[0.3em]">Mapa de Calor Cripto (Top 50)</h3>
+              </div>
+              <div className="h-full p-4">
+                 <CryptoHeatMapWidget />
               </div>
            </div>
 
+           {/* MERCADO GLOBAL (INDICES Y COMMODITIES) */}
+           <div className="lg:col-span-6 glass-card bg-black border-white/5 rounded-[60px] overflow-hidden h-[600px] shadow-2xl">
+              <div className="p-10 border-b border-white/5 flex items-center gap-4 bg-white/[0.01]">
+                 <Globe className="text-blue-500" size={20} />
+                 <h3 className="text-sm font-black uppercase tracking-[0.3em]">Índices Globales y Metales</h3>
+              </div>
+              <div className="h-full p-4">
+                 <MarketOverviewWidget />
+              </div>
+           </div>
         </div>
 
-        {/* --- CLAÚSULA DE SOBERANÍA --- */}
+        {/* --- CLAÚSULA DE PROFESIONALISMO --- */}
         <section className="mt-40 text-center">
-           <div className="max-w-4xl mx-auto p-20 bg-gradient-to-b from-white/[0.03] to-transparent border border-white/10 rounded-[80px]">
+           <div className="max-w-4xl mx-auto p-20 bg-gradient-to-b from-white/[0.03] to-transparent border border-white/10 rounded-[80px] shadow-3xl">
               <ShieldCheck className="mx-auto text-[#FFD700] mb-10" size={80} />
-              <h2 className="text-4xl md:text-5xl font-black uppercase italic tracking-tighter">HAWKIN <span className="text-gray-500">Gold Standard Intelligence.</span></h2>
+              <h2 className="text-5xl font-black uppercase italic tracking-tighter">HAWKIN <span className="text-gray-500">Gold Standard Intel.</span></h2>
               <p className="text-gray-400 text-lg leading-relaxed font-light mt-10 italic max-w-2xl mx-auto">
-                "Esta no es una página de noticias. Es una <b className="text-white uppercase">puerta al flujo de capital mundial</b>. Cada dato es verídico, cada señal es analizada y cada gráfico corre en tiempo real."
+                "Esta terminal no utiliza datos retrasados. <b className="text-white uppercase tracking-widest font-black">Cada segundo es real</b>. Estás viendo el flujo del capital mundial en transmisión directa."
               </p>
            </div>
         </section>

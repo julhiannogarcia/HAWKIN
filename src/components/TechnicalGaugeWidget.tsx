@@ -3,10 +3,11 @@
 import { useEffect, useRef } from 'react';
 
 export default function TechnicalGaugeWidget() {
-  const container = useRef<HTMLDivElement>(null);
+  const containerRef = useRef<HTMLDivElement>(null);
 
   useEffect(() => {
-    if (container.current) {
+    if (containerRef.current) {
+      containerRef.current.innerHTML = '';
       const script = document.createElement("script");
       script.src = "https://s3.tradingview.com/external-embedding/embed-widget-technical-analysis.js";
       script.type = "text/javascript";
@@ -22,10 +23,9 @@ export default function TechnicalGaugeWidget() {
         "locale": "es",
         "colorTheme": "dark"
       });
-      container.current.innerHTML = '';
-      container.current.appendChild(script);
+      containerRef.current.appendChild(script);
     }
   }, []);
 
-  return <div ref={container} className="tradingview-widget-container" />;
+  return <div ref={containerRef} className="w-full h-full" />;
 }
