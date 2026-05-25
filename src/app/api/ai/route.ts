@@ -1,4 +1,4 @@
-// --- HAWKIN AI v20.0: SINCRONIZACIÓN v1 ESTABLE (MAYO 2026) ---
+// --- HAWKIN AI v22.0: ESCÁNER DE CONEXIÓN TOTAL (MAYO 2026) ---
 import { NextResponse } from "next/server";
 
 export async function POST(req: Request) {
@@ -8,52 +8,57 @@ export async function POST(req: Request) {
     const apiKey = (process.env.GEMINI_API_KEY || "").trim();
 
     if (!apiKey) {
-      return NextResponse.json({ text: "Socio, falta mi núcleo de energía. Verifica Vercel." });
+      return NextResponse.json({ text: "Socio, falta mi núcleo de energía. Configura la llave en Vercel." });
     }
 
-    const SYSTEM_PROMPT = `Eres HAWKIN AI, el cerebro técnico de HAWKIN Global. 
-    Ayuda al socio en tecnología e inglés. Tono profesional y directo.`;
+    const SYSTEM_PROMPT = `Eres HAWKIN AI, la inteligencia de HAWKIN Global. Ayuda al Socio en tecnología e inglés.`;
 
-    // LISTA DE CANDIDATOS PARA MAYO 2026 EN ENDPOINT v1
-    const candidates = ["gemini-1.5-flash", "gemini-1.5-pro", "gemini-pro"];
+    // LISTA DE COMBINACIONES PARA ENCONTRAR LA PUERTA ABIERTA DE GOOGLE
+    const config = [
+      { ver: 'v1', mod: 'gemini-2.0-flash' },
+      { ver: 'v1beta', mod: 'gemini-2.0-flash' },
+      { ver: 'v1', mod: 'gemini-1.5-flash-latest' },
+      { ver: 'v1beta', mod: 'gemini-1.5-flash-latest' },
+      { ver: 'v1', mod: 'gemini-pro' },
+      { ver: 'v1beta', mod: 'gemini-pro' }
+    ];
     
-    let finalResponse = "";
-    let lastError = "";
+    let finalAiText = "";
+    let lastTechnicalError = "";
 
-    for (const model of candidates) {
+    for (const attempt of config) {
       try {
-        // CAMBIO MAESTRO: Usamos el endpoint /v1/ en lugar de /v1beta/
-        const response = await fetch(`https://generativelanguage.googleapis.com/v1/models/${model}:generateContent?key=${apiKey}`, {
+        const response = await fetch(`https://generativelanguage.googleapis.com/${attempt.ver}/models/${attempt.mod}:generateContent?key=${apiKey}`, {
           method: 'POST',
           headers: { 'Content-Type': 'application/json' },
           body: JSON.stringify({
-            contents: [{ parts: [{ text: `${SYSTEM_PROMPT}\n\nSocio: ${userMessage}` }] }],
-            generationConfig: { temperature: 0.7, maxOutputTokens: 600 }
+            contents: [{ parts: [{ text: `${SYSTEM_PROMPT}\n\nSocio pregunta: ${userMessage}` }] }],
+            generationConfig: { temperature: 0.7, maxOutputTokens: 800 }
           }),
         });
 
         const data = await response.json();
 
         if (response.ok && data.candidates?.[0]?.content?.parts?.[0]?.text) {
-          finalResponse = data.candidates[0].content.parts[0].text;
-          break; 
+          finalAiText = data.candidates[0].content.parts[0].text;
+          break; // ¡CONEXIÓN EXITOSA!
         } else {
-          lastError = data.error?.message || "Fallo de handshake";
+          lastTechnicalError = data.error?.message || "Sin respuesta";
         }
       } catch (e) {
         continue;
       }
     }
 
-    if (!finalResponse) {
+    if (!finalAiText) {
       return NextResponse.json({ 
-        text: `Socio, Google ha rechazado la sincronización en v1. [Motivo: ${lastError}]. Por favor, verifica que en Google AI Studio la llave esté configurada para el modelo 'gemini-1.5-flash'.` 
+        text: `Socio, mis núcleos de Google están cerrados. [Motivo: ${lastTechnicalError}]. Por favor, verifica que tu llave de API tenga activado el modelo 'Gemini 1.5 Flash' en AI Studio.` 
       });
     }
 
-    return NextResponse.json({ text: finalResponse });
+    return NextResponse.json({ text: finalAiText });
 
   } catch (error: any) {
-    return NextResponse.json({ text: "Socio, desfase en la red cuántica. Intenta de nuevo." });
+    return NextResponse.json({ text: "Socio, detecto un desfase en la red. Intenta de nuevo." });
   }
 }
