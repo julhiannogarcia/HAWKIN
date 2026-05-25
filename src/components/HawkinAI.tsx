@@ -3,15 +3,25 @@
 import { motion, AnimatePresence } from 'framer-motion';
 import { useState, useEffect, useRef } from 'react';
 import { Send, Sparkles, X, Loader2 } from 'lucide-react';
+import { useSession } from 'next-auth/react';
 
 export default function HawkinAI() {
+  const { data: session } = useSession();
+  const userName = session?.user?.name || "Socio";
   const [isOpen, setIsOpen] = useState(false);
   const [messages, setMessages] = useState([
-    { role: 'ai', text: 'Hola, Socio. Soy HAWKIN AI. ¿En qué te puedo ayudar o asesorar hoy?' }
+    { role: 'ai', text: `Hola, ${userName}. Soy HAWKIN AI. ¿En qué te puedo ayudar o asesorar hoy?` }
   ]);
   const [inputValue, setInputValue] = useState('');
   const [isTyping, setIsTyping] = useState(false);
   const chatEndRef = useRef<HTMLDivElement>(null);
+
+  // Actualizar saludo cuando la sesión cargue
+  useEffect(() => {
+    if (session?.user?.name) {
+      setMessages([{ role: 'ai', text: `Hola, ${session.user.name}. Soy HAWKIN AI. Es un gusto verte de nuevo en el imperio.` }]);
+    }
+  }, [session]);
 
   const scrollToBottom = () => {
     chatEndRef.current?.scrollIntoView({ behavior: "smooth" });
@@ -33,7 +43,10 @@ export default function HawkinAI() {
       const response = await fetch('/api/ai', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ messages: [...messages, userMsg] }),
+        body: JSON.stringify({ 
+          messages: [...messages, userMsg],
+          userName: session?.user?.name // Enviamos el nombre real a la IA
+        }),
       });
 
       const data = await response.json();
@@ -45,7 +58,6 @@ export default function HawkinAI() {
     }
   };
 
-  // RENDERIZADO VISUAL SUTIL (Botones de teclado orgánicos)
   const formatAiMessage = (text: string) => {
     return text.split('\n').map((line, index) => {
       if (line.includes('[ ') && line.includes(' ]')) {
@@ -59,12 +71,7 @@ export default function HawkinAI() {
           </div>
         );
       }
-
-      return (
-        <p key={index} className="text-gray-300 mb-3 leading-relaxed">
-          {line.replace(/\[CYAN\]|\[RED\]|\[GREEN\]|\[YELLOW\]/g, '')}
-        </p>
-      );
+      return <p key={index} className="text-gray-300 mb-3 leading-relaxed">{line}</p>;
     });
   };
 
@@ -85,20 +92,16 @@ export default function HawkinAI() {
             initial={{ opacity: 0, scale: 0.95 }} animate={{ opacity: 1, scale: 1 }} exit={{ opacity: 0, scale: 0.95 }}
             className="fixed bottom-28 right-8 w-[380px] h-[600px] bg-black/95 backdrop-blur-3xl border border-white/10 rounded-[40px] z-[9999] flex flex-col overflow-hidden shadow-[0_40px_80px_rgba(0,0,0,0.9)]"
           >
-            {/* Header Limpio HAWKIN AI */}
             <div className="p-6 border-b border-white/5 flex justify-between items-center bg-gradient-to-r from-white/[0.03] to-transparent">
               <div className="flex items-center gap-3">
                 <div className="w-2.5 h-2.5 bg-cyan-400 rounded-full animate-pulse shadow-[0_0_10px_cyan]" />
-                <div>
-                  <h3 className="text-sm font-black tracking-widest text-white uppercase">HAWKIN <span className="text-cyan-400">AI</span></h3>
-                </div>
+                <h3 className="text-sm font-black tracking-widest text-white uppercase">HAWKIN <span className="text-cyan-400">AI</span></h3>
               </div>
               <button onClick={() => setIsOpen(false)} className="w-8 h-8 rounded-full flex items-center justify-center bg-white/5 text-gray-500 hover:text-white transition-all">
                 <X size={18} />
               </button>
             </div>
 
-            {/* Conversación Natural */}
             <div className="flex-1 overflow-y-auto p-6 space-y-6 scrollbar-hide bg-[url('https://www.transparenttextures.com/patterns/carbon-fibre.png')]">
               {messages.map((msg, i) => (
                 <motion.div initial={{ opacity: 0, y: 10 }} animate={{ opacity: 1, y: 0 }} key={i} className={`flex ${msg.role === 'ai' ? 'justify-start' : 'justify-end'}`}>
@@ -115,19 +118,18 @@ export default function HawkinAI() {
                 <div className="flex justify-start">
                    <div className="bg-white/5 border border-white/10 p-4 rounded-3xl flex items-center gap-2">
                       <Loader2 className="animate-spin text-cyan-400" size={16} />
-                      <span className="text-[10px] font-black text-gray-600 uppercase tracking-widest">IA Procesando...</span>
+                      <span className="text-[10px] font-black text-gray-500 uppercase tracking-widest">IA Procesando...</span>
                    </div>
                 </div>
               )}
               <div ref={chatEndRef} />
             </div>
 
-            {/* Input Minimalista */}
             <div className="p-6 bg-black border-t border-white/5 flex gap-3">
               <input
                 type="text" value={inputValue} onChange={(e) => setInputValue(e.target.value)}
                 onKeyPress={(e) => e.key === 'Enter' && handleSend()}
-                placeholder="¿En qué te puedo ayudar?"
+                placeholder={`Hablar con HAWKIN...`}
                 className="flex-1 bg-white/5 border border-white/10 rounded-2xl px-5 py-4 text-sm text-white outline-none focus:border-cyan-400 transition-all"
               />
               <button onClick={handleSend} disabled={isTyping} className="w-14 h-14 bg-cyan-400 rounded-2xl flex items-center justify-center text-black hover:bg-white transition-all shadow-xl disabled:opacity-50">
