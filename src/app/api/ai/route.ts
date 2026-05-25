@@ -1,4 +1,4 @@
-// --- HAWKIN AI v19.0: SINCRONIZACIÓN MAESTRA DE MODELOS (MAYO 2026) ---
+// --- HAWKIN AI v20.0: SINCRONIZACIÓN v1 ESTABLE (MAYO 2026) ---
 import { NextResponse } from "next/server";
 
 export async function POST(req: Request) {
@@ -14,15 +14,16 @@ export async function POST(req: Request) {
     const SYSTEM_PROMPT = `Eres HAWKIN AI, el cerebro técnico de HAWKIN Global. 
     Ayuda al socio en tecnología e inglés. Tono profesional y directo.`;
 
-    // LISTA DE MODELOS REALES DEL 2026 (Probaremos hasta que uno abra)
+    // LISTA DE CANDIDATOS PARA MAYO 2026 EN ENDPOINT v1
     const candidates = ["gemini-1.5-flash", "gemini-1.5-pro", "gemini-pro"];
     
     let finalResponse = "";
-    let errorDetail = "";
+    let lastError = "";
 
     for (const model of candidates) {
       try {
-        const response = await fetch(`https://generativelanguage.googleapis.com/v1beta/models/${model}:generateContent?key=${apiKey}`, {
+        // CAMBIO MAESTRO: Usamos el endpoint /v1/ en lugar de /v1beta/
+        const response = await fetch(`https://generativelanguage.googleapis.com/v1/models/${model}:generateContent?key=${apiKey}`, {
           method: 'POST',
           headers: { 'Content-Type': 'application/json' },
           body: JSON.stringify({
@@ -35,9 +36,9 @@ export async function POST(req: Request) {
 
         if (response.ok && data.candidates?.[0]?.content?.parts?.[0]?.text) {
           finalResponse = data.candidates[0].content.parts[0].text;
-          break; // ¡LO LOGRAMOS! Salimos del bucle
+          break; 
         } else {
-          errorDetail = data.error?.message || "Fallo de sincronización";
+          lastError = data.error?.message || "Fallo de handshake";
         }
       } catch (e) {
         continue;
@@ -46,7 +47,7 @@ export async function POST(req: Request) {
 
     if (!finalResponse) {
       return NextResponse.json({ 
-        text: `Socio, Google ha rechazado mis modelos candidatos. [Motivo: ${errorDetail}]. Por favor, verifica que tu llave de API tenga la 'Generative Language API' activada en Google Cloud.` 
+        text: `Socio, Google ha rechazado la sincronización en v1. [Motivo: ${lastError}]. Por favor, verifica que en Google AI Studio la llave esté configurada para el modelo 'gemini-1.5-flash'.` 
       });
     }
 
