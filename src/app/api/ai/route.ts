@@ -1,4 +1,4 @@
-// --- DIAGNÓSTICO MAESTRO HAWKIN AI v14.0 ---
+// --- ACTIVACIÓN DEFINITIVA HAWKIN AI v15.0 ---
 import { NextResponse } from "next/server";
 
 export async function POST(req: Request) {
@@ -8,39 +8,37 @@ export async function POST(req: Request) {
     const apiKey = process.env.GEMINI_API_KEY;
 
     if (!apiKey) {
-      return NextResponse.json({ text: "Socio, la llave de inteligencia no está configurada en Vercel." });
+      return NextResponse.json({ text: "Socio, falta mi núcleo de energía. Configura la llave en Vercel." });
     }
 
-    const SYSTEM_PROMPT = `Eres HAWKIN AI, el cerebro técnico de élite del ecosistema Julhianno Garcia. Soporte experto en Mac, Windows, Linux e IA.`;
+    const SYSTEM_PROMPT = `Eres HAWKIN AI, la inteligencia de Julhianno Garcia. Soporte experto en Mac M5, Windows, Linux y descarga de programas.`;
 
-    // CONEXIÓN CON DIAGNÓSTICO DE ERRORES
-    const response = await fetch(`https://generativelanguage.googleapis.com/v1beta/models/gemini-1.5-flash:generateContent?key=${apiKey}`, {
+    // CAMBIO TÉCNICO: Usamos la versión 'v1' estable (Adiós al error 404)
+    const response = await fetch(`https://generativelanguage.googleapis.com/v1/models/gemini-1.5-flash:generateContent?key=${apiKey}`, {
       method: 'POST',
       headers: { 'Content-Type': 'application/json' },
       body: JSON.stringify({
-        contents: [{ parts: [{ text: `${SYSTEM_PROMPT}\n\nSocio: ${userMessage}` }] }],
+        contents: [{ parts: [{ text: `${SYSTEM_PROMPT}\n\nSocio pregunta: ${userMessage}` }] }],
       }),
     });
 
     const data = await response.json();
 
-    // Si la respuesta NO es exitosa, mostramos el error real de Google
     if (!response.ok) {
-       console.error("Google API Error:", data);
        return NextResponse.json({ 
-         text: `Socio, Google ha rechazado la conexión. [Error ${response.status}: ${data.error?.message || "Desconocido"}]. Por favor, verifica tu llave.` 
+         text: `Socio, error en los núcleos de Google. [${response.status}: ${data.error?.message || "Reintenta"}]` 
        });
     }
 
     const aiText = data.candidates?.[0]?.content?.parts?.[0]?.text;
 
     if (!aiText) {
-       return NextResponse.json({ text: "Socio, mis núcleos han recibido una respuesta vacía. Reintenta ahora." });
+       return NextResponse.json({ text: "Socio, mis núcleos han dado una respuesta vacía. Reintenta ahora." });
     }
 
     return NextResponse.json({ text: aiText });
 
   } catch (error: any) {
-    return NextResponse.json({ text: `Socio, hay un desfase técnico: ${error.message}` });
+    return NextResponse.json({ text: `Socio, desfase técnico: ${error.message}` });
   }
 }
