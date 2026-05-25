@@ -1,10 +1,11 @@
 'use client';
 
+// HAWKIN GOLD v4.7 - REPARACIÓN FINAL DE IMPORTACIÓN
 import { motion, AnimatePresence } from 'framer-motion';
 import { useState, useEffect } from 'react';
 import Header from '@/components/Header';
 import Footer from '@/components/Footer';
-import GlobalTicker from '../../components/Ticker';
+import GlobalTicker from '@/components/Ticker'; // Usamos el alias oficial
 import TickerTapeWidget from '@/components/TickerTapeWidget';
 import TradingViewWidget from '@/components/TradingViewWidget';
 import TechnicalGaugeWidget from '@/components/TechnicalGaugeWidget';
