@@ -4,6 +4,7 @@ import { Suspense } from "react";
 import { SpeedInsights } from "@vercel/speed-insights/next"
 import HawkinAI from "@/components/HawkinAI";
 import GlobalAlert from "@/components/GlobalAlert";
+import { Providers } from "@/components/Providers";
 
 export const metadata: Metadata = {
   title: {
@@ -47,12 +48,14 @@ export default function RootLayout({ children }: { children: React.ReactNode }) 
         <link rel="canonical" href="https://aihawkin.com" />
       </head>
       <body className="antialiased bg-black text-white">
-        <Suspense fallback={null}>
-          <GlobalAlert />
-        </Suspense>
-        {children}
-        <HawkinAI />
-        <SpeedInsights />
+        <Providers>
+          <Suspense fallback={null}>
+            <GlobalAlert />
+          </Suspense>
+          {children}
+          <HawkinAI />
+          <SpeedInsights />
+        </Providers>
       </body>
     </html>
   );
