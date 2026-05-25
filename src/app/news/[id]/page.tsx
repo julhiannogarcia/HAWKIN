@@ -215,18 +215,20 @@ export default function ArticlePage() {
               {/* ANUNCIO DINÁMICO (Se oculta si es premium) */}
               <AdSpace isPremium={isPremium} type="inline" />
               
-              <div className="p-12 rounded-[50px] border border-cyan-500/10 bg-gradient-to-b from-white/[0.03] to-transparent text-center space-y-8 mt-20">
-                <h3 className="text-3xl font-black uppercase tracking-tighter text-white italic underline decoration-cyan-400">Análisis Protegido</h3>
-                <p className="text-sm text-gray-600 mb-8 leading-relaxed max-w-sm mx-auto">
-                  El análisis profundo y los manuales técnicos son exclusivos para socios de élite.
-                </p>
-                <button 
-                  onClick={() => handleCheckout('monthly')}
-                  className="btn-glow text-[10px] w-full max-w-xs py-5"
-                >
-                  DESBLOQUEAR POR {geoData?.currencySymbol || '$'}{geoData?.monthlyPrice || '8.00'}/MES
-                </button>
-              </div>
+              {!isPremium && (
+                <div className="p-12 rounded-[50px] border border-cyan-500/10 bg-gradient-to-b from-white/[0.03] to-transparent text-center space-y-8 mt-20">
+                  <h3 className="text-3xl font-black uppercase tracking-tighter text-white italic underline decoration-cyan-400">Análisis Protegido</h3>
+                  <p className="text-sm text-gray-600 mb-8 leading-relaxed max-w-sm mx-auto">
+                    El análisis profundo y los manuales técnicos son exclusivos para socios de élite.
+                  </p>
+                  <button 
+                    onClick={() => handleCheckout('monthly')}
+                    className="btn-glow text-[10px] w-full max-w-xs py-5"
+                  >
+                    DESBLOQUEAR POR {geoData?.currencySymbol || '$'}{geoData?.monthlyPrice || '8.00'}/MES
+                  </button>
+                </div>
+              )}
             </div>
 
             <div className="mt-40 pt-20 border-t border-white/5 flex flex-col md:flex-row justify-between items-center gap-12">
