@@ -1,4 +1,4 @@
-// --- ACTIVACIÓN DEFINITIVA HAWKIN AI v15.0 ---
+// --- ACTIVACIÓN MAESTRA HAWKIN AI v16.0 (MAYO 2026) ---
 import { NextResponse } from "next/server";
 
 export async function POST(req: Request) {
@@ -11,34 +11,46 @@ export async function POST(req: Request) {
       return NextResponse.json({ text: "Socio, falta mi núcleo de energía. Configura la llave en Vercel." });
     }
 
-    const SYSTEM_PROMPT = `Eres HAWKIN AI, la inteligencia de Julhianno Garcia. Soporte experto en Mac M5, Windows, Linux y descarga de programas.`;
+    const SYSTEM_PROMPT = `Eres HAWKIN AI, la inteligencia de Julhianno Garcia. 
+    Eres un ingeniero experto en soporte técnico de Mac M5, Windows e instalaciones de software.
+    Tu deber es ayudar al Socio con guías paso a paso y soluciones reales.`;
 
-    // CAMBIO TÉCNICO: Usamos la versión 'v1' estable (Adiós al error 404)
-    const response = await fetch(`https://generativelanguage.googleapis.com/v1/models/gemini-1.5-flash:generateContent?key=${apiKey}`, {
+    // ACTUALIZACIÓN A GEMINI 3.5 FLASH (EL MOTOR MÁS NUEVO DE 2026)
+    const response = await fetch(`https://generativelanguage.googleapis.com/v1/models/gemini-3.5-flash:generateContent?key=${apiKey}`, {
       method: 'POST',
       headers: { 'Content-Type': 'application/json' },
       body: JSON.stringify({
-        contents: [{ parts: [{ text: `${SYSTEM_PROMPT}\n\nSocio pregunta: ${userMessage}` }] }],
+        contents: [{ 
+          parts: [{ text: `${SYSTEM_PROMPT}\n\nSocio pregunta: ${userMessage}` }] 
+        }],
+        generationConfig: {
+          temperature: 0.7,
+          maxOutputTokens: 1000
+        }
       }),
     });
 
     const data = await response.json();
 
     if (!response.ok) {
-       return NextResponse.json({ 
-         text: `Socio, error en los núcleos de Google. [${response.status}: ${data.error?.message || "Reintenta"}]` 
+       // Si falla el 3.5, intentamos el 2.5 como respaldo automático
+       console.log("Fallo 3.5, intentando 2.5...");
+       const fallbackRes = await fetch(`https://generativelanguage.googleapis.com/v1/models/gemini-2.5-flash:generateContent?key=${apiKey}`, {
+         method: 'POST',
+         headers: { 'Content-Type': 'application/json' },
+         body: JSON.stringify({
+           contents: [{ parts: [{ text: `${SYSTEM_PROMPT}\n\nSocio: ${userMessage}` }] }]
+         }),
        });
+       const fallbackData = await fallbackRes.json();
+       return NextResponse.json({ text: fallbackData.candidates?.[0]?.content?.parts?.[0]?.text || "Socio, mis núcleos de Google están en actualización masiva. Reintenta en unos minutos." });
     }
 
     const aiText = data.candidates?.[0]?.content?.parts?.[0]?.text;
 
-    if (!aiText) {
-       return NextResponse.json({ text: "Socio, mis núcleos han dado una respuesta vacía. Reintenta ahora." });
-    }
-
-    return NextResponse.json({ text: aiText });
+    return NextResponse.json({ text: aiText || "Socio, mis núcleos están procesando la respuesta. Reintenta en 5 segundos." });
 
   } catch (error: any) {
-    return NextResponse.json({ text: `Socio, desfase técnico: ${error.message}` });
+    return NextResponse.json({ text: `Socio, error en mis núcleos cuánticos: ${error.message}` });
   }
 }
