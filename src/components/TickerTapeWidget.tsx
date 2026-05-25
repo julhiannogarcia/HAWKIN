@@ -3,10 +3,11 @@
 import { useEffect, useRef } from 'react';
 
 export default function TickerTapeWidget() {
-  const container = useRef<HTMLDivElement>(null);
+  const containerRef = useRef<HTMLDivElement>(null);
 
   useEffect(() => {
-    if (container.current && container.current.children.length === 0) {
+    if (containerRef.current) {
+      containerRef.current.innerHTML = '';
       const script = document.createElement("script");
       script.src = "https://s3.tradingview.com/external-embedding/embed-widget-ticker-tape.js";
       script.type = "text/javascript";
@@ -25,13 +26,11 @@ export default function TickerTapeWidget() {
         "displayMode": "adaptive",
         "locale": "es"
       });
-      container.current.appendChild(script);
+      containerRef.current.appendChild(script);
     }
   }, []);
 
   return (
-    <div className="tradingview-widget-container" ref={container}>
-      <div className="tradingview-widget-container__widget"></div>
-    </div>
+    <div className="w-full h-full" ref={containerRef} />
   );
 }
