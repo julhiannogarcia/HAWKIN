@@ -1,54 +1,93 @@
 'use client';
 
+import { useState, useEffect } from 'react';
 import Link from 'next/link';
-import { Menu, X } from 'lucide-react';
-import { useState } from 'react';
+import { usePathname } from 'next/navigation';
+import { motion, AnimatePresence } from 'framer-motion';
+import { Menu, X, Shield, Globe, GraduationCap, Building2, Coins } from 'lucide-react';
+import { signIn, signOut, useSession } from 'next-auth/react';
 
 export default function Header() {
-  const [isMenuOpen, setIsMenuOpen] = useState(false);
+  const [isOpen, setIsOpen] = useState(false);
+  const pathname = usePathname();
+  const { data: session } = useSession();
+
+  const navLinks = [
+    { name: 'Inicio', href: '/' },
+    { name: 'Radar', href: '/#news' },
+    { name: 'Academia', href: '/academy' },
+    { name: 'Shield', href: '/shield' },
+    { name: 'Colaboración', href: '/#planes' },
+    { name: 'B2B', href: '/b2b' },
+    { name: 'GOLD', href: '/gold', special: true }, // Nueva pestaña Oro
+  ];
 
   return (
-    <header className="fixed top-0 left-0 w-full z-50 px-6 py-4 md:px-8 md:py-6 flex justify-between items-center backdrop-blur-md border-b border-white/5 bg-black/20">
-      <Link href="/" className="text-xl md:text-2xl font-black tracking-widest bg-gradient-to-r from-cyan-400 to-purple-600 bg-clip-text text-transparent hover:opacity-80 transition-opacity">
-        HAWKIN
-      </Link>
-      
-      {/* Menu Desktop */}
-      <nav className="hidden md:flex gap-8 items-center text-[10px] font-black uppercase tracking-[0.2em] text-gray-400">
-        <Link href="/" className="hover:text-cyan-400 transition-colors">Inicio</Link>
-        <Link href="/news" className="hover:text-cyan-400 transition-colors">Radar</Link>
-        <Link href="/academy" className="hover:text-cyan-400 transition-colors">Academia</Link>
-        <Link href="/shield" className="hover:text-red-500 transition-colors">Shield</Link>
-        <Link href="/philanthropy" className="hover:text-amber-500 transition-colors">Colaboración</Link>
-        <Link href="/b2b" className="hover:text-purple-400 transition-colors">B2B</Link>
-        <Link href="/auth/signin" className="px-6 py-2 bg-white/5 border border-white/10 rounded-full hover:bg-white/10 transition-colors text-white">
-          Entrar
+    <header className="fixed top-0 left-0 w-full z-[1000] p-6">
+      <nav className="max-w-6xl mx-auto flex items-center justify-between glass-card bg-black/40 backdrop-blur-xl border-white/5 py-4 px-8 rounded-full shadow-[0_20px_50px_rgba(0,0,0,0.5)]">
+        
+        {/* LOGO */}
+        <Link href="/" className="flex items-center gap-2 group">
+          <div className="w-8 h-8 bg-gradient-to-tr from-cyan-400 to-purple-600 rounded-lg flex items-center justify-center group-hover:rotate-12 transition-transform">
+             <Shield className="text-white fill-white" size={18} />
+          </div>
+          <span className="text-xl font-black tracking-tighter uppercase italic">HAWKIN</span>
         </Link>
+
+        {/* NAV LINKS DESKTOP */}
+        <div className="hidden lg:flex items-center gap-8">
+          {navLinks.map((link) => (
+            <Link 
+              key={link.name} 
+              href={link.href}
+              className={`text-[10px] font-black uppercase tracking-widest transition-all hover:scale-110 ${
+                link.special 
+                  ? 'text-[#FFD700] hover:drop-shadow-[0_0_10px_rgba(255,215,0,0.5)]' 
+                  : pathname === link.href ? 'text-cyan-400' : 'text-gray-400 hover:text-white'
+              }`}
+            >
+              {link.name}
+            </Link>
+          ))}
+        </div>
+
+        {/* AUTH / ACTIONS */}
+        <div className="flex items-center gap-4">
+           {session ? (
+             <div className="flex items-center gap-4">
+               <span className="hidden md:block text-[9px] font-black text-gray-500 uppercase tracking-widest">Socio Alpha</span>
+               <button onClick={() => signOut()} className="px-6 py-2 bg-white/5 border border-white/10 rounded-full text-[9px] font-black uppercase hover:bg-red-500 transition-all">Salir</button>
+             </div>
+           ) : (
+             <button onClick={() => signIn()} className="px-8 py-2 bg-white text-black rounded-full text-[10px] font-black uppercase tracking-widest hover:bg-cyan-400 transition-all">Entrar</button>
+           )}
+           <button onClick={() => setIsOpen(!isOpen)} className="lg:hidden text-white"><Menu size={24} /></button>
+        </div>
       </nav>
 
-      {/* Botón Menu Móvil */}
-      <button 
-        className="md:hidden text-white p-2"
-        onClick={() => setIsMenuOpen(!isMenuOpen)}
-      >
-        {isMenuOpen ? <X size={24} /> : <Menu size={24} />}
-      </button>
-
-      {/* Overlay Menu Móvil */}
-      {isMenuOpen && (
-        <div className="fixed inset-0 top-[73px] bg-black/95 backdrop-blur-xl z-40 flex flex-col p-8 gap-8 md:hidden border-t border-white/5 overflow-y-auto">
-          <Link href="/" className="text-2xl font-black tracking-tighter" onClick={() => setIsMenuOpen(false)}>Inicio</Link>
-          <Link href="/news" className="text-2xl font-black tracking-tighter" onClick={() => setIsMenuOpen(false)}>Radar IA</Link>
-          <Link href="/academy" className="text-2xl font-black tracking-tighter" onClick={() => setIsMenuOpen(false)}>Academia</Link>
-          <Link href="/shield" className="text-2xl font-black tracking-tighter text-red-500" onClick={() => setIsMenuOpen(false)}>Shield (Ciberseguridad)</Link>
-          <Link href="/philanthropy" className="text-2xl font-black tracking-tighter text-amber-500" onClick={() => setIsMenuOpen(false)}>Impacto Social</Link>
-          <Link href="/b2b" className="text-2xl font-black tracking-tighter text-purple-400" onClick={() => setIsMenuOpen(false)}>Anunciantes B2B</Link>
-          <hr className="border-white/10" />
-          <Link href="/auth/signin" className="btn-glow text-center py-4 uppercase text-[10px]" onClick={() => setIsMenuOpen(false)}>
-            Entrar al Portal
-          </Link>
-        </div>
-      )}
+      {/* MOBILE MENU */}
+      <AnimatePresence>
+        {isOpen && (
+          <motion.div 
+            initial={{ opacity: 0, x: 100 }}
+            animate={{ opacity: 1, x: 0 }}
+            exit={{ opacity: 0, x: 100 }}
+            className="fixed inset-0 bg-black/95 z-[2000] p-12 flex flex-col gap-8 text-center"
+          >
+            <button onClick={() => setIsOpen(false)} className="absolute top-8 right-8 text-white"><X size={32} /></button>
+            {navLinks.map((link) => (
+              <Link 
+                key={link.name} 
+                href={link.href} 
+                onClick={() => setIsOpen(false)}
+                className={`text-3xl font-black uppercase italic ${link.special ? 'text-[#FFD700]' : 'text-white'}`}
+              >
+                {link.name}
+              </Link>
+            ))}
+          </motion.div>
+        )}
+      </AnimatePresence>
     </header>
   );
 }
