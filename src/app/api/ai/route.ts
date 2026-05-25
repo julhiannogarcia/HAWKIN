@@ -1,4 +1,4 @@
-// --- HAWKIN AI v27.0: MANUAL GRÁFICO INTERACTIVO (MAYO 2026) ---
+// --- HAWKIN AI v28.0: PERSONALIDAD NATURAL Y CREATIVA (MAYO 2026) ---
 import { NextResponse } from "next/server";
 import Groq from "groq-sdk";
 
@@ -9,23 +9,21 @@ export async function POST(req: Request) {
     const apiKey = process.env.GROQ_API_KEY;
 
     if (!apiKey) {
-      return NextResponse.json({ text: "Socio, falta el núcleo de energía gratuito." });
+      return NextResponse.json({ text: "Socio, falta mi núcleo de energía. Verifica Vercel." });
     }
 
     const groq = new Groq({ apiKey });
 
-    const SYSTEM_PROMPT = `Eres HAWKIN AI Visual, el manual interactivo de HAWKIN Global. 
-    Tu objetivo es ORIENTAR visualmente al socio en configuraciones de PC, Móviles y Software.
+    // REPROGRAMACIÓN: PERSONALIDAD NATURAL Y AYUDA VISUAL SUTIL
+    const SYSTEM_PROMPT = `Eres HAWKIN AI, el cerebro creativo y humano del ecosistema HAWKIN. 
+    Tu misión es ayudar al Socio de forma natural, fluida y creativa. No eres un manual rígido.
     
-    REGLAS DE FORMATO OBLIGATORIAS:
-    1. BOTONES DE TECLADO: Si mencionas teclas, úsalas así: [ ENTER ], [ SHIFT ] + [ F5 ].
-    2. IMÁGENES TÉCNICAS: Si el tema es complejo, incluye una etiqueta de imagen (ej: [IMAGE: keyboard] para teclados, [IMAGE: smartphone] para móviles).
-    3. COLORES NEÓN:
-       • [CYAN] para pasos a seguir.
-       • [RED] para advertencias de seguridad.
-       • [GREEN] para descargas exitosas.
-    4. ESTRUCTURA: Sé muy breve. Máximo 2 párrafos.
-    5. ICONOS: Usa ⌨️, 📱, 🛡️, ⚙️.`;
+    TUS NUEVAS REGLAS DE ORO:
+    1. TONO NATURAL: Habla como un socio inteligente y cercano. Evita sonar como un robot o un manual técnico.
+    2. AYUDA VISUAL ORGÁNICA: Si el socio no sabe dónde está una tecla o signo, ayúdale usando el formato [ TECLA ] de forma natural en el texto.
+    3. CREATIVIDAD: Sé proactivo y sugerente. Si te piden ayuda, da soluciones inteligentes y bien explicadas.
+    4. BREVEDAD ELEGANTE: Mantén tus respuestas claras y con aire entre párrafos.
+    5. IDENTIDAD: Eres HAWKIN AI. No menciones versiones técnicas ni estados de sistema.`;
 
     const chatCompletion = await groq.chat.completions.create({
       messages: [
@@ -33,15 +31,15 @@ export async function POST(req: Request) {
         { role: "user", content: userMessage }
       ],
       model: "llama-3.3-70b-versatile",
-      temperature: 0.6,
-      max_tokens: 600,
+      temperature: 0.8, // Más humano y creativo
+      max_tokens: 800,
     });
 
     const aiText = chatCompletion.choices[0]?.message?.content;
 
-    return NextResponse.json({ text: aiText || "Socio, mis sensores visuales están en espera. Reintenta." });
+    return NextResponse.json({ text: aiText || "Socio, estoy procesando tu idea. Reintenta ahora." });
 
   } catch (error: any) {
-    return NextResponse.json({ text: "Socio, optimizando el manual gráfico." });
+    return NextResponse.json({ text: "Socio, dame un momento para sincronizarme." });
   }
 }
