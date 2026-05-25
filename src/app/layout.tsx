@@ -4,7 +4,7 @@ import { Suspense } from "react";
 import { SpeedInsights } from "@vercel/speed-insights/next"
 import HawkinAI from "@/components/HawkinAI";
 import GlobalAlert from "@/components/GlobalAlert";
-import { Providers } from "@/components/Providers";
+import Providers from "@/components/Providers";
 
 export const metadata: Metadata = {
   title: {
@@ -49,7 +49,7 @@ export default function RootLayout({ children }: { children: React.ReactNode }) 
       </head>
       <body className="antialiased bg-black text-white">
         <Providers>
-          <Suspense fallback={null}>
+          <Suspense fallback={<div className="min-h-screen bg-black" />}>
             <GlobalAlert />
           </Suspense>
           {children}
