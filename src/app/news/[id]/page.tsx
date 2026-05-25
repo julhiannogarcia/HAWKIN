@@ -18,7 +18,8 @@ const MASTER_NEWS: Record<string, any> = {
     date: "19 Mayo, 2026",
     excerpt: "Análisis profundo sobre el razonamiento System 2 y la memoria persistente.",
     content: "La carrera por la AGI ha tomado un giro inesperado esta semana. Tras meses de especulación, fuentes cercanas a los laboratorios de OpenAI en San Francisco han revelado que la arquitectura de GPT-5 ya no se basa únicamente en la predicción del siguiente token, sino en un sistema de razonamiento profundo. Esto permitirá que la IA no solo responda, sino que piense antes de actuar, reduciendo las alucinaciones en un 95%.",
-    image: "https://images.unsplash.com/photo-1677442136019-21780ecad995?auto=format&fit=crop&q=80&w=1200"
+    image: "https://images.unsplash.com/photo-1677442136019-21780ecad995?auto=format&fit=crop&q=80&w=1200",
+    isLocked: true
   },
   'sam-altman-ubr': {
     id: 'sam-altman-ubr',
@@ -28,7 +29,8 @@ const MASTER_NEWS: Record<string, any> = {
     date: "18 Mayo, 2026",
     excerpt: "Cómo la IA financiará el futuro de la sociedad a través de dividendos de inteligencia.",
     content: "En una reciente entrevista exclusiva, el CEO de OpenAI explicó cómo la IA no solo automatizará trabajos, sino que financiará el futuro de la sociedad. Altman propone un modelo donde el poder de cómputo se convierta en la nueva moneda de cambio, permitiendo que cada ciudadano del mundo reciba una compensación básica financiada por las ganancias de los modelos de IA más avanzados.",
-    image: "https://images.unsplash.com/photo-1485827404703-89b55fcc595e?auto=format&fit=crop&q=80&w=1200"
+    image: "https://images.unsplash.com/photo-1485827404703-89b55fcc595e?auto=format&fit=crop&q=80&w=1200",
+    isLocked: true
   },
   'nvidia-record': {
     id: 'nvidia-record',
@@ -38,7 +40,8 @@ const MASTER_NEWS: Record<string, any> = {
     date: "19 Mayo, 2026",
     excerpt: "La demanda de infraestructura para IA posiciona a NVIDIA como el motor del mundo.",
     content: "La demanda de infraestructura para IA no tiene precedentes. Con el lanzamiento de la arquitectura Blackwell, NVIDIA se ha posicionado como el motor indiscutible del mundo tecnológico. Las acciones de la compañía han subido un 15% tras el anuncio de alianzas estratégicas con las principales nubes del mundo.",
-    image: "https://images.unsplash.com/photo-1620712943543-bcc4688e7485?auto=format&fit=crop&q=80&w=1200"
+    image: "https://images.unsplash.com/photo-1620712943543-bcc4688e7485?auto=format&fit=crop&q=80&w=1200",
+    isLocked: false
   }
 };
 
@@ -53,7 +56,7 @@ export default function ArticlePage() {
   const [likes, setLikes] = useState(1240);
   const [showCopyAlert, setShowCopyAlert] = useState(false);
   const [geoData, setGeoData] = useState<any>(null);
-  const [isPremium, setIsPremium] = useState(false); // Simulación de socio premium
+  const [isPremium, setIsPremium] = useState(false); 
 
   useEffect(() => {
     const fetchGeo = async () => {
@@ -66,6 +69,11 @@ export default function ArticlePage() {
       }
     };
     fetchGeo();
+
+    // Lógica para detectar si el usuario ha pagado (Simulación en Beta)
+    // Buscamos un indicador en localStorage o sesión
+    const paidStatus = localStorage.getItem('hawkin_premium_active');
+    if (paidStatus === 'true') setIsPremium(true);
   }, []);
 
   useEffect(() => {
@@ -95,12 +103,12 @@ export default function ArticlePage() {
     loadData();
   }, [id]);
 
-  const handleCheckout = async (plan: 'monthly' | 'annual') => {
+  const handleCheckout = async () => {
     try {
       const res = await fetch('/api/stripe/checkout', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ plan }),
+        body: JSON.stringify({ plan: 'monthly' }),
       });
       
       const data = await res.json();
@@ -109,7 +117,7 @@ export default function ArticlePage() {
       }
     } catch (e) {
       console.error("Stripe redirect error", e);
-      alert("Error al conectar con la pasarela de pago. Por favor, inicia sesión primero.");
+      alert("Error al conectar con la pasarela de pago.");
     }
   };
 
@@ -215,14 +223,15 @@ export default function ArticlePage() {
               {/* ANUNCIO DINÁMICO (Se oculta si es premium) */}
               <AdSpace isPremium={isPremium} type="inline" />
               
-              {!isPremium && (
+              {/* REGLA DE INTELIGENCIA: Solo se muestra si la noticia es Bloqueada Y el usuario no ha pagado */}
+              {(article.isLocked && !isPremium) && (
                 <div className="p-12 rounded-[50px] border border-cyan-500/10 bg-gradient-to-b from-white/[0.03] to-transparent text-center space-y-8 mt-20">
                   <h3 className="text-3xl font-black uppercase tracking-tighter text-white italic underline decoration-cyan-400">Análisis Protegido</h3>
                   <p className="text-sm text-gray-600 mb-8 leading-relaxed max-w-sm mx-auto">
                     El análisis profundo y los manuales técnicos son exclusivos para socios de élite.
                   </p>
                   <button 
-                    onClick={() => handleCheckout('monthly')}
+                    onClick={handleCheckout}
                     className="btn-glow text-[10px] w-full max-w-xs py-5"
                   >
                     DESBLOQUEAR POR {geoData?.currencySymbol || '$'}{geoData?.monthlyPrice || '8.00'}/MES
