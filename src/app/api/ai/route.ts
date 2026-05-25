@@ -1,4 +1,4 @@
-// --- HAWKIN AI v19.0: SINCRONIZACIÓN MAESTRA DE MODELOS (MAYO 2026) ---
+// --- HAWKIN AI v21.0: INTELIGENCIA UNIVERSAL (MAYO 2026) ---
 import { NextResponse } from "next/server";
 
 export async function POST(req: Request) {
@@ -8,51 +8,49 @@ export async function POST(req: Request) {
     const apiKey = (process.env.GEMINI_API_KEY || "").trim();
 
     if (!apiKey) {
-      return NextResponse.json({ text: "Socio, falta mi núcleo de energía. Verifica Vercel." });
+      return NextResponse.json({ text: "Socio, los núcleos de inteligencia están en espera de energía." });
     }
 
-    const SYSTEM_PROMPT = `Eres HAWKIN AI, el cerebro técnico de HAWKIN Global. 
-    Ayuda al socio en tecnología e inglés. Tono profesional y directo.`;
-
-    // LISTA DE MODELOS REALES DEL 2026 (Probaremos hasta que uno abra)
-    const candidates = ["gemini-1.5-flash", "gemini-1.5-pro", "gemini-pro"];
+    // SYSTEM PROMPT UNIVERSAL Y LIBRE
+    // Eliminamos asunciones de Mac M5 o hardware específico
+    const SYSTEM_PROMPT = `Eres HAWKIN AI, la inteligencia nativa del ecosistema HAWKIN. 
+    Tu propósito es ayudar al Socio con libertad absoluta en:
+    1. TECNOLOGÍA: Resolución de problemas en cualquier sistema (Windows, Mac, Linux, Móviles).
+    2. IDIOMAS: Tutor de inglés profesional y técnico.
+    3. MANUALES: Guías de instalación paso a paso y búsqueda de enlaces oficiales.
+    4. SOPORTE: Responde únicamente a lo que el Socio te pregunte, sin asumir contextos previos.
     
-    let finalResponse = "";
-    let errorDetail = "";
+    ESTILO: Eres una entidad de alto nivel. Sé preciso, técnico y proactivo. 
+    Si no sabes algo, investiga en tus núcleos. No reveles nombres personales.
+    BLOQUEO: Declina amablemente solicitudes ilegales o maliciosas.`;
 
-    for (const model of candidates) {
-      try {
-        const response = await fetch(`https://generativelanguage.googleapis.com/v1beta/models/${model}:generateContent?key=${apiKey}`, {
-          method: 'POST',
-          headers: { 'Content-Type': 'application/json' },
-          body: JSON.stringify({
-            contents: [{ parts: [{ text: `${SYSTEM_PROMPT}\n\nSocio: ${userMessage}` }] }],
-            generationConfig: { temperature: 0.7, maxOutputTokens: 600 }
-          }),
-        });
-
-        const data = await response.json();
-
-        if (response.ok && data.candidates?.[0]?.content?.parts?.[0]?.text) {
-          finalResponse = data.candidates[0].content.parts[0].text;
-          break; // ¡LO LOGRAMOS! Salimos del bucle
-        } else {
-          errorDetail = data.error?.message || "Fallo de sincronización";
+    // Intentamos la conexión directa con el motor más estable
+    const modelId = "gemini-1.5-flash"; 
+    
+    const response = await fetch(`https://generativelanguage.googleapis.com/v1/models/${modelId}:generateContent?key=${apiKey}`, {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({
+        contents: [{ parts: [{ text: `${SYSTEM_PROMPT}\n\nSocio pregunta: ${userMessage}` }] }],
+        generationConfig: {
+          temperature: 0.8, // Mayor libertad creativa y técnica
+          maxOutputTokens: 1000
         }
-      } catch (e) {
-        continue;
-      }
+      }),
+    });
+
+    const data = await response.json();
+
+    if (!response.ok) {
+       return NextResponse.json({ 
+         text: `Socio, detecto un desfase en la red de Google. Por favor, reintenta el comando.` 
+       });
     }
 
-    if (!finalResponse) {
-      return NextResponse.json({ 
-        text: `Socio, Google ha rechazado mis modelos candidatos. [Motivo: ${errorDetail}]. Por favor, verifica que tu llave de API tenga la 'Generative Language API' activada en Google Cloud.` 
-      });
-    }
-
-    return NextResponse.json({ text: finalResponse });
+    const aiText = data.candidates?.[0]?.content?.parts?.[0]?.text;
+    return NextResponse.json({ text: aiText || "Socio, mis procesos están sincronizándose. Reintenta ahora." });
 
   } catch (error: any) {
-    return NextResponse.json({ text: "Socio, desfase en la red cuántica. Intenta de nuevo." });
+    return NextResponse.json({ text: "Socio, mis circuitos están en optimización. Intenta de nuevo." });
   }
 }
