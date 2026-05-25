@@ -72,8 +72,9 @@ export default function B2BPage() {
   };
 
   const handleContact = () => {
-    const message = encodeURIComponent("Hola HAWKIN, deseo anunciar mi negocio en la plataforma. ¿Cuáles son los pasos a seguir?");
-    window.open(`https://wa.me/51900000000?text=${message}`, '_blank');
+    const subject = encodeURIComponent("Propuesta Comercial - HAWKIN Ads");
+    const body = encodeURIComponent("Hola HAWKIN,\n\nDeseo anunciar mi negocio en la plataforma. Mi marca es [Nombre de Empresa] y estoy interesado en el espacio [Tipo de Anuncio].\n\nQuedo a la espera de sus instrucciones.\n\nSaludos.");
+    window.open(`mailto:julhianno@aihawkin.com?subject=${subject}&body=${body}`, '_self');
   };
 
   // Componente interno para los botones de PayPal en B2B
