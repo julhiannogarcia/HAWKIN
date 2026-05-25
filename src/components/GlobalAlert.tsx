@@ -1,12 +1,14 @@
 'use client';
 
 import { useState, useEffect } from 'react';
+import { useSearchParams } from 'next/navigation';
 import { motion, AnimatePresence } from 'framer-motion';
 import confetti from 'canvas-confetti';
 import { Heart, X } from 'lucide-react';
 
 export default function GlobalAlert() {
   const [alert, setAlert] = useState<{name: string, message: string} | null>(null);
+  const searchParams = useSearchParams();
 
   const triggerCelebration = (name: string, message: string) => {
     setAlert({ name, message });
@@ -33,13 +35,16 @@ export default function GlobalAlert() {
     setTimeout(() => setAlert(null), 8000);
   };
 
-  // Simulación de una donación real para que Julhianno la vea
   useEffect(() => {
-    const timer = setTimeout(() => {
-      triggerCelebration("Julhianno Garcia", "¡Creyendo en el futuro de HAWKIN! 🚀💎");
-    }, 5000);
-    return () => clearTimeout(timer);
-  }, []);
+    // REGLA DE ORO: Solo se activa si regresamos de un pago exitoso
+    const success = searchParams.get('success');
+    if (success === 'true') {
+      const timer = setTimeout(() => {
+        triggerCelebration("Nuevo Socio de Élite", "¡Creyendo en el futuro de HAWKIN! 🚀💎");
+      }, 1000);
+      return () => clearTimeout(timer);
+    }
+  }, [searchParams]);
 
   return (
     <AnimatePresence>

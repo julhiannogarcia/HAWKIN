@@ -1,21 +1,22 @@
 'use client';
 
-import { motion, AnimatePresence } from 'framer-motion';
+import { motion } from 'framer-motion';
 import { useState, useRef, useEffect } from 'react';
 import Header from '@/components/Header';
 import Footer from '@/components/Footer';
 import Ticker from '@/components/Ticker';
-import { BarChart3, UploadCloud, PieChart, ShieldCheck, Globe, ShoppingBag, Laptop, Shirt, MessageCircle, Play, Loader2, FileCheck, CheckCircle2 } from 'lucide-react';
+import { BarChart3, UploadCloud, Globe, ShoppingBag, MessageCircle, Play, Loader2, FileCheck, CheckCircle2 } from 'lucide-react';
 
 export default function B2BPage() {
   const [isUploading, setIsUploading] = useState(false);
   const [uploadProgress, setUploadProgress] = useState(0);
   const [showSuccess, setShowSuccess] = useState(false);
-  const [selectedPlan, setSelectedPlan] = useState<string | null>(null);
+  const [isPaypalLoaded, setIsPaypalLoaded] = useState(false);
   const [geoData, setGeoData] = useState<any>(null);
   const fileInputRef = useRef<HTMLInputElement>(null);
 
   useEffect(() => {
+    // 1. Obtener moneda por IP
     const fetchGeo = async () => {
       try {
         const res = await fetch('/api/geo');
@@ -26,6 +27,19 @@ export default function B2BPage() {
       }
     };
     fetchGeo();
+
+    // 2. Cargar el SDK de PayPal
+    const clientId = process.env.NEXT_PUBLIC_PAYPAL_CLIENT_ID || 'test';
+    if (!document.getElementById('paypal-sdk-b2b')) {
+      const script = document.createElement('script');
+      script.id = 'paypal-sdk-b2b';
+      script.src = `https://www.paypal.com/sdk/js?client-id=${clientId}&currency=USD`;
+      script.async = true;
+      script.onload = () => setIsPaypalLoaded(true);
+      document.body.appendChild(script);
+    } else {
+      setIsPaypalLoaded(true);
+    }
   }, []);
 
   const adPlacements = [
@@ -57,16 +71,38 @@ export default function B2BPage() {
     }, 150);
   };
 
-  const handleCheckout = async (planId: string, price: number) => {
-    setSelectedPlan(planId);
-    // Aquí invocaremos a la pasarela de pago real
-    // Simulamos la redirección profesional
-    alert(`Socio, estamos conectando con la red bancaria para procesar tu anuncio por un valor de ${geoData?.currencySymbol || '$'}${(price * (geoData?.rate || 1)).toFixed(2)}. Redirigiendo...`);
-  };
-
   const handleContact = () => {
     const message = encodeURIComponent("Hola HAWKIN, deseo anunciar mi negocio en la plataforma. ¿Cuáles son los pasos a seguir?");
     window.open(`https://wa.me/51900000000?text=${message}`, '_blank');
+  };
+
+  // Componente interno para los botones de PayPal en B2B
+  const PaypalButtonB2B = ({ planId, amount }: { planId: string, amount: string }) => {
+    const containerRef = useRef<HTMLDivElement>(null);
+
+    useEffect(() => {
+      if (isPaypalLoaded && containerRef.current && window.paypal) {
+        containerRef.current.innerHTML = '';
+        window.paypal.Buttons({
+          style: { layout: 'horizontal', color: 'blue', shape: 'pill', label: 'buynow', height: 45 },
+          createOrder: (data: any, actions: any) => {
+            return actions.order.create({
+              purchase_units: [{
+                description: `Publicidad HAWKIN - ${planId}`,
+                amount: { value: amount }
+              }]
+            });
+          },
+          onApprove: async (data: any, actions: any) => {
+            const order = await actions.order.capture();
+            alert(`¡Reserva Exitosa! Su espacio publicitario ha sido bloqueado. ID: ${order.id}`);
+            window.location.href = "/b2b?success=true";
+          }
+        }).render(containerRef.current);
+      }
+    }, [isPaypalLoaded, planId, amount]);
+
+    return <div ref={containerRef} className="mt-8" />;
   };
 
   return (
@@ -100,29 +136,24 @@ export default function B2BPage() {
            <div className="bg-black/60 rounded-[59px] p-8 md:p-20">
               <div className="grid grid-cols-1 lg:grid-cols-3 gap-16">
                  
-                 {/* Estadísticas */}
                  <div className="lg:col-span-2 space-y-16">
-                    <h2 className="text-3xl font-black uppercase tracking-widest italic">Alcance <span className="text-cyan-400">Sin Límites</span></h2>
+                    <h2 className="text-3xl font-black uppercase tracking-widest italic text-white">Alcance <span className="text-cyan-400">Sin Límites</span></h2>
                     <div className="grid grid-cols-1 md:grid-cols-3 gap-8 text-center">
                        <div className="p-8 bg-white/[0.02] rounded-3xl border border-white/5">
-                          <Laptop className="mx-auto text-cyan-400 mb-4" />
-                          <p className="text-[10px] font-black text-gray-500 uppercase">Tecnología</p>
-                          <h4 className="text-3xl font-black mt-2">450K</h4>
+                          <p className="text-[10px] font-black text-gray-500 uppercase mb-4 tracking-widest">Tecnología</p>
+                          <h4 className="text-3xl font-black mt-2 text-cyan-400">450K</h4>
                        </div>
                        <div className="p-8 bg-white/[0.02] rounded-3xl border border-white/5">
-                          <Shirt className="mx-auto text-purple-400 mb-4" />
-                          <p className="text-[10px] font-black text-gray-500 uppercase">Moda & Estilo</p>
-                          <h4 className="text-3xl font-black mt-2">320K</h4>
+                          <p className="text-[10px] font-black text-gray-500 uppercase mb-4 tracking-widest">Moda & Estilo</p>
+                          <h4 className="text-3xl font-black mt-2 text-purple-500">320K</h4>
                        </div>
                        <div className="p-8 bg-white/[0.02] rounded-3xl border border-white/5">
-                          <ShoppingBag className="mx-auto text-green-400 mb-4" />
-                          <p className="text-[10px] font-black text-gray-500 uppercase">Retail</p>
-                          <h4 className="text-3xl font-black mt-2">280K</h4>
+                          <p className="text-[10px] font-black text-gray-500 uppercase mb-4 tracking-widest">Retail</p>
+                          <h4 className="text-3xl font-black mt-2 text-green-500">280K</h4>
                        </div>
                     </div>
                  </div>
 
-                 {/* CARGA DE MATERIAL REAL */}
                  <div className="space-y-10">
                     <div className="p-10 bg-gradient-to-br from-cyan-400 to-purple-600 text-black rounded-[40px] flex flex-col items-center gap-6 text-center shadow-2xl relative overflow-hidden">
                        <AnimatePresence mode="wait">
@@ -134,14 +165,13 @@ export default function B2BPage() {
                          ) : showSuccess ? (
                            <motion.div key="success" initial={{opacity:0, scale:0.8}} animate={{opacity:1, scale:1}} className="space-y-4">
                               <FileCheck className="mx-auto" size={40} />
-                              <p className="text-[10px] font-black uppercase">¡Material Recibido!</p>
+                              <p className="text-[10px] font-black uppercase text-black">¡Material Recibido!</p>
                            </motion.div>
                          ) : (
                            <>
                              <UploadCloud size={40} className="animate-bounce" />
                              <div>
                                 <h4 className="text-lg font-black uppercase italic leading-tight">Sube tu Arte <br />o Link de Venta</h4>
-                                <p className="text-[9px] font-bold opacity-70 mt-2 uppercase">Video, Imagen o Enlace Directo</p>
                              </div>
                              <button onClick={handleFileSelect} className="w-full py-4 bg-black text-white rounded-2xl text-[10px] font-black uppercase tracking-widest hover:scale-105 transition-all">
                                 SUBIR MATERIAL
@@ -155,11 +185,11 @@ export default function B2BPage() {
            </div>
         </div>
 
-        {/* SELECTOR DE PLANES Y COBROS */}
+        {/* SELECTOR DE PLANES CON PAYPAL REAL */}
         <section id="ad-selector" className="mt-40 space-y-16">
            <div className="text-center">
-              <h2 className="text-3xl md:text-5xl font-black uppercase italic tracking-tighter">Escoge tu <span className="text-cyan-400">Espacio de Poder</span></h2>
-              <p className="text-gray-500 mt-4 uppercase font-black text-xs tracking-widest">Precios en moneda local: {geoData?.currencyName || 'Dólares'}</p>
+              <h2 className="text-3xl md:text-5xl font-black uppercase italic tracking-tighter text-white">Escoge tu <span className="text-cyan-400">Espacio de Poder</span></h2>
+              <p className="text-gray-500 mt-4 uppercase font-black text-xs tracking-widest">Reserva segura global vía PayPal • {geoData?.currencyName || 'Soles'}</p>
            </div>
            
            <div className="grid grid-cols-1 md:grid-cols-3 gap-8">
@@ -169,9 +199,9 @@ export default function B2BPage() {
                       <div className="w-12 h-12 bg-white/5 rounded-2xl flex items-center justify-center group-hover:scale-110 transition-transform">
                          {ad.icon}
                       </div>
-                      <h3 className="text-2xl font-black uppercase leading-tight">{ad.title}</h3>
+                      <h3 className="text-2xl font-black uppercase leading-tight text-white">{ad.title}</h3>
                       <div className="flex items-baseline gap-2">
-                         <span className="text-3xl font-black text-white">{geoData?.currencySymbol || '$'}{(ad.price * (geoData?.rate || 1)).toFixed(2)}</span>
+                         <span className="text-3xl font-black text-white">{geoData?.currencySymbol || 'S/'}{(ad.price * (geoData?.rate || 1)).toFixed(2)}</span>
                          <span className="text-gray-600 text-[10px] font-bold uppercase">/ SEMANA</span>
                       </div>
                       <div className="pt-6 border-t border-white/5">
@@ -180,20 +210,20 @@ export default function B2BPage() {
                          </div>
                       </div>
                    </div>
-                   <button 
-                     onClick={() => handleCheckout(ad.id, ad.price)}
-                     className="mt-12 w-full py-5 rounded-2xl bg-white text-black font-black uppercase tracking-widest text-[10px] hover:bg-cyan-400 transition-colors"
-                   >
-                     RESERVAR Y PAGAR
-                   </button>
+                   
+                   {/* BOTÓN DE PAYPAL DINÁMICO */}
+                   <div className="mt-12 min-h-[60px]">
+                      {isPaypalLoaded ? (
+                        <PaypalButtonB2B planId={ad.id} amount={(ad.price).toFixed(2)} />
+                      ) : (
+                        <div className="w-full h-12 bg-white/5 animate-pulse rounded-full flex items-center justify-center text-[9px] text-gray-600 font-black uppercase">
+                          Cargando Pasarela...
+                        </div>
+                      )}
+                   </div>
                 </div>
               ))}
            </div>
-        </section>
-
-        <section className="mt-40 text-center pb-20">
-           <p className="text-gray-600 text-[10px] font-black uppercase tracking-[0.4em] mb-12">Publicidad para cualquier negocio • 100% Real</p>
-           <h2 className="text-4xl font-black uppercase italic leading-none">Tu éxito empieza <br /><span className="text-cyan-400 text-6xl md:text-8xl">AQUÍ.</span></h2>
         </section>
 
       </div>
