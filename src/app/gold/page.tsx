@@ -10,12 +10,30 @@ import TechnicalGaugeWidget from '@/components/TechnicalGaugeWidget';
 import MarketOverviewWidget from '@/components/MarketOverviewWidget';
 import EconomicCalendarWidget from '@/components/EconomicCalendarWidget';
 import CryptoHeatMapWidget from '@/components/CryptoHeatMapWidget';
-import { Activity, ShieldCheck, Zap, Globe, Clock, Bell, BellRing, Loader2, BarChart3, TrendingUp, LayoutGrid, Radio } from 'lucide-react';
+import { Activity, ShieldCheck, Zap, Globe, Clock, Bell, BellRing, Loader2, BarChart3, TrendingUp, LayoutGrid, Radio, ExternalLink, Info } from 'lucide-react';
 
 export default function GoldPage() {
+  const [news, setNews] = useState<any[]>([]);
+  const [insights, setInsights] = useState<any[]>([]);
+  const [loading, setLoading] = useState(true);
   const [isAlertActive, setIsAlertActive] = useState(false);
   const [showNotification, setShowSuccess] = useState(false);
   const [isConnecting, setIsConnecting] = useState(false);
+
+  useEffect(() => {
+    const loadGoldData = async () => {
+      try {
+        const res = await fetch('/api/news/gold');
+        const data = await res.json();
+        setNews(data.news || []);
+        setInsights(data.insights || []);
+        setLoading(false);
+      } catch (e) {
+        console.error("Error loading Gold news", e);
+      }
+    };
+    loadGoldData();
+  }, []);
 
   const handleActivateAlerts = () => {
     setIsConnecting(true);
@@ -31,7 +49,6 @@ export default function GoldPage() {
     <main className="min-h-screen bg-black text-white selection:bg-[#FFD700] selection:text-black overflow-x-hidden">
       <Header />
       
-      {/* 1. TICKER TAPE LIVE (FIJO SUPERIOR) */}
       <div className="fixed top-[88px] left-0 w-full z-[900] bg-black/80 backdrop-blur-xl border-y border-white/5 h-12 flex items-center overflow-hidden">
          <TickerTapeWidget />
       </div>
@@ -43,8 +60,8 @@ export default function GoldPage() {
             <div className="bg-[#FFD700] text-black p-6 rounded-[30px] flex items-center gap-6 shadow-[0_20px_60px_rgba(255,215,0,0.4)] border-4 border-black">
                <BellRing className="animate-bounce" size={24} />
                <div>
-                  <h4 className="font-black uppercase text-sm italic tracking-tighter">SISTEMA ALPHA SINCRONIZADO</h4>
-                  <p className="text-[10px] font-bold uppercase opacity-80">Recibiendo datos de alta frecuencia.</p>
+                  <h4 className="font-black uppercase text-sm italic tracking-tighter">ALPHA SINCRONIZADO</h4>
+                  <p className="text-[10px] font-bold uppercase opacity-80">Manual de inversión activo.</p>
                </div>
             </div>
           </motion.div>
@@ -53,24 +70,19 @@ export default function GoldPage() {
 
       <div className="max-w-[1900px] mx-auto px-6 pt-56 pb-32">
         
-        {/* CABECERA DE MANDO INSTITUCIONAL */}
-        <header className="flex flex-col xl:flex-row justify-between items-start xl:items-end mb-16 gap-12">
+        <header className="flex flex-col xl:flex-row justify-between items-start xl:items-end mb-16 gap-12 border-l-4 border-[#FFD700] pl-8">
           <div className="space-y-6">
             <div className="flex items-center gap-4">
                <div className="px-4 py-1.5 bg-red-500/10 border border-red-500/30 rounded-full flex items-center gap-3">
                   <Radio className="text-red-500 animate-pulse" size={14} />
-                  <span className="text-[10px] font-black text-red-500 uppercase tracking-[0.4em]">Transmisión en Vivo</span>
-               </div>
-               <div className="flex items-center gap-3">
-                  <div className="w-2 h-2 bg-[#FFD700] rounded-full animate-ping" />
-                  <span className="text-[9px] font-black text-gray-500 uppercase">HAWKIN GOLD v4.1</span>
+                  <span className="text-[10px] font-black text-red-500 uppercase tracking-[0.4em]">Transmisión GOLD Live</span>
                </div>
             </div>
             <h1 className="text-6xl md:text-9xl font-black tracking-tighter leading-[0.8] uppercase italic">
-              Soberanía <br /><span className="bg-gradient-to-r from-[#FFD700] via-[#FDB931] to-[#FFD700] bg-clip-text text-transparent">Financiera.</span>
+              Donde <span className="bg-gradient-to-r from-[#FFD700] via-[#FDB931] to-[#FFD700] bg-clip-text text-transparent">Invertir.</span>
             </h1>
             <p className="text-gray-500 text-lg max-w-xl font-light italic">
-              "En el mundo del capital, la información lenta es pérdida. Bienvenida a la terminal de latencia cero."
+              "En HAWKIN GOLD no solo ves el precio, ves la estrategia. Los datos son el nuevo petróleo de la élite."
             </p>
           </div>
           
@@ -78,58 +90,101 @@ export default function GoldPage() {
             className={`px-12 py-8 rounded-[40px] transition-all flex items-center gap-8 ${isAlertActive ? 'bg-green-500 text-black shadow-[0_0_50px_rgba(34,197,94,0.4)]' : 'bg-[#FFD700] text-black hover:scale-105 shadow-[0_20px_50px_rgba(255,215,0,0.2)]'}`}>
              <div className="text-left">
                 <p className="text-[8px] font-black opacity-60 uppercase mb-1">Estatus del Terminal</p>
-                <p className="text-lg font-black uppercase tracking-widest">{isConnecting ? 'CONECTANDO...' : isAlertActive ? 'ALPHA LIVE' : 'ACTIVAR SEÑALES PRO'}</p>
+                <p className="text-lg font-black uppercase tracking-widest">{isConnecting ? 'CONECTANDO...' : isAlertActive ? 'ESTRATEGIA ACTIVA' : 'ACTIVAR SEÑALES PRO'}</p>
              </div>
              {isConnecting ? <Loader2 className="animate-spin" size={32} /> : <Zap className={isAlertActive ? 'fill-black' : ''} size={32} />}
           </button>
         </header>
 
-        {/* --- GRID DE LA SUPER TERMINAL --- */}
+        {/* --- NIVEL 1: TRADING Y SEÑALES --- */}
         <div className="grid grid-cols-1 lg:grid-cols-12 gap-8 mb-8">
-           
-           {/* CENTRO DE MANDO: GRÁFICO PRINCIPAL */}
            <div className="lg:col-span-8 glass-card bg-black border-white/10 rounded-[60px] overflow-hidden h-[850px] shadow-[0_60px_120px_rgba(0,0,0,1)] relative">
               <TradingViewWidget />
            </div>
 
-           {/* LATERAL DERECHO: ANALÍTICA Y EVENTOS */}
            <div className="lg:col-span-4 space-y-8">
-              <div className="glass-card bg-gradient-to-br from-[#FFD700]/5 to-transparent border-[#FFD700]/20 p-12 rounded-[60px] shadow-2xl relative h-[450px] flex flex-col justify-between overflow-hidden">
-                 <div className="relative z-10">
-                    <h3 className="text-xs font-black uppercase tracking-[0.4em] text-[#FFD700] mb-10 flex items-center gap-3">
-                       <BarChart3 size={18} /> Sentimiento Técnico
-                    </h3>
-                    <TechnicalGaugeWidget />
+              {/* PANEL DE AYUDA EN INVERSIÓN (RECOMENDACIONES) */}
+              <div className="glass-card bg-white/[0.02] border-[#FFD700]/20 p-10 rounded-[60px] flex flex-col justify-between shadow-2xl relative overflow-hidden group">
+                 <div className="absolute top-0 right-0 p-4 opacity-5">
+                    <TrendingUp size={150} />
                  </div>
-                 <p className="text-[9px] font-bold text-gray-600 uppercase tracking-widest mt-6">Sincronización: 100% Real Time</p>
+                 <div className="relative z-10">
+                    <h3 className="text-sm font-black uppercase tracking-[0.4em] text-[#FFD700] mb-8 flex items-center gap-3">
+                       <ShieldCheck size={18} className="fill-[#FFD700]" /> IA ALPHA INSIGHTS
+                    </h3>
+                    
+                    <div className="space-y-6">
+                       {insights.map((ins, i) => (
+                         <div key={i} className="p-5 bg-black/40 border border-white/5 rounded-3xl group hover:border-[#FFD700]/40 transition-all">
+                            <div className="flex justify-between items-center mb-2">
+                               <span className="text-xs font-black text-white">{ins.asset}</span>
+                               <span className={`text-[9px] font-black px-3 py-1 rounded-full ${ins.advice === 'ACUMULAR' ? 'bg-green-500/10 text-green-400' : 'bg-blue-500/10 text-blue-400'}`}>{ins.advice}</span>
+                            </div>
+                            <p className="text-[10px] text-gray-500 italic leading-relaxed">{ins.reason}</p>
+                         </div>
+                       ))}
+                    </div>
+                 </div>
+                 <button className="mt-8 w-full py-5 border border-[#FFD700]/30 text-[#FFD700] font-black uppercase tracking-widest text-[9px] rounded-2xl hover:bg-[#FFD700] hover:text-black transition-all">Ver Manual Completo</button>
               </div>
 
-              <div className="glass-card bg-white/[0.01] border-white/5 p-10 rounded-[60px] h-[375px] overflow-hidden group hover:border-white/10 transition-all">
-                 <h3 className="text-xs font-black uppercase tracking-[0.4em] text-gray-500 mb-8 flex items-center gap-3">
-                    <Clock size={16} /> Calendario Económico (FED/ECB)
+              <div className="glass-card bg-gradient-to-br from-[#FFD700]/5 to-transparent border-white/5 p-10 rounded-[60px] h-[375px] overflow-hidden">
+                 <h3 className="text-[10px] font-black uppercase tracking-[0.4em] text-gray-500 mb-8 flex items-center gap-3">
+                    <Clock size={16} /> Próximos Eventos Críticos
                  </h3>
-                 <div className="h-full overflow-y-auto no-scrollbar">
+                 <div className="h-full overflow-y-auto no-scrollbar pb-10">
                     <EconomicCalendarWidget />
                  </div>
               </div>
            </div>
         </div>
 
-        {/* --- SEGUNDA FILA: MAPA Y MERCADOS --- */}
+        {/* --- NIVEL 2: NOTICIAS MASIVAS (MÁXIMO ENFOQUE) --- */}
+        <div className="space-y-8 mb-20">
+           <div className="flex items-center gap-4">
+              <div className="w-4 h-4 bg-[#FFD700] rounded-full" />
+              <h2 className="text-4xl font-black uppercase italic tracking-tighter">Último Minuto: <span className="text-gray-500">Mundo Cripto y Financiero</span></h2>
+           </div>
+
+           {loading ? (
+             <div className="grid grid-cols-1 md:grid-cols-3 gap-8">
+                {[1,2,3].map(i => <div key={i} className="h-64 bg-white/5 rounded-[50px] animate-pulse" />)}
+             </div>
+           ) : (
+             <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
+                {news.map((item, i) => (
+                  <motion.div initial={{ opacity: 0, y: 20 }} whileInView={{ opacity: 1, y: 0 }} key={i} 
+                    className="p-10 glass-card border-white/5 bg-white/[0.01] rounded-[50px] hover:border-[#FFD700]/30 transition-all group flex flex-col justify-between"
+                  >
+                    <div>
+                       <div className="flex justify-between items-start mb-8">
+                          <span className="text-[9px] font-black text-[#FFD700] border border-[#FFD700]/30 px-4 py-1.5 rounded-full uppercase tracking-widest">{item.source}</span>
+                          <span className="text-[9px] font-bold text-gray-600 uppercase italic">{new Date(item.date).toLocaleTimeString()}</span>
+                       </div>
+                       <h3 className="text-xl font-black leading-tight group-hover:text-[#FFD700] transition-colors mb-6">{item.title}</h3>
+                       <p className="text-gray-500 text-xs leading-relaxed mb-10 line-clamp-3">{item.content}</p>
+                    </div>
+                    <a href={item.link} target="_blank" className="p-4 bg-white/5 rounded-2xl text-[9px] font-black uppercase text-gray-400 hover:bg-[#FFD700] hover:text-black transition-all flex items-center justify-center gap-3">
+                       Analizar Datos <ExternalLink size={12} />
+                    </a>
+                  </motion.div>
+                ))}
+             </div>
+           )}
+        </div>
+
+        {/* --- NIVEL 3: MAPA DE CALOR Y MERCADOS --- */}
         <div className="grid grid-cols-1 lg:grid-cols-12 gap-8">
-           
-           {/* MAPA DE CALOR CRIPTO */}
            <div className="lg:col-span-6 glass-card bg-black border-white/5 rounded-[60px] overflow-hidden h-[600px] shadow-2xl">
               <div className="p-10 border-b border-white/5 flex items-center gap-4 bg-white/[0.01]">
                  <LayoutGrid className="text-[#FFD700]" size={20} />
-                 <h3 className="text-sm font-black uppercase tracking-[0.3em]">Mapa de Calor Cripto (Top 50)</h3>
+                 <h3 className="text-sm font-black uppercase tracking-[0.3em]">Concentración de Liquidez (Market Heatmap)</h3>
               </div>
               <div className="h-full p-4">
                  <CryptoHeatMapWidget />
               </div>
            </div>
 
-           {/* MERCADO GLOBAL (INDICES Y COMMODITIES) */}
            <div className="lg:col-span-6 glass-card bg-black border-white/5 rounded-[60px] overflow-hidden h-[600px] shadow-2xl">
               <div className="p-10 border-b border-white/5 flex items-center gap-4 bg-white/[0.01]">
                  <Globe className="text-blue-500" size={20} />
@@ -141,20 +196,10 @@ export default function GoldPage() {
            </div>
         </div>
 
-        {/* --- CLAÚSULA DE PROFESIONALISMO --- */}
-        <section className="mt-40 text-center">
-           <div className="max-w-4xl mx-auto p-20 bg-gradient-to-b from-white/[0.03] to-transparent border border-white/10 rounded-[80px] shadow-3xl">
-              <ShieldCheck className="mx-auto text-[#FFD700] mb-10" size={80} />
-              <h2 className="text-5xl font-black uppercase italic tracking-tighter">HAWKIN <span className="text-gray-500">Gold Standard Intel.</span></h2>
-              <p className="text-gray-400 text-lg leading-relaxed font-light mt-10 italic max-w-2xl mx-auto">
-                "Esta terminal no utiliza datos retrasados. <b className="text-white uppercase tracking-widest font-black">Cada segundo es real</b>. Estás viendo el flujo del capital mundial en transmisión directa."
-              </p>
-           </div>
-        </section>
-
       </div>
 
       <Footer />
+      <Ticker />
     </main>
   );
 }
