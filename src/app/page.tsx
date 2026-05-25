@@ -1,5 +1,6 @@
 'use client';
 
+import React, { Suspense } from 'react';
 import Intro from '@/components/Intro';
 import Hero from '@/components/Hero';
 import Ticker from '@/components/Ticker';
@@ -8,14 +9,12 @@ import Header from '@/components/Header';
 import Footer from '@/components/Footer';
 import Pricing from '@/components/Pricing';
 import LiveFeed from '@/components/LiveFeed';
-import GlobalAlert from '@/components/GlobalAlert';
 
 export default function Home() {
   return (
     <main className="relative min-h-screen">
       <Intro />
       <Header />
-      <GlobalAlert />
 
       <div className="flex flex-col">
         {/* Espacio Publicitario Premium */}
