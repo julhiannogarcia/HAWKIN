@@ -4,7 +4,7 @@ import React, { useState, useEffect } from 'react';
 import { useParams, useRouter } from 'next/navigation';
 import Header from '@/components/Header';
 import Footer from '@/components/Footer';
-import Ticker from '@/components/Ticker';
+import GlobalTicker from '@/components/Ticker';
 import AdSpace from '@/components/AdSpace';
 import { Bookmark, BookmarkCheck, Share2, ThumbsUp, ThumbsDown, MessageSquare, Volume2, ArrowLeft, ShieldAlert, CheckCircle2, Lock } from 'lucide-react';
 
@@ -250,7 +250,7 @@ export default function ArticlePage() {
       </article>
 
       <Footer />
-      <Ticker />
+      <GlobalTicker />
     </main>
   );
 }

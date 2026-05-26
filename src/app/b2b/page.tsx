@@ -4,7 +4,7 @@ import { motion, AnimatePresence } from 'framer-motion';
 import { useState, useRef, useEffect } from 'react';
 import Header from '@/components/Header';
 import Footer from '@/components/Footer';
-import Ticker from '@/components/Ticker';
+import GlobalTicker from '@/components/Ticker';
 import { BarChart3, UploadCloud, Globe, ShoppingBag, MessageCircle, Play, Loader2, FileCheck, CheckCircle2 } from 'lucide-react';
 
 export default function B2BPage() {
@@ -230,7 +230,7 @@ export default function B2BPage() {
       </div>
 
       <Footer />
-      <Ticker />
+      <GlobalTicker />
     </main>
   );
 }

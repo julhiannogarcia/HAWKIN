@@ -4,7 +4,7 @@ import { motion } from 'framer-motion';
 import Link from 'next/link';
 import Header from '@/components/Header';
 import Footer from '@/components/Footer';
-import Ticker from '@/components/Ticker';
+import GlobalTicker from '@/components/Ticker';
 
 const courses = [
   {
@@ -117,7 +117,7 @@ export default function AcademyPage() {
       </div>
 
       <Footer />
-      <Ticker />
+      <GlobalTicker />
     </main>
   );
 }
