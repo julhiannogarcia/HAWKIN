@@ -5,7 +5,7 @@ import { useState, useEffect } from 'react';
 import { ShieldAlert, Lock, EyeOff, Terminal, Zap, ShieldCheck, ExternalLink, Laptop, Smartphone, Monitor, ChevronRight } from 'lucide-react';
 import Header from '@/components/Header';
 import Footer from '@/components/Footer';
-import Ticker from '@/components/Ticker';
+import GlobalTicker from '@/components/Ticker';
 import Link from 'next/link';
 
 export default function ShieldPage() {
@@ -190,7 +190,7 @@ export default function ShieldPage() {
       </div>
 
       <Footer />
-      <Ticker />
+      <GlobalTicker />
     </main>
   );
 }
