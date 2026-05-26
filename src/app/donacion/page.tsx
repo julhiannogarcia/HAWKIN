@@ -128,14 +128,33 @@ export default function DonacionPage() {
                       {isLoadingGeo ? <Loader2 className="animate-spin" size={20} /> : (geoData?.currencySymbol || '$')}
                     </span>
                     <input 
-                      type="number" value={amount} onChange={(e) => setAmount(e.target.value)}
-                      className="w-full bg-black/40 border border-white/10 rounded-[25px] py-6 pl-16 pr-6 text-3xl font-black outline-none focus:border-pink-500 transition-all text-white"
-                      placeholder="0.00"
+                      type="number" 
+                      value={amount} 
+                      onChange={(e) => {
+                        const val = e.target.value;
+                        setAmount(val);
+                      }}
+                      onBlur={() => {
+                        // REGLA DE ORO: Monto mínimo de 20 al perder el foco
+                        if (parseFloat(amount) < 20) {
+                          setAmount("20.00");
+                        }
+                      }}
+                      className="w-full bg-black/40 border border-white/10 rounded-[25px] py-6 pl-16 pr-6 text-3xl font-black outline-none focus:border-pink-500 transition-all text-white appearance-none"
+                      style={{ MozAppearance: 'textfield' }} // Ocultar flechas en Firefox
+                      placeholder="20.00"
                     />
+                    <style jsx>{`
+                      input::-webkit-outer-spin-button,
+                      input::-webkit-inner-spin-button {
+                        -webkit-appearance: none;
+                        margin: 0;
+                      }
+                    `}</style>
                  </div>
 
                  <div className="grid grid-cols-3 gap-4">
-                    {[10, 50, 100].map((val) => {
+                    {[20, 50, 100].map((val) => {
                       const rate = geoData?.rate || 1;
                       const localVal = (val * rate).toFixed(0);
                       return (
@@ -148,11 +167,16 @@ export default function DonacionPage() {
                  </div>
 
                  <div className="pt-10 border-t border-white/5 text-center">
+                    {parseFloat(amount) < 20 && (
+                      <p className="text-[10px] font-black text-red-500 uppercase mb-4 animate-pulse">
+                         Monto mínimo permitido: {geoData?.currencySymbol || '$'}20.00
+                      </p>
+                    )}
                     <p className="text-[10px] font-black text-gray-600 uppercase mb-4 tracking-widest">
                        Moneda Detectada: {geoData?.currencyName || 'Cargando...'}
                     </p>
                     {isPaypalLoaded ? (
-                      <PaypalDonationButtons value={amount} />
+                      <PaypalDonationButtons value={parseFloat(amount) >= 20 ? amount : "20.00"} />
                     ) : (
                       <div className="w-full h-16 bg-white/5 animate-pulse rounded-full flex items-center justify-center text-[10px] text-gray-600 font-black uppercase">Sincronizando Pasarela...</div>
                     )}
