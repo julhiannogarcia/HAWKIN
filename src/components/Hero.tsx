@@ -50,7 +50,7 @@ export default function Hero() {
           </h1>
 
           <p className="text-gray-400 text-xl max-w-2xl mx-auto font-light leading-relaxed">
-            El primer centro de inteligencia liderado por <b className="text-white">Julhianno Garcia</b>. 
+            El primer centro de inteligencia global. 
             Rumores de CEOs, Academia de Élite y Blindaje SHIELD en un solo lugar.
           </p>
 
