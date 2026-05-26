@@ -37,7 +37,12 @@ export default function ShieldPage() {
     <main className="min-h-screen bg-[#020202] text-white selection:bg-red-500 selection:text-white">
       <Header />
 
-      <div className="max-w-7xl mx-auto px-6 pt-40 pb-32">
+      {/* BARRA DE CONFIRMACIÓN ALPHA v2.0 */}
+      <div className="fixed top-[88px] left-0 w-full z-[900] bg-red-600 text-white py-2 px-6 text-center shadow-[0_0_30px_rgba(220,38,38,0.5)]">
+         <p className="text-[10px] font-black uppercase tracking-[0.5em] animate-pulse">SISTEMA ALPHA SHIELD v2.0 • MONITOREO GLOBAL ACTIVO • NO USAR CACHÉ</p>
+      </div>
+
+      <div className="max-w-7xl mx-auto px-6 pt-56 pb-32">
         {/* Hero Shield Evolucionado */}
         <section className="text-center space-y-10 mb-32">
           <motion.div 
