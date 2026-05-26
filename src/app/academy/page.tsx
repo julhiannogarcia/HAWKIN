@@ -63,6 +63,31 @@ export default function AcademyPage() {
           </p>
         </section>
 
+        {/* Banner Prototipo Inglés IA */}
+        <motion.div 
+          initial={{ opacity: 0, scale: 0.95 }}
+          animate={{ opacity: 1, scale: 1 }}
+          className="mb-16 p-8 md:p-12 rounded-[50px] bg-gradient-to-r from-cyan-600/20 via-purple-600/20 to-blue-600/20 border border-cyan-500/30 flex flex-col md:flex-row items-center justify-between gap-8 relative overflow-hidden group"
+        >
+          <div className="absolute top-0 right-0 w-64 h-64 bg-cyan-500/10 blur-[100px] rounded-full -mr-32 -mt-32" />
+          <div className="relative z-10 space-y-4 text-center md:text-left">
+            <div className="inline-flex items-center gap-2 px-4 py-2 bg-cyan-500 text-black rounded-full text-[9px] font-black uppercase tracking-widest">
+              Lanzamiento Beta
+            </div>
+            <h2 className="text-3xl md:text-5xl font-black tracking-tighter uppercase italic leading-none">
+              Inglés Conversacional <br /><span className="text-cyan-400">con HAWKIN AI</span>
+            </h2>
+            <p className="text-gray-400 text-sm max-w-md font-light">
+              Habla directamente con nuestra IA, mejora tu pronunciación en tiempo real y escala niveles desde Básico hasta Experto.
+            </p>
+          </div>
+          <Link href="/prototipo-curso" className="relative z-10 shrink-0">
+            <button className="px-12 py-6 bg-white text-black rounded-3xl font-black uppercase tracking-[0.3em] text-[11px] hover:bg-cyan-400 hover:scale-105 transition-all shadow-[0_20px_40px_rgba(0,0,0,0.4)]">
+              Probar Prototipo Gratuito
+            </button>
+          </Link>
+        </motion.div>
+
         {/* Galería de Cursos */}
         <div className="grid grid-cols-1 md:grid-cols-2 gap-8">
           {courses.map((course, index) => (

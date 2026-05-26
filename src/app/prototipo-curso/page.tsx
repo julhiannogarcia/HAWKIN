@@ -3,17 +3,20 @@
 import React, { useState, useEffect } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
 import AIAvatar from '@/components/course/AIAvatar';
+import VoiceRecorder from '@/components/course/VoiceRecorder';
 import { ENGLISH_COURSE_DATA, LessonStep } from '@/lib/courseData';
 import GlobalTicker from '@/components/Ticker';
-import { ChevronRight, ArrowLeft, CheckCircle2, AlertCircle, BookOpen, Trophy } from 'lucide-react';
+import { ChevronRight, ArrowLeft, CheckCircle2, AlertCircle, BookOpen, Trophy, Mic, Star } from 'lucide-react';
 import Link from 'next/link';
 
 export default function CoursePrototypePage() {
+  const [view, setView] = useState<'levels' | 'lesson'>('levels');
   const [currentLessonIndex, setCurrentLessonIndex] = useState(0);
   const [currentStepIndex, setCurrentStepIndex] = useState(0);
   const [isSpeaking, setIsSpeaking] = useState(false);
   const [selectedOption, setSelectedOption] = useState<number | null>(null);
   const [showFeedback, setShowFeedback] = useState<'correct' | 'wrong' | null>(null);
+  const [voiceAccuracy, setVoiceAccuracy] = useState<number | null>(null);
   const [isCompleted, setIsCompleted] = useState(false);
 
   const currentLesson = ENGLISH_COURSE_DATA[currentLessonIndex];
@@ -21,10 +24,20 @@ export default function CoursePrototypePage() {
 
   // Iniciar la voz automáticamente cuando cambia el paso
   useEffect(() => {
-    setIsSpeaking(true);
-    setSelectedOption(null);
-    setShowFeedback(null);
-  }, [currentStepIndex]);
+    if (view === 'lesson') {
+      setIsSpeaking(true);
+      setSelectedOption(null);
+      setShowFeedback(null);
+      setVoiceAccuracy(null);
+    }
+  }, [currentStepIndex, view]);
+
+  const handleLevelSelect = (index: number) => {
+    setCurrentLessonIndex(index);
+    setCurrentStepIndex(0);
+    setIsCompleted(false);
+    setView('lesson');
+  };
 
   const handleNext = () => {
     if (currentStepIndex < currentLesson.steps.length - 1) {
@@ -39,22 +52,72 @@ export default function CoursePrototypePage() {
     setSelectedOption(index);
     if (index === currentStep.uiContent?.correctOption) {
       setShowFeedback('correct');
-      // Esperar un momento antes de permitir avanzar si es correcto
     } else {
       setShowFeedback('wrong');
     }
   };
+
+  const handleVoiceResult = (accuracy: number, transcript: string) => {
+    setVoiceAccuracy(accuracy);
+    if (accuracy > 70) {
+      setShowFeedback('correct');
+    } else {
+      setShowFeedback('wrong');
+    }
+  };
+
+  if (view === 'levels') {
+    return (
+      <main className="min-h-screen bg-black text-white flex flex-col items-center justify-center p-6">
+        <div className="max-w-4xl w-full space-y-12">
+          <header className="text-center space-y-4">
+            <h1 className="text-5xl md:text-7xl font-black tracking-tighter uppercase italic">Academia de <span className="text-cyan-400">Inglés.</span></h1>
+            <p className="text-gray-500 uppercase tracking-[0.4em] text-[10px] font-bold">Selecciona tu nivel de entrada al sistema</p>
+          </header>
+
+          <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
+            {ENGLISH_COURSE_DATA.map((lesson, i) => (
+              <button
+                key={lesson.id}
+                onClick={() => handleLevelSelect(i)}
+                className="glass-card group p-8 border-white/5 hover:border-cyan-500/40 text-left space-y-6 transition-all"
+              >
+                <div className={`w-12 h-12 rounded-2xl flex items-center justify-center text-black font-black ${
+                  lesson.level === 'Básico' ? 'bg-cyan-400' : lesson.level === 'Intermedio' ? 'bg-purple-500' : 'bg-red-500'
+                }`}>
+                  {lesson.level[0]}
+                </div>
+                <div>
+                  <h3 className="text-xl font-bold group-hover:text-cyan-400 transition-colors">{lesson.title}</h3>
+                  <p className="text-xs text-gray-500 mt-2 uppercase tracking-widest font-bold">{lesson.level}</p>
+                </div>
+                <p className="text-sm text-gray-400 leading-relaxed font-light">{lesson.description}</p>
+                <div className="pt-4 flex items-center gap-2 text-[10px] font-black uppercase text-cyan-400 group-hover:translate-x-2 transition-transform">
+                  Entrar a lección <ChevronRight size={14} />
+                </div>
+              </button>
+            ))}
+          </div>
+
+          <Link href="/academy" className="block text-center text-gray-600 hover:text-white transition-colors text-[10px] font-black uppercase tracking-[0.5em]">
+            ← Volver a la Academia Principal
+          </Link>
+        </div>
+        <GlobalTicker />
+      </main>
+    );
+  }
 
   return (
     <main className="min-h-screen bg-black text-white selection:bg-cyan-500 selection:text-black flex flex-col">
       {/* HEADER DEL CURSO */}
       <header className="p-6 border-b border-white/5 flex items-center justify-between bg-black/50 backdrop-blur-xl sticky top-0 z-50">
         <div className="flex items-center gap-6">
-          <Link href="/academy" className="p-2 hover:bg-white/5 rounded-full transition-colors">
+          <button onClick={() => setView('levels')} className="p-2 hover:bg-white/5 rounded-full transition-colors">
             <ArrowLeft size={20} />
-          </Link>
+          </button>
           <div>
-            <p className="text-[10px] font-black text-cyan-400 uppercase tracking-widest">Módulo 1: Fundamentos de Élite</p>
+            <p className="text-[10px] font-black text-cyan-400 uppercase tracking-widest">{currentLesson.level} • Paso {currentStepIndex + 1}</p>
             <h1 className="text-sm font-bold uppercase tracking-tighter">{currentLesson.title}</h1>
           </div>
         </div>
@@ -157,6 +220,37 @@ export default function CoursePrototypePage() {
                     </div>
                   )}
 
+                  {currentStep.type === 'speaking' && (
+                    <div className="space-y-8">
+                      <VoiceRecorder 
+                        targetPhrase={currentStep.uiContent?.targetPhrase || ''}
+                        onResult={handleVoiceResult}
+                        lang={currentStep.avatarLang === 'en' ? 'en-US' : 'es-MX'}
+                      />
+                      
+                      {voiceAccuracy !== null && (
+                        <motion.div 
+                          initial={{ scale: 0.9, opacity: 0 }}
+                          animate={{ scale: 1, opacity: 1 }}
+                          className="p-6 rounded-3xl bg-white/5 border border-white/10 flex items-center justify-between"
+                        >
+                           <div>
+                              <p className="text-[10px] font-black text-gray-500 uppercase tracking-widest">Precisión de Pronunciación</p>
+                              <p className={`text-2xl font-black ${voiceAccuracy > 70 ? 'text-cyan-400' : 'text-red-500'}`}>
+                                {Math.round(voiceAccuracy)}%
+                              </p>
+                           </div>
+                           <div className="text-right">
+                              <p className="text-[10px] font-black text-gray-500 uppercase tracking-widest">Status</p>
+                              <p className={`text-sm font-bold uppercase ${voiceAccuracy > 70 ? 'text-green-500' : 'text-red-500'}`}>
+                                {voiceAccuracy > 70 ? 'Excelente' : 'Necesita Práctica'}
+                              </p>
+                           </div>
+                        </motion.div>
+                      )}
+                    </div>
+                  )}
+
                   {currentStep.type === 'practice' && (
                     <div className="p-10 bg-cyan-500/5 border border-cyan-500/20 rounded-[40px] text-center space-y-6">
                        <BookOpen className="text-cyan-400 mx-auto" size={40} />
@@ -181,10 +275,10 @@ export default function CoursePrototypePage() {
                    )}
                    
                    <button
-                     disabled={currentStep.type === 'quiz' && showFeedback !== 'correct'}
+                     disabled={(currentStep.type === 'quiz' || currentStep.type === 'speaking') && showFeedback !== 'correct'}
                      onClick={handleNext}
                      className={`w-full py-6 rounded-3xl font-black uppercase tracking-[0.3em] text-[11px] flex items-center justify-center gap-4 transition-all shadow-2xl disabled:opacity-30 ${
-                        showFeedback === 'correct' || currentStep.type !== 'quiz'
+                        showFeedback === 'correct' || (currentStep.type !== 'quiz' && currentStep.type !== 'speaking')
                           ? 'bg-white text-black hover:bg-cyan-400'
                           : 'bg-white/5 text-gray-700 border border-white/5'
                      }`}
@@ -211,27 +305,27 @@ export default function CoursePrototypePage() {
                 <div className="space-y-4">
                   <h2 className="text-4xl font-black uppercase italic tracking-tighter">¡Lección Dominada!</h2>
                   <p className="text-gray-500 font-light text-lg">
-                    Has completado con éxito el primer bloque de tu entrenamiento en inglés de élite.
+                    Has completado con éxito el bloque de **{currentLesson.level}**. Tu camino hacia la maestría continúa.
                   </p>
                 </div>
 
                 <div className="grid grid-cols-2 gap-4">
                   <div className="p-6 bg-white/5 rounded-3xl border border-white/10">
                     <p className="text-[10px] font-black text-gray-600 uppercase mb-2">XP Ganada</p>
-                    <p className="text-2xl font-black text-cyan-400">+500</p>
+                    <p className="text-2xl font-black text-cyan-400">+1000</p>
                   </div>
                   <div className="p-6 bg-white/5 rounded-3xl border border-white/10">
-                    <p className="text-[10px] font-black text-gray-600 uppercase mb-2">Fluidez</p>
-                    <p className="text-2xl font-black text-purple-400">100%</p>
+                    <p className="text-[10px] font-black text-gray-600 uppercase mb-2">Insignia</p>
+                    <div className="flex justify-center text-purple-400"><Star size={24} fill="currentColor" /></div>
                   </div>
                 </div>
 
-                <Link 
-                  href="/academy"
+                <button 
+                  onClick={() => setView('levels')}
                   className="block w-full py-6 bg-white text-black rounded-3xl font-black uppercase tracking-[0.3em] text-[11px] hover:bg-cyan-400 transition-all"
                 >
-                  VOLVER A LA ACADEMIA
-                </Link>
+                  VOLVER A NIVELES
+                </button>
               </motion.div>
             )}
           </AnimatePresence>

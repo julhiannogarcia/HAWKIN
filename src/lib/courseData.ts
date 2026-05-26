@@ -1,6 +1,6 @@
 export interface LessonStep {
   id: string;
-  type: 'dialogue' | 'teaching' | 'quiz' | 'practice';
+  type: 'dialogue' | 'teaching' | 'quiz' | 'practice' | 'speaking';
   avatarText: string;
   avatarLang: 'en' | 'es';
   uiContent?: {
@@ -9,12 +9,14 @@ export interface LessonStep {
     options?: string[];
     correctOption?: number;
     visualAid?: string;
+    targetPhrase?: string; // Para el modo 'speaking'
   };
 }
 
 export interface Lesson {
   id: string;
   title: string;
+  level: 'Básico' | 'Intermedio' | 'Experto';
   description: string;
   steps: LessonStep[];
 }
@@ -23,6 +25,7 @@ export const ENGLISH_COURSE_DATA: Lesson[] = [
   {
     id: 'intro-to-business-english',
     title: 'Inglés para el Élite Tecnológica',
+    level: 'Básico',
     description: 'Aprende a presentarte y presentar tu visión en un entorno global.',
     steps: [
       {
@@ -57,6 +60,17 @@ export const ENGLISH_COURSE_DATA: Lesson[] = [
       },
       {
         id: 'step-4',
+        type: 'speaking',
+        avatarText: 'Ahora es tu turno. Di la frase: "Hello, my name is Julhianno". Te escucharé y corregiré.',
+        avatarLang: 'es',
+        uiContent: {
+          title: 'Laboratorio de Voz',
+          description: 'Pulsa el micrófono y di: "Hello, my name is Julhianno"',
+          targetPhrase: 'Hello my name is Julhianno'
+        }
+      },
+      {
+        id: 'step-5',
         type: 'quiz',
         avatarText: '¿Cuál es la forma correcta de decir que eres un visionario?',
         avatarLang: 'es',
@@ -72,13 +86,42 @@ export const ENGLISH_COURSE_DATA: Lesson[] = [
         }
       },
       {
-        id: 'step-5',
+        id: 'step-6',
         type: 'dialogue',
         avatarText: '¡Excelente! Estás progresando rápidamente. En la próxima lección, profundizaremos en cómo negociar términos de inversión en inglés.',
         avatarLang: 'es',
         uiContent: {
           title: 'Lección Completada',
           description: 'Has dominado tu primera presentación de élite.'
+        }
+      }
+    ]
+  },
+  {
+    id: 'advanced-negotiation',
+    title: 'Negociación de Capital',
+    level: 'Experto',
+    description: 'Términos avanzados para cerrar rondas de inversión.',
+    steps: [
+      {
+        id: 'adv-1',
+        type: 'dialogue',
+        avatarText: 'Bienvenido al nivel Experto. Aquí no solo hablamos inglés, cerramos tratos. Analicemos el término "Burn Rate".',
+        avatarLang: 'es',
+        uiContent: {
+          title: 'Mentalidad de Tiburón',
+          description: 'Conceptos financieros de alto nivel.'
+        }
+      },
+      {
+        id: 'adv-2',
+        type: 'speaking',
+        avatarText: 'Repite esta frase compleja: "Our current burn rate is sustainable given our last seed round." Tú puedes.',
+        avatarLang: 'es',
+        uiContent: {
+          title: 'Desafío de Pronunciación',
+          description: 'Di: "Our current burn rate is sustainable given our last seed round."',
+          targetPhrase: 'Our current burn rate is sustainable given our last seed round'
         }
       }
     ]
