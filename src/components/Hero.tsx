@@ -56,46 +56,12 @@ export default function Hero() {
 
           <div className="flex flex-col md:flex-row items-center justify-center gap-6 pt-10">
             <button className="btn-glow text-[11px] py-6 px-12 group flex items-center gap-4">
-               INICIAR EXPERIENCIA <Shield size={18} className="group-hover:rotate-12 transition-transform" />
-            </button>
-            
-            {/* BOTÓN DE AUDIO INTERACTIVO */}
-            <button 
-              onClick={toggleMute}
-              className="px-12 py-6 bg-white text-black rounded-full text-[11px] font-black uppercase tracking-widest hover:bg-cyan-400 transition-all flex items-center gap-4 shadow-[0_10px_30px_rgba(255,255,255,0.2)]"
-            >
-               {isMuted ? <VolumeX size={18} /> : <Volume2 size={18} />}
-               {isMuted ? 'ACTIVAR SONIDO' : 'SILENCIAR'}
+               COMENZAR AHORA <Shield size={18} className="group-hover:rotate-12 transition-transform" />
             </button>
           </div>
         </motion.div>
       </div>
 
-      {/* Control Flotante de Audio en la esquina */}
-      <div className="absolute bottom-12 right-12 z-20 hidden md:block">
-         <button 
-           onClick={toggleMute}
-           className="p-4 bg-black/60 backdrop-blur-xl border border-white/10 rounded-full text-white hover:border-cyan-400 transition-all group"
-         >
-            {isMuted ? <VolumeX size={20} className="text-gray-500 group-hover:text-white" /> : <Volume2 size={20} className="text-cyan-400" />}
-         </button>
-      </div>
-
-      {/* Status del Fundador */}
-      <div className="absolute bottom-12 left-12 flex items-center gap-4 p-4 bg-black/60 backdrop-blur-xl border border-white/5 rounded-3xl hidden md:flex">
-         <div className="relative">
-            <img 
-              src="https://images.unsplash.com/photo-1531746020798-e6953c6e8e04?auto=format&fit=crop&q=80&w=200" 
-              className="w-12 h-12 rounded-2xl object-cover border border-cyan-500/50" 
-              alt="Julhianno"
-            />
-            <div className="absolute -top-1 -right-1 w-3 h-3 bg-green-500 rounded-full border-2 border-black animate-pulse" />
-         </div>
-         <div className="text-left">
-            <p className="text-[10px] font-black text-white uppercase tracking-tighter">Julhianno Garcia</p>
-            <p className="text-[8px] font-bold text-gray-500 uppercase tracking-widest">Fundador • En Línea</p>
-         </div>
-      </div>
     </section>
   );
 }
