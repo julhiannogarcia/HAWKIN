@@ -20,6 +20,7 @@ export default function Header() {
     { name: 'Donación', href: '/donacion', special: true, color: 'text-pink-500' }, // Nombre cambiado y color distintivo
     { name: 'B2B', href: '/b2b' },
     { name: 'GOLD', href: '/gold', special: true, color: 'text-[#FFD700]' },
+    { name: 'Contacto', href: '/contacto' },
   ];
 
   return (

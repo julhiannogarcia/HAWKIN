@@ -4,6 +4,7 @@ import Header from '@/components/Header';
 import Footer from '@/components/Footer';
 import GlobalTicker from '@/components/Ticker';
 import LiveFeed from '@/components/LiveFeed';
+import NewsCard from '@/components/NewsCard';
 
 export default function NewsPage() {
   const allNews = [
