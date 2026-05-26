@@ -17,9 +17,9 @@ export default function Header() {
     { name: 'Radar', href: '/#news' },
     { name: 'Academia', href: '/academy' },
     { name: 'Shield', href: '/shield' },
-    { name: 'Colaboración', href: '/#planes' },
+    { name: 'Donación', href: '/donacion', special: true, color: 'text-pink-500' }, // Nombre cambiado y color distintivo
     { name: 'B2B', href: '/b2b' },
-    { name: 'GOLD', href: '/gold', special: true }, // Nueva pestaña Oro
+    { name: 'GOLD', href: '/gold', special: true, color: 'text-[#FFD700]' },
   ];
 
   return (
@@ -42,7 +42,7 @@ export default function Header() {
               href={link.href}
               className={`text-[10px] font-black uppercase tracking-widest transition-all hover:scale-110 ${
                 link.special 
-                  ? 'text-[#FFD700] hover:drop-shadow-[0_0_10px_rgba(255,215,0,0.5)]' 
+                  ? `${link.color} hover:drop-shadow-[0_0_10px_rgba(255,255,255,0.3)]` 
                   : pathname === link.href ? 'text-cyan-400' : 'text-gray-400 hover:text-white'
               }`}
             >
@@ -80,7 +80,7 @@ export default function Header() {
                 key={link.name} 
                 href={link.href} 
                 onClick={() => setIsOpen(false)}
-                className={`text-3xl font-black uppercase italic ${link.special ? 'text-[#FFD700]' : 'text-white'}`}
+                className={`text-3xl font-black uppercase italic ${link.special ? link.color : 'text-white'}`}
               >
                 {link.name}
               </Link>
