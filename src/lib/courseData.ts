@@ -375,5 +375,102 @@ export const COURSE_CURRICULUM: Day[] = [
         ]
       }
     ]
+  },
+  {
+    dayNumber: 3,
+    title: 'The Database Architect',
+    ageGroup: 'Professional',
+    level: 'Básico',
+    modules: [
+      {
+        id: 'd3-m1',
+        title: 'Theory: Database Structures',
+        type: 'Theory',
+        estimatedTime: '60 min',
+        icon: '🗄️',
+        lessons: [
+          {
+            id: 'd3-m1-l1',
+            title: 'Nouns & Plurals in Data',
+            steps: [
+              {
+                id: 's1',
+                type: 'teaching',
+                avatarText: 'En el mundo de los datos, la precisión es clave. Aprenderemos a manejar sustantivos contables e incontables.',
+                avatarLang: 'es',
+                uiContent: { 
+                  title: 'Data vs Datum', 
+                  description: 'Sustantivos esenciales para arquitectos de información.',
+                  longText: 'En inglés técnico:\n- Data: Datos (generalmente plural).\n- Database: Base de datos.\n- Entry: Registro.'
+                }
+              }
+            ]
+          }
+        ]
+      },
+      {
+        id: 'd3-m2',
+        title: 'Lexicon: Storage & Cloud',
+        type: 'Lexicon',
+        estimatedTime: '45 min',
+        icon: '☁️',
+        lessons: [{ id: 'l1', title: 'Cloud Computing', steps: [{ id: 's1', type: 'practice', avatarText: 'Cloud infrastructure is the backbone of modern AI.', avatarLang: 'en' }] }]
+      },
+      { id: 'd3-m3', title: 'Deep Listening: Data Centers', type: 'Listening', estimatedTime: '60 min', icon: '🏢', lessons: [] },
+      { id: 'd3-m4', title: 'The Writing Lab: Queries', type: 'Writing', estimatedTime: '45 min', icon: '📝', lessons: [] },
+      { id: 'd3-m5', title: 'Speaking Arena: Pitching Data', type: 'Speaking', estimatedTime: '60 min', icon: '🔊', lessons: [] }
+    ]
+  },
+  {
+    dayNumber: 4,
+    title: 'The Security Specialist',
+    ageGroup: 'Professional',
+    level: 'Básico',
+    modules: [
+      { id: 'd4-m1', title: 'Theory: Modals for Security', type: 'Theory', estimatedTime: '60 min', icon: '🔒', lessons: [] },
+      { id: 'd4-m2', title: 'Lexicon: Cyber Threats', type: 'Lexicon', estimatedTime: '60 min', icon: '🛡️', lessons: [] },
+      { id: 'd4-m3', title: 'Deep Listening: Hacking Logs', type: 'Listening', estimatedTime: '60 min', icon: '📟', lessons: [] },
+      { id: 'd4-m4', title: 'The Writing Lab: Incident Reports', type: 'Writing', estimatedTime: '60 min', icon: '🖊️', lessons: [] },
+      { id: 'd4-m5', title: 'Speaking Arena: Security Briefing', type: 'Speaking', estimatedTime: '60 min', icon: '📣', lessons: [] }
+    ]
+  },
+  {
+    dayNumber: 5,
+    title: 'The AI Engineer',
+    ageGroup: 'Professional',
+    level: 'Básico',
+    modules: [
+      { id: 'd5-m1', title: 'Theory: Future Tense (AI Roadmap)', type: 'Theory', estimatedTime: '60 min', icon: '🤖', lessons: [] },
+      { id: 'd5-m2', title: 'Lexicon: Neural Networks', type: 'Lexicon', estimatedTime: '60 min', icon: '🧠', lessons: [] },
+      { id: 'd5-m3', title: 'Deep Listening: OpenAI Keynote', type: 'Listening', estimatedTime: '60 min', icon: '🎤', lessons: [] },
+      { id: 'd5-m4', title: 'The Writing Lab: Prompt Crafting', type: 'Writing', estimatedTime: '60 min', icon: '💬', lessons: [] },
+      { id: 'd5-m5', title: 'Speaking Arena: Demo Day', type: 'Speaking', estimatedTime: '60 min', icon: '💎', lessons: [] }
+    ]
+  },
+  {
+    dayNumber: 6,
+    title: 'The Venture Capitalist',
+    ageGroup: 'Professional',
+    level: 'Intermedio',
+    modules: [
+      { id: 'd6-m1', title: 'Theory: Conditionals for Risk', type: 'Theory', estimatedTime: '60 min', icon: '📈', lessons: [] },
+      { id: 'd6-m2', title: 'Lexicon: Funding Rounds', type: 'Lexicon', estimatedTime: '60 min', icon: '💰', lessons: [] },
+      { id: 'd6-m3', title: 'Deep Listening: Shark Tank English', type: 'Listening', estimatedTime: '60 min', icon: '🦈', lessons: [] },
+      { id: 'd6-m4', title: 'The Writing Lab: Investment Term Sheet', type: 'Writing', estimatedTime: '60 min', icon: '📄', lessons: [] },
+      { id: 'd6-m5', title: 'Speaking Arena: Negotiating Equity', type: 'Speaking', estimatedTime: '60 min', icon: '🤝', lessons: [] }
+    ]
+  },
+  {
+    dayNumber: 7,
+    title: 'The Global Visionary',
+    ageGroup: 'Professional',
+    level: 'Experto',
+    modules: [
+      { id: 'd7-m1', title: 'Theory: Mastery Review', type: 'Theory', estimatedTime: '60 min', icon: '👑', lessons: [] },
+      { id: 'd7-m2', title: 'Lexicon: Leadership Idioms', type: 'Lexicon', estimatedTime: '60 min', icon: '🌟', lessons: [] },
+      { id: 'd7-m3', title: 'Deep Listening: Steve Jobs Analysis', type: 'Listening', estimatedTime: '60 min', icon: '🍎', lessons: [] },
+      { id: 'd7-m4', title: 'The Writing Lab: Vision Statement', type: 'Writing', estimatedTime: '60 min', icon: '🗺️', lessons: [] },
+      { id: 'd7-m5', title: 'Speaking Arena: Keynote Mastery', type: 'Speaking', estimatedTime: '60 min', icon: '🔥', lessons: [] }
+    ]
   }
 ];
