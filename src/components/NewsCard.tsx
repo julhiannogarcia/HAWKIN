@@ -2,7 +2,7 @@
 
 import { motion } from 'framer-motion';
 import Link from 'next/link';
-import { Clock, Lock, PlayCircle } from 'lucide-react';
+import { Clock, Lock } from 'lucide-react';
 
 interface NewsCardProps {
   id: string;
@@ -13,57 +13,54 @@ interface NewsCardProps {
   image?: string;
   date: string;
   author: string;
-  hasVideo?: boolean;
 }
 
-export default function NewsCard({ id, title, excerpt, category, isLocked, image, date, author, hasVideo }: NewsCardProps) {
+export default function NewsCard({ id, title, excerpt, category, isLocked, image, date, author }: NewsCardProps) {
   return (
     <Link href={`/news/${id}`}>
       <motion.div 
         whileHover={{ y: -8 }}
         className="glass-card group cursor-pointer relative overflow-hidden h-full flex flex-col p-0 border-white/5 hover:border-cyan-500/40 transition-all duration-500"
       >
-        {/* Imagen de Cabecera con Badge de Video */}
-        <div className="relative h-48 w-full overflow-hidden">
+        {/* Imagen de Cabecera Purificada (Sin iconos falsos) */}
+        <div className="relative h-48 w-full overflow-hidden bg-gray-900">
           <img 
-            src={image || "https://images.unsplash.com/photo-1677442136019-21780ecad995?auto=format&fit=crop&q=80&w=800"} 
+            src={image || "https://images.unsplash.com/photo-1451187580459-43490279c0fa?auto=format&fit=crop&q=80&w=800"} 
             alt={title}
-            className="w-full h-full object-cover transition-transform duration-700 group-hover:scale-110"
+            className="w-full h-full object-cover transition-transform duration-700 group-hover:scale-110 opacity-80 group-hover:opacity-100"
           />
-          <div className="absolute inset-0 bg-gradient-to-t from-black/80 to-transparent" />
+          <div className="absolute inset-0 bg-gradient-to-t from-black/90 via-black/20 to-transparent" />
           
-          {hasVideo && (
-            <div className="absolute inset-0 flex items-center justify-center">
-              <PlayCircle className="text-white/80 group-hover:text-cyan-400 transition-colors" size={48} />
-            </div>
-          )}
-
           <div className="absolute top-4 left-4">
-            <span className="text-[9px] font-black uppercase tracking-widest text-white bg-cyan-600 px-2 py-1 rounded shadow-[0_0_10px_rgba(6,182,212,0.5)]">
+            <span className={`text-[8px] font-black uppercase tracking-widest text-white px-3 py-1 rounded-full shadow-lg ${
+              category === 'GOLD' ? 'bg-[#FFD700] text-black' : 'bg-cyan-600'
+            }`}>
               {category}
             </span>
           </div>
         </div>
 
-        <div className="p-6 flex flex-col flex-1">
-          <div className="flex items-center gap-2 text-[9px] font-black text-gray-500 uppercase tracking-widest mb-3">
-            <Clock size={10} className="text-cyan-500" /> {date} • {author}
+        <div className="p-7 flex flex-col flex-1">
+          <div className="flex items-center gap-3 text-[9px] font-black text-gray-500 uppercase tracking-widest mb-4">
+            <span className="text-cyan-400">✦</span> {date} • {author}
           </div>
           
-          <h3 className="text-lg font-bold mb-3 leading-tight group-hover:text-cyan-400 transition-colors line-clamp-2">
+          <h3 className="text-xl font-black mb-4 leading-tight group-hover:text-cyan-400 transition-colors line-clamp-2 italic uppercase tracking-tighter">
             {title}
           </h3>
           
-          <p className={`text-gray-400 text-xs leading-relaxed line-clamp-3 ${isLocked ? 'blur-[1px] select-none opacity-50' : ''}`}>
+          <p className={`text-gray-400 text-xs leading-relaxed line-clamp-3 font-light ${isLocked ? 'blur-[0.5px] select-none opacity-40' : ''}`}>
             {excerpt}
           </p>
 
-          <div className="mt-auto pt-6 flex justify-between items-center">
-            <div className="flex items-center gap-2 text-[9px] font-black text-white uppercase tracking-[0.2em]">
-              {isLocked ? 'Desbloquear' : 'Leer más'} <span className="text-cyan-400">→</span>
+          <div className="mt-auto pt-8 flex justify-between items-center border-t border-white/5 mt-6">
+            <div className="flex items-center gap-3 text-[9px] font-black text-white uppercase tracking-[0.3em]">
+              {isLocked ? 'Acceso Socio' : 'Analizar'} <span className="text-cyan-400">→</span>
             </div>
             {isLocked && (
-              <Lock size={14} className="text-gray-600" />
+              <div className="w-8 h-8 rounded-full bg-white/5 flex items-center justify-center border border-white/10 group-hover:border-cyan-500/30 transition-all">
+                <Lock size={12} className="text-gray-500 group-hover:text-cyan-400" />
+              </div>
             )}
           </div>
         </div>

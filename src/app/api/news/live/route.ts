@@ -37,35 +37,37 @@ export async function GET() {
     const formatItems = (items: any[], category: string) => items.slice(0, 15).map((item, index) => {
       const uniqueId = generateShortId(item.link);
       
-      // IMÁGENES DIVERSIFICADAS CON SEEDS ÚNICOS PARA EVITAR REPETICIÓN
+      // MOTOR DE IMÁGENES AUTÉNTICAS CON SEEDS DINÁMICOS
       const getProfessionalImage = (title: string, cat: string) => {
         const t = title.toLowerCase();
-        // Usamos una colección más amplia de Unsplash con filtros para que las fotos sean distintas
         const base = "https://images.unsplash.com/";
-        if (cat === "SHIELD") return `${base}photo-1550751827-4bd374c3f58b?auto=format&fit=crop&q=80&w=1000&sig=${uniqueId}`;
-        if (t.includes("nvidia") || t.includes("chip")) return `${base}photo-1620712943543-bcc4688e7485?auto=format&fit=crop&q=80&w=1000&sig=${uniqueId}`;
-        if (t.includes("altman") || t.includes("openai")) return `${base}photo-1677442136019-21780ecad995?auto=format&fit=crop&q=80&w=1000&sig=${uniqueId}`;
-        if (t.includes("pichai") || t.includes("google")) return `${base}photo-1573164713714-d95e436ab8d6?auto=format&fit=crop&q=80&w=1000&sig=${uniqueId}`;
-        if (t.includes("zuckerberg") || t.includes("meta")) return `${base}photo-1611162617213-7d7a39e9b1d7?auto=format&fit=crop&q=80&w=1000&sig=${uniqueId}`;
-        return `${base}photo-1485827404703-89b55fcc595e?auto=format&fit=crop&q=80&w=1000&sig=${uniqueId}`;
+        
+        // Colecciones ultra-específicas para evitar repetición
+        if (cat === "SHIELD") {
+          return `${base}photo-1563986768609-322da13575f3?auto=format&fit=crop&q=80&w=1000&sig=${uniqueId}`;
+        }
+        if (t.includes("nvidia") || t.includes("chip") || t.includes("gpu")) {
+          return `${base}photo-1591405351990-4726e331f141?auto=format&fit=crop&q=80&w=1000&sig=${uniqueId}`;
+        }
+        if (t.includes("altman") || t.includes("openai") || t.includes("gpt")) {
+          return `${base}photo-1677442136019-21780ecad995?auto=format&fit=crop&q=80&w=1000&sig=${uniqueId}`;
+        }
+        if (t.includes("apple") || t.includes("mac") || t.includes("iphone")) {
+          return `${base}photo-1510511459019-5dee99dc47ef?auto=format&fit=crop&q=80&w=1000&sig=${uniqueId}`;
+        }
+        if (t.includes("robot") || t.includes("tesla") || t.includes("musk")) {
+          return `${base}photo-1485827404703-89b55fcc595e?auto=format&fit=crop&q=80&w=1000&sig=${uniqueId}`;
+        }
+        
+        // Imagen por defecto tecnológica variada
+        return `${base}photo-1451187580459-43490279c0fa?auto=format&fit=crop&q=80&w=1000&sig=${uniqueId}`;
       };
-
-      const snippet = item.contentSnippet || "Analizando impacto tecnológico...";
-      const fullAnalysis = `
-        En una actualización de impacto global reportada por ${item.source?.name || "Radar HAWKIN"}, la industria tecnológica se enfrenta a un nuevo paradigma. Este hito marca un antes y un después en la competencia por la soberanía digital y el control de la Inteligencia Artificial de alto nivel.
-
-        Según el análisis verificado por el ecosistema HAWKIN, este movimiento estratégico afectará directamente las valoraciones de mercado y la forma en que los consumidores interactúan con el hardware de próxima generación. ${snippet}
-
-        Nuestros analistas sugieren que estamos ante el inicio de una era de 'Razonamiento Sintético' integrado. HAWKIN continúa monitoreando cada rumor y decisión de la élite millonaria para asegurar que nuestra comunidad de socios tenga la verdad técnica antes que cualquier medio masivo. La transparencia informativa es nuestro compromiso inquebrantable.
-      `;
 
       return {
         id: uniqueId,
         title: item.title.split(' - ')[0],
         category: category,
-        excerpt: snippet.substring(0, 160) + "...",
-        content: fullAnalysis,
-        isLocked: index > 2,
+        excerpt: (item.contentSnippet || "Analizando impacto tecnológico...").substring(0, 160) + "...",
         author: item.source?.name || "HAWKIN Intel",
         date: item.pubDate ? getTimeAgo(item.pubDate) : "Ahora",
         image: getProfessionalImage(item.title, category),
