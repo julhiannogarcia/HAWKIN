@@ -129,31 +129,35 @@ export default function DonacionPage() {
               
               <div className="space-y-8">
                  <div className="relative">
-                    <span className="absolute left-6 top-1/2 -translate-y-1/2 text-2xl font-black text-gray-600">$</span>
+                    <span className="absolute left-6 top-1/2 -translate-y-1/2 text-2xl font-black text-[#FFD700]">{geoData?.currencySymbol || '$'}</span>
                     <input 
                       type="number" 
                       value={amount}
                       onChange={(e) => setAmount(e.target.value)}
-                      className="w-full bg-black/40 border border-white/10 rounded-[25px] py-6 pl-12 pr-6 text-3xl font-black outline-none focus:border-pink-500 transition-all"
+                      className="w-full bg-black/40 border border-white/10 rounded-[25px] py-6 pl-16 pr-6 text-3xl font-black outline-none focus:border-pink-500 transition-all"
                       placeholder="0.00"
                     />
                  </div>
 
                  <div className="grid grid-cols-3 gap-4">
-                    {['10', '50', '100'].map((val) => (
-                      <button 
-                        key={val} 
-                        onClick={() => setAmount(val + ".00")}
-                        className={`py-4 rounded-2xl font-black text-[10px] uppercase tracking-widest border transition-all ${amount === val + ".00" ? 'bg-white text-black border-white' : 'bg-white/5 text-gray-500 border-white/5 hover:border-white/20'}`}
-                      >
-                        ${val}
-                      </button>
-                    ))}
+                    {[10, 50, 100].map((val) => {
+                      const localVal = (val * (geoData?.rate || 1)).toFixed(0);
+                      return (
+                        <button 
+                          key={val} 
+                          onClick={() => setAmount(localVal + ".00")}
+                          className={`py-4 rounded-2xl font-black text-[10px] uppercase tracking-widest border transition-all ${amount === localVal + ".00" ? 'bg-[#FFD700] text-black border-[#FFD700]' : 'bg-white/5 text-gray-500 border-white/5 hover:border-white/20'}`}
+                        >
+                          {geoData?.currencySymbol || '$'}{localVal}
+                        </button>
+                      );
+                    })}
                  </div>
 
-                 <div className="pt-10 border-t border-white/5">
+                 <div className="pt-10 border-t border-white/5 text-center">
+                    <p className="text-[10px] font-black text-gray-500 uppercase mb-4 tracking-widest">Equivalente aproximado en: {geoData?.currencyName || 'Dólares'}</p>
                     {isPaypalLoaded ? (
-                      <PaypalDonationButtons value={amount} />
+                      <PaypalDonationButtons value={(parseFloat(amount) / (geoData?.rate || 1)).toFixed(2)} />
                     ) : (
                       <div className="w-full h-16 bg-white/5 animate-pulse rounded-full flex items-center justify-center text-[10px] text-gray-600 font-black uppercase">
                          Sincronizando Pasarela Social...
