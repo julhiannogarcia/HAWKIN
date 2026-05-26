@@ -3,7 +3,7 @@
 import React, { Suspense } from 'react';
 import Intro from '@/components/Intro';
 import Hero from '@/components/Hero';
-import Ticker from '@/components/Ticker';
+import GlobalTicker from '@/components/Ticker';
 import FounderZone from '@/components/FounderZone';
 import Header from '@/components/Header';
 import Footer from '@/components/Footer';
@@ -51,7 +51,7 @@ export default function Home() {
         <FounderZone />
         <Pricing />
         <Footer />
-        <Ticker />
+        <GlobalTicker />
       </div>
     </main>
   );

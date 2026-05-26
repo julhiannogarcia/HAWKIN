@@ -4,7 +4,7 @@ import { motion, AnimatePresence } from 'framer-motion';
 import { useState, useEffect, useRef } from 'react';
 import Header from '@/components/Header';
 import Footer from '@/components/Footer';
-import Ticker from '@/components/Ticker';
+import GlobalTicker from '@/components/Ticker';
 import { UploadCloud, DollarSign, Users, BookOpen, CheckCircle, Clock, BarChart3, PlusCircle, FileCheck, Loader2 } from 'lucide-react';
 
 export default function InstructorDashboard() {
@@ -149,7 +149,7 @@ export default function InstructorDashboard() {
       </div>
 
       <Footer />
-      <Ticker />
+      <GlobalTicker />
     </main>
   );
 }

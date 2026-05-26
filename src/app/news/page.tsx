@@ -2,8 +2,8 @@
 
 import Header from '@/components/Header';
 import Footer from '@/components/Footer';
-import Ticker from '@/components/Ticker';
-import NewsCard from '@/components/NewsCard';
+import GlobalTicker from '@/components/Ticker';
+import LiveFeed from '@/components/LiveFeed';
 
 export default function NewsPage() {
   const allNews = [
@@ -25,7 +25,7 @@ export default function NewsPage() {
         </div>
       </div>
       <Footer />
-      <Ticker />
+      <GlobalTicker />
     </main>
   );
 }
