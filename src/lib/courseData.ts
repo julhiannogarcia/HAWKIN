@@ -1,6 +1,9 @@
+export type AgeGroup = 'Junior' | 'Professional';
+export type LessonLevel = 'Básico' | 'Intermedio' | 'Experto';
+
 export interface LessonStep {
   id: string;
-  type: 'dialogue' | 'teaching' | 'quiz' | 'practice' | 'speaking';
+  type: 'dialogue' | 'teaching' | 'quiz' | 'practice' | 'speaking' | 'writing';
   avatarText: string;
   avatarLang: 'en' | 'es';
   uiContent?: {
@@ -9,121 +12,180 @@ export interface LessonStep {
     options?: string[];
     correctOption?: number;
     visualAid?: string;
-    targetPhrase?: string; // Para el modo 'speaking'
+    targetPhrase?: string; // Para modo 'speaking' o 'writing'
+    placeholder?: string;
   };
+}
+
+export interface Day {
+  dayNumber: number;
+  title: string;
+  lessons: Lesson[];
 }
 
 export interface Lesson {
   id: string;
   title: string;
-  level: 'Básico' | 'Intermedio' | 'Experto';
+  level: LessonLevel;
+  ageGroup: AgeGroup;
   description: string;
   steps: LessonStep[];
 }
 
-export const ENGLISH_COURSE_DATA: Lesson[] = [
+// CURRÍCULO DE ÉLITE - MUESTRA DE LA SEMANA 1
+export const COURSE_CURRICULUM: Day[] = [
   {
-    id: 'intro-to-business-english',
-    title: 'Inglés para el Élite Tecnológica',
-    level: 'Básico',
-    description: 'Aprende a presentarte y presentar tu visión en un entorno global.',
-    steps: [
+    dayNumber: 1,
+    title: 'The Visionary Identity',
+    lessons: [
       {
-        id: 'step-1',
-        type: 'dialogue',
-        avatarText: 'Hola, soy HAWKIN AI. Bienvenido a tu primer paso hacia la maestría del inglés global. Hoy aprenderemos a presentarnos con autoridad.',
-        avatarLang: 'es',
-        uiContent: {
-          title: 'Bienvenida',
-          description: 'Escucha atentamente la introducción de tu tutor de IA.'
-        }
+        id: 'day1-prof-basic',
+        title: 'Presentación de Élite',
+        level: 'Básico',
+        ageGroup: 'Professional',
+        description: 'Domina tu primera impresión en el mundo tecnológico.',
+        steps: [
+          {
+            id: 'd1-s1',
+            type: 'dialogue',
+            avatarText: 'Hola, soy tu tutor HAWKIN. Hoy comienza tu viaje de 30 días hacia la maestría. Primero, aprendamos a decir quiénes somos con autoridad.',
+            avatarLang: 'es',
+            uiContent: { title: 'Día 1: Identidad', description: 'Escucha la visión de hoy.' }
+          },
+          {
+            id: 'd1-s2',
+            type: 'speaking',
+            avatarText: 'Repite conmigo: "I am a technology leader."',
+            avatarLang: 'es',
+            uiContent: { 
+              title: 'Prueba de Voz', 
+              description: 'Di con claridad: "I am a technology leader"',
+              targetPhrase: 'I am a technology leader'
+            }
+          },
+          {
+            id: 'd1-s3',
+            type: 'writing',
+            avatarText: 'Ahora, escribe la traducción de: "Yo soy un líder tecnológico".',
+            avatarLang: 'es',
+            uiContent: { 
+              title: 'Desafío Escrito', 
+              description: 'Escribe la frase en inglés.',
+              targetPhrase: 'I am a technology leader',
+              placeholder: 'Escribe aquí...'
+            }
+          }
+        ]
       },
       {
-        id: 'step-2',
-        type: 'teaching',
-        avatarText: 'En inglés, la forma más profesional de comenzar es diciendo: "Hello, my name is... and I am a visionary." Repite conmigo.',
-        avatarLang: 'es',
-        uiContent: {
-          title: 'Presentación Profesional',
-          description: 'Frase clave: "Hello, my name is... and I am a visionary."'
-        }
-      },
-      {
-        id: 'step-3',
-        type: 'practice',
-        avatarText: 'Hello, my name is Julhianno, and I am a visionary.',
-        avatarLang: 'en',
-        uiContent: {
-          title: 'Escucha la Pronunciación',
-          description: 'Presta atención a la entonación y las pausas.'
-        }
-      },
-      {
-        id: 'step-4',
-        type: 'speaking',
-        avatarText: 'Ahora es tu turno. Di la frase: "Hello, my name is Julhianno". Te escucharé y corregiré.',
-        avatarLang: 'es',
-        uiContent: {
-          title: 'Laboratorio de Voz',
-          description: 'Pulsa el micrófono y di: "Hello, my name is Julhianno"',
-          targetPhrase: 'Hello my name is Julhianno'
-        }
-      },
-      {
-        id: 'step-5',
-        type: 'quiz',
-        avatarText: '¿Cuál es la forma correcta de decir que eres un visionario?',
-        avatarLang: 'es',
-        uiContent: {
-          title: 'Prueba de Conocimiento',
-          options: [
-            'I am a visionary',
-            'I am a vision',
-            'I have a visionary',
-            'I am visionary'
-          ],
-          correctOption: 0
-        }
-      },
-      {
-        id: 'step-6',
-        type: 'dialogue',
-        avatarText: '¡Excelente! Estás progresando rápidamente. En la próxima lección, profundizaremos en cómo negociar términos de inversión en inglés.',
-        avatarLang: 'es',
-        uiContent: {
-          title: 'Lección Completada',
-          description: 'Has dominado tu primera presentación de élite.'
-        }
+        id: 'day1-junior-basic',
+        title: 'Pequeño Visionario',
+        level: 'Básico',
+        ageGroup: 'Junior',
+        description: 'Aprende inglés jugando con tecnología.',
+        steps: [
+          {
+            id: 'd1-j-s1',
+            type: 'dialogue',
+            avatarText: '¡Hola, aventurero! Soy HAWKIN. ¿Listo para aprender el idioma de los robots? Vamos a empezar con algo divertido.',
+            avatarLang: 'es',
+            uiContent: { title: '¡Hola Robot!', description: 'Bienvenido al futuro.' }
+          },
+          {
+            id: 'd1-j-s2',
+            type: 'speaking',
+            avatarText: 'Di conmigo: "Hello robot!"',
+            avatarLang: 'es',
+            uiContent: { 
+              title: 'Habla con el Robot', 
+              description: 'Di: "Hello robot!"',
+              targetPhrase: 'Hello robot'
+            }
+          }
+        ]
       }
     ]
   },
   {
-    id: 'advanced-negotiation',
-    title: 'Negociación de Capital',
-    level: 'Experto',
-    description: 'Términos avanzados para cerrar rondas de inversión.',
-    steps: [
+    dayNumber: 2,
+    title: 'Global Tech Vocabulary',
+    lessons: [
       {
-        id: 'adv-1',
-        type: 'dialogue',
-        avatarText: 'Bienvenido al nivel Experto. Aquí no solo hablamos inglés, cerramos tratos. Analicemos el término "Burn Rate".',
-        avatarLang: 'es',
-        uiContent: {
-          title: 'Mentalidad de Tiburón',
-          description: 'Conceptos financieros de alto nivel.'
-        }
+        id: 'day2-prof-basic',
+        title: 'Hardware & Software',
+        level: 'Básico',
+        ageGroup: 'Professional',
+        description: 'Vocabulario esencial para navegar en empresas de Silicon Valley.',
+        steps: [
+          {
+            id: 'd2-s1',
+            type: 'dialogue',
+            avatarText: 'Hoy aprenderemos palabras clave de hardware. En inglés, la computadora de trabajo se llama Workstation.',
+            avatarLang: 'es',
+            uiContent: { title: 'Día 2: Hardware', description: 'Vocabulario de oficina moderna.' }
+          },
+          {
+            id: 'd2-s2',
+            type: 'writing',
+            avatarText: 'Escribe en inglés la palabra: "Estación de trabajo".',
+            avatarLang: 'es',
+            uiContent: { 
+              title: 'Prueba Escrita', 
+              targetPhrase: 'Workstation',
+              placeholder: 'Write the word...'
+            }
+          }
+        ]
       },
       {
-        id: 'adv-2',
-        type: 'speaking',
-        avatarText: 'Repite esta frase compleja: "Our current burn rate is sustainable given our last seed round." Tú puedes.',
-        avatarLang: 'es',
-        uiContent: {
-          title: 'Desafío de Pronunciación',
-          description: 'Di: "Our current burn rate is sustainable given our last seed round."',
-          targetPhrase: 'Our current burn rate is sustainable given our last seed round'
-        }
+        id: 'day2-junior-basic',
+        title: 'The Blue Planet',
+        level: 'Básico',
+        ageGroup: 'Junior',
+        description: 'Colores y naturaleza en el espacio.',
+        steps: [
+          {
+            id: 'd2-j-s1',
+            type: 'dialogue',
+            avatarText: '¡Mira por la ventana de la nave! El planeta es de color azul. En inglés decimos: "The planet is blue".',
+            avatarLang: 'es',
+            uiContent: { title: 'Colores Espaciales', description: 'Aprendiendo colores.' }
+          },
+          {
+            id: 'd2-j-s2',
+            type: 'speaking',
+            avatarText: 'Dilo tú: "Blue planet"',
+            avatarLang: 'es',
+            uiContent: { 
+              title: 'Micrófono Abierto', 
+              targetPhrase: 'Blue planet'
+            }
+          }
+        ]
+      }
+    ]
+  },
+  {
+    dayNumber: 3,
+    title: 'Action & Code',
+    lessons: [
+      {
+        id: 'day3-prof-basic',
+        title: 'Verbos de Programación',
+        level: 'Básico',
+        ageGroup: 'Professional',
+        description: 'Los verbos que usan los programadores cada día.',
+        steps: [
+          {
+            id: 'd3-s1',
+            type: 'teaching',
+            avatarText: 'Cuando guardas tu progreso, estás haciendo un "Commit". Es una palabra sagrada en HAWKIN.',
+            avatarLang: 'es',
+            uiContent: { title: 'Día 3: Verbos', description: 'Aprende a ejecutar acciones.' }
+          }
+        ]
       }
     ]
   }
+  // El sistema soporta hasta 30 días cargando dinámicamente
 ];

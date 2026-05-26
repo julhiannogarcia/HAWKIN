@@ -46,6 +46,12 @@ export default function VoiceRecorder({ targetPhrase, onResult, lang = 'en-US' }
 
       onResult(Math.min(accuracy, 100), result);
       setIsListening(false);
+
+      // Feedback hablado automático (Opcional, se puede controlar desde el componente padre)
+      if (accuracy > 70) {
+        const audio = new Audio('https://assets.mixkit.co/active_storage/sfx/2013/2013-preview.mp3');
+        audio.play();
+      }
     };
 
     recognition.onerror = (event: any) => {
