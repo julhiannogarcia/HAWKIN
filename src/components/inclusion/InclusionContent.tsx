@@ -27,11 +27,15 @@ export default function InclusionContent() {
   };
 
   const handleNext = () => {
-    if (!activeModule) return;
-    if (currentStepIndex < (activeModule.steps?.length || 0) - 1) {
+    if (!activeModule || !activeModule.steps) return;
+    
+    // Si aún hay pasos pendientes en el módulo actual
+    if (currentStepIndex < activeModule.steps.length - 1) {
       setCurrentStepIndex(prev => prev + 1);
       setSelectedOption(null);
+      setShowFeedback(null);
     } else {
+      // Solo cuando se llega al final del último paso se muestra el éxito
       setIsSuccess(true);
     }
   };
@@ -40,9 +44,13 @@ export default function InclusionContent() {
     if (!currentStep?.content?.options) return;
     setSelectedOption(index);
     if (index === currentStep.content.correctOption) {
+      // Feedback visual de éxito antes de pasar al siguiente paso
+      setShowFeedback('correct');
       setTimeout(() => {
         handleNext();
-      }, 1000);
+      }, 1500);
+    } else {
+      setShowFeedback('wrong');
     }
   };
 
