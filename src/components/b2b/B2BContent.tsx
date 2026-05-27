@@ -12,6 +12,62 @@ import {
   ExternalLink, Radio, Tv
 } from 'lucide-react';
 
+// =====================================================================
+// COMPONENTE DE BOTÓN DE PAYPAL (EXTERIOR PARA ESTABILIDAD)
+// =====================================================================
+const PaypalButtonB2B = ({ placement, amount, currency, isPaypalLoaded }: { placement: any, amount: string, currency: string, isPaypalLoaded: boolean }) => {
+  const btnContainerRef = useRef<HTMLDivElement>(null);
+
+  useEffect(() => {
+    if (isPaypalLoaded && (window as any).paypal && btnContainerRef.current) {
+      const container = btnContainerRef.current;
+      container.innerHTML = ''; // Limpiar previo para evitar duplicados
+
+      try {
+        (window as any).paypal.Buttons({
+          style: { 
+            layout: 'vertical', 
+            color: 'gold', 
+            shape: 'rect', 
+            label: 'pay', 
+            height: 50 
+          },
+          createOrder: (data: any, actions: any) => {
+            return actions.order.create({
+              purchase_units: [{
+                description: `HAWKIN B2B - ${placement.title}`,
+                amount: { 
+                  currency_code: currency, 
+                  value: amount 
+                }
+              }],
+              application_context: { 
+                shipping_preference: 'NO_SHIPPING',
+                brand_name: 'HAWKIN INTELLIGENCE'
+              }
+            });
+          },
+          onApprove: async (data: any, actions: any) => {
+            const order = await actions.order.capture();
+            alert(`¡Reserva Exitosa! Socio, tu espacio publicitario ha sido bloqueado. ID: ${order.id}`);
+            window.location.href = "/b2b?success=true";
+          },
+          onError: (err: any) => {
+            console.error("PayPal Error:", err);
+          }
+        }).render(container);
+      } catch (error) {
+        console.error("PayPal Render Error:", error);
+      }
+    }
+  }, [isPaypalLoaded, placement.id, amount, currency]);
+
+  return <div ref={btnContainerRef} className="w-full min-h-[50px]" />;
+};
+
+// =====================================================================
+// COMPONENTE PRINCIPAL B2B
+// =====================================================================
 export default function B2BContent() {
   const [isUploading, setIsUploading] = useState(false);
   const [uploadProgress, setUploadProgress] = useState(0);
@@ -52,6 +108,7 @@ export default function B2BContent() {
 
   const [selectedPlacement, setSelectedPlacement] = useState(adPlacements[0]);
 
+  // 1. Obtener Geolocalización Completa
   useEffect(() => {
     const fetchGeo = async () => {
       try {
@@ -64,6 +121,17 @@ export default function B2BContent() {
       }
     };
     fetchGeo();
+  }, []);
+
+  // 2. Verificar disponibilidad de PayPal si el script ya cargó
+  useEffect(() => {
+    const checkPaypal = setInterval(() => {
+      if ((window as any).paypal) {
+        setIsPaypalLoaded(true);
+        clearInterval(checkPaypal);
+      }
+    }, 500);
+    return () => clearInterval(checkPaypal);
   }, []);
 
   const handleFileSelect = () => fileInputRef.current?.click();
@@ -90,39 +158,6 @@ export default function B2BContent() {
     window.open(`mailto:julhianno@aihawkin.com?subject=B2B Proposal&body=Interesado en pauta corporativa.`, '_self');
   };
 
-  // COMPONENTE DE BOTÓN DE PAYPAL DINÁMICO
-  const PaypalButtonB2B = ({ placement, amount, currency }: { placement: any, amount: string, currency: string }) => {
-    const btnContainerRef = useRef<HTMLDivElement>(null);
-
-    useEffect(() => {
-      if (isPaypalLoaded && (window as any).paypal && btnContainerRef.current) {
-        btnContainerRef.current.innerHTML = '';
-        (window as any).paypal.Buttons({
-          style: { layout: 'vertical', color: 'gold', shape: 'rect', label: 'pay', height: 50 },
-          createOrder: (data: any, actions: any) => {
-            return actions.order.create({
-              purchase_units: [{
-                description: `HAWKIN B2B - ${placement.title}`,
-                amount: { currency_code: currency, value: amount }
-              }],
-              application_context: { shipping_preference: 'NO_SHIPPING' }
-            });
-          },
-          onApprove: async (data: any, actions: any) => {
-            const order = await actions.order.capture();
-            alert(`¡Reserva Exitosa! ID: ${order.id}`);
-            window.location.href = "/b2b?success=true";
-          },
-          onError: (err: any) => {
-             console.error("PayPal Error:", err);
-          }
-        }).render(btnContainerRef.current);
-      }
-    }, [isPaypalLoaded, placement.id, amount, currency]);
-
-    return <div ref={btnContainerRef} className="w-full min-h-[50px]" />;
-  };
-
   const clientId = 'ASALTTzsK9I-m087Qv64N3tPLr_HFAyDKhliwe1bbS';
   const payPalCurrency = geoData?.currencyCode || 'USD';
   const payPalLocale = geoData?.locale || 'en_US';
@@ -131,11 +166,13 @@ export default function B2BContent() {
     <div className="flex-1 flex flex-col items-center">
       <Header />
       
+      {/* Script de PayPal con carga forzada y sin restricciones de pago */}
       {geoData && (
         <Script 
-          id="paypal-script-b2b"
-          src={`https://www.paypal.com/sdk/js?client-id=${clientId}&currency=${payPalCurrency}&locale=${payPalLocale}&disable-funding=credit,card`}
+          id="paypal-sdk-b2b"
+          src={`https://www.paypal.com/sdk/js?client-id=${clientId}&currency=${payPalCurrency}&locale=${payPalLocale}&enable-funding=paylater,venmo`}
           onLoad={() => setIsPaypalLoaded(true)}
+          strategy="afterInteractive"
         />
       )}
 
@@ -146,17 +183,17 @@ export default function B2BContent() {
         <section className="text-center space-y-8 mb-32">
           <span className="text-cyan-400 font-black uppercase tracking-[0.4em] text-[10px]">HAWKIN GLOBAL MEDIA</span>
           <h1 className="text-6xl md:text-8xl font-black tracking-tighter leading-none italic text-white text-center">
-            Domina el <span className="bg-gradient-to-r from-cyan-400 to-purple-600 bg-clip-text text-transparent uppercase">Mercado.</span>
+            Poder <span className="bg-gradient-to-r from-cyan-400 to-purple-600 bg-clip-text text-transparent uppercase">Comercial.</span>
           </h1>
           <p className="text-gray-400 text-xl max-w-2xl mx-auto font-light leading-relaxed text-center">
             Pauta inteligente con localización automática. Tu marca en el corazón de la IA.
           </p>
           <div className="flex flex-col md:flex-row justify-center gap-6 pt-12">
              <button onClick={() => document.getElementById('previsualizador')?.scrollIntoView({behavior: 'smooth'})} className="btn-glow text-[10px] py-6 px-16 uppercase">
-                Ver Ubicaciones
+                Iniciar Reserva
              </button>
              <button onClick={handleContact} className="px-16 py-6 bg-white/5 border border-white/10 rounded-full text-[10px] font-black uppercase tracking-widest hover:bg-white hover:text-black transition-all">
-               Hablar con Socio Fundador
+               Soporte Élite
              </button>
           </div>
         </section>
@@ -166,7 +203,7 @@ export default function B2BContent() {
            <div className="text-center space-y-4">
               <h2 className="text-4xl md:text-6xl font-black uppercase italic tracking-tighter text-white line-none text-center">Consola de <span className="text-cyan-400 uppercase">Impacto Global</span></h2>
               <p className="text-gray-600 uppercase font-black text-[10px] tracking-widest flex items-center justify-center gap-2">
-                 <Globe size={14} /> Localización: {geoData?.countryCode || 'Sincronizando...'} | {geoData?.currencyName || '...'}
+                 <Globe size={14} /> Localización Detectada: {geoData?.countryCode || 'Sincronizando...'} | Moneda: {geoData?.currencyName || '...'}
               </p>
            </div>
 
@@ -217,7 +254,7 @@ export default function B2BContent() {
                             <div className="absolute inset-0 bg-[url('https://images.unsplash.com/photo-1541562232579-512a21360020?auto=format&fit=crop&q=80&w=1000')] bg-cover opacity-40 animate-pulse" />
                             <div className="absolute top-4 left-4 bg-red-600 px-4 py-1.5 rounded-full flex items-center gap-2 animate-pulse shadow-lg">
                                <div className="w-2 h-2 bg-white rounded-full" />
-                               <span className="text-[9px] font-black uppercase text-white">LIVE STREAM</span>
+                               <span className="text-[9px] font-black uppercase text-white">LIVE</span>
                             </div>
                             <Play size={40} className="text-white fill-white absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2" />
                             <div className="absolute bottom-4 right-4 flex items-center gap-2 bg-cyan-500 text-black px-4 py-2 rounded-xl font-black text-[9px] uppercase shadow-xl">
@@ -238,7 +275,7 @@ export default function B2BContent() {
                  {/* ÁREA DE PAGO LOCALIZADA */}
                  <div className="mt-8 bg-white/[0.02] border border-white/5 p-8 rounded-[40px] space-y-6">
                     <div className="flex items-center justify-between">
-                       <p className="text-[10px] font-black text-gray-500 uppercase tracking-widest">Reserva segura:</p>
+                       <p className="text-[10px] font-black text-gray-500 uppercase tracking-widest">Reserva:</p>
                        <p className="text-xs font-bold text-cyan-400 uppercase italic underline">{selectedPlacement.placement}</p>
                     </div>
                     
@@ -246,13 +283,14 @@ export default function B2BContent() {
                        {!isPaypalLoaded ? (
                          <div className="flex flex-col items-center gap-4 text-center">
                             <Loader2 className="animate-spin text-cyan-400" size={32} />
-                            <p className="text-[9px] font-black text-gray-600 uppercase tracking-[0.3em] animate-pulse">Sincronizando Pasarela de Pago...</p>
+                            <p className="text-[9px] font-black text-gray-600 uppercase tracking-[0.3em] animate-pulse">Detectando Moneda por IP...</p>
                          </div>
                        ) : (
                          <PaypalButtonB2B 
                             placement={selectedPlacement} 
-                            amount={(selectedPlacement.price).toFixed(2)} 
+                            amount={(selectedPlacement.price * (geoData?.rate || 1)).toFixed(2)} 
                             currency={geoData?.currencyCode || 'USD'}
+                            isPaypalLoaded={isPaypalLoaded}
                          />
                        )}
                     </div>
