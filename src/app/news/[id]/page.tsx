@@ -17,7 +17,13 @@ const MASTER_NEWS: Record<string, any> = {
     author: "Julhianno Garcia",
     date: "19 Mayo, 2026",
     excerpt: "Análisis profundo sobre el razonamiento System 2 y la memoria persistente.",
-    content: "La carrera por la AGI ha tomado un giro inesperado esta semana. Tras meses de especulación, fuentes cercanas a los laboratorios de OpenAI en San Francisco han revelado que la arquitectura de GPT-5 ya no se basa únicamente en la predicción del siguiente token, sino en un sistema de razonamiento profundo. Esto permitirá que la IA no solo responda, sino que piense antes de actuar, reduciendo las alucinaciones en un 95%.",
+    content: `
+      La carrera por la Inteligencia Artificial General (AGI) ha alcanzado un punto de inflexión crítico con las recientes filtraciones sobre GPT-5. Fuentes internas de OpenAI confirman que la nueva arquitectura, denominada internamente "Artemis", marca el fin de la era de la simple predicción estadística. 
+
+      A diferencia de GPT-4, que opera bajo una lógica de "pensamiento rápido" o System 1, GPT-5 implementa un mecanismo de razonamiento System 2. Esto significa que el modelo ahora es capaz de realizar pausas deliberadas durante la generación de respuestas para verificar la lógica interna y contrastar hechos contra una base de conocimientos verificada en tiempo real. 
+
+      Las implicaciones para el mercado global son masivas. Se estima que GPT-5 podrá resolver problemas complejos de ingeniería, medicina y leyes con una tasa de precisión del 99.8%, eliminando prácticamente las alucinaciones que plagaban a sus predecesores. Además, la integración de una "memoria persistente episódica" permitirá que la IA aprenda de cada interacción con el usuario, creando un asistente verdaderamente personalizado que evoluciona junto a la visión del socio de HAWKIN.
+    `,
     image: "https://images.unsplash.com/photo-1677442136019-21780ecad995?auto=format&fit=crop&q=80&w=1200",
     isLocked: true
   },
@@ -28,7 +34,13 @@ const MASTER_NEWS: Record<string, any> = {
     author: "Julhianno Garcia",
     date: "18 Mayo, 2026",
     excerpt: "Cómo la IA financiará el futuro de la sociedad a través de dividendos de inteligencia.",
-    content: "En una reciente entrevista exclusiva, el CEO de OpenAI explicó cómo la IA no solo automatizará trabajos, sino que financiará el futuro de la sociedad. Altman propone un modelo donde el poder de cómputo se convierta en la nueva moneda de cambio, permitiendo que cada ciudadano del mundo reciba una compensación básica financiada por las ganancias de los modelos de IA más avanzados.",
+    content: `
+      En una cumbre exclusiva sobre el futuro del capital, Sam Altman ha presentado una propuesta que redefine el contrato social moderno: el Dividendo de Inteligencia Global. La premisa es simple pero radical: a medida que la IA genera una riqueza sin precedentes al automatizar la producción global, una parte de ese valor debe ser redistribuida directamente a los ciudadanos.
+
+      "No estamos hablando de caridad, sino de soberanía", afirmó Altman durante su intervención. Su modelo propone que las grandes corporaciones de IA aporten un porcentaje de su capacidad de cómputo y beneficios a un fondo soberano digital. Este fondo distribuiría activos no solo en moneda fiduciaria, sino en créditos de energía y procesamiento de datos, las dos materias primas más valiosas del siglo XXI.
+
+      Para los socios de HAWKIN, esto representa una oportunidad única de posicionamiento. Aquellos que dominen el uso de estas herramientas hoy, serán los administradores de la abundancia del mañana. La IA no viene a reemplazar al humano, sino a liberar su potencial creativo de las tareas mecánicas, permitiendo una nueva era de exploración intelectual y financiera.
+    `,
     image: "https://images.unsplash.com/photo-1485827404703-89b55fcc595e?auto=format&fit=crop&q=80&w=1200",
     isLocked: true
   },
@@ -39,7 +51,13 @@ const MASTER_NEWS: Record<string, any> = {
     author: "Julhianno Garcia",
     date: "19 Mayo, 2026",
     excerpt: "La demanda de infraestructura para IA posiciona a NVIDIA como el motor del mundo.",
-    content: "La demanda de infraestructura para IA no tiene precedentes. Con el lanzamiento de la arquitectura Blackwell, NVIDIA se ha posicionado como el motor indiscutible del mundo tecnológico. Las acciones de la compañía han subido un 15% tras el anuncio de alianzas estratégicas con las principales nubes del mundo.",
+    content: `
+      NVIDIA ha vuelto a pulverizar todas las expectativas de Wall Street, alcanzando una capitalización de mercado que desafía la lógica económica tradicional. El motor de este crecimiento explosivo es el despliegue masivo de los chips Blackwell B200, diseñados específicamente para alimentar la próxima generación de modelos de lenguaje a escala trillonaria.
+
+      Jensen Huang, CEO de NVIDIA, describió este momento como la "nueva revolución industrial". A diferencia de la era del software, donde el código era el rey, en la era de la IA generativa, el hardware es el terreno sobre el cual se construye el imperio digital. Las nubes de Azure, AWS y Google han reservado el 90% de la producción de NVIDIA para los próximos 18 meses, creando una barrera de entrada tecnológica insalvable para competidores menores.
+
+      El análisis de Radar HAWKIN sugiere que estamos viendo la formación de un monopolio de infraestructura que dictará los precios de la inteligencia en la próxima década. Para el inversor estratégico, la clave no es solo poseer acciones de NVIDIA, sino entender cómo la eficiencia de estos chips reducirá el costo de entrenar IA personalizada para empresas del ecosistema B2B.
+    `,
     image: "https://images.unsplash.com/photo-1620712943543-bcc4688e7485?auto=format&fit=crop&q=80&w=1200",
     isLocked: false
   }

@@ -13,7 +13,6 @@ import LiveFeed from '@/components/LiveFeed';
 export default function Home() {
   return (
     <main className="relative min-h-screen">
-      <Intro />
       <Header />
 
       <div className="flex flex-col">
