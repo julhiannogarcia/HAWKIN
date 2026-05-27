@@ -25,15 +25,25 @@ const PaypalButtonB2B = ({ placement, amount, currency, locale, isLoaded }: {
 
   useEffect(() => {
     if (isLoaded && (window as any).paypal && containerRef.current && placement) {
-      containerRef.current.innerHTML = ''; 
+      const container = containerRef.current;
+      container.innerHTML = ''; 
       try {
         (window as any).paypal.Buttons({
-          style: { layout: 'vertical', color: 'gold', shape: 'rect', label: 'pay', height: 50 },
+          style: { 
+            layout: 'vertical', 
+            color: 'gold', 
+            shape: 'rect', 
+            label: 'pay', 
+            height: 50 
+          },
           createOrder: (data: any, actions: any) => {
             return actions.order.create({
               purchase_units: [{
                 description: `HAWKIN B2B - ${placement.title}`,
-                amount: { currency_code: currency, value: amount }
+                amount: { 
+                  currency_code: currency, 
+                  value: amount 
+                }
               }],
               application_context: { 
                 shipping_preference: 'NO_SHIPPING',
@@ -44,12 +54,15 @@ const PaypalButtonB2B = ({ placement, amount, currency, locale, isLoaded }: {
           },
           onApprove: async (data: any, actions: any) => {
             const order = await actions.order.capture();
-            alert(`¡PAGO EXITOSO! ID: ${order.id}. Tu pauta ha sido reservada.`);
+            alert(`¡PAGO EXITOSO! ID: ${order.id}. Su anuncio se activará en breve.`);
             window.location.href = "/b2b?success=true";
+          },
+          onError: (err: any) => {
+            console.error("PayPal Interaction Error:", err);
           }
-        }).render(containerRef.current);
+        }).render(container);
       } catch (e) {
-        console.error("Error al renderizar botones:", e);
+        console.error("PayPal Buttons Render Fail:", e);
       }
     }
   }, [isLoaded, placement?.id, amount, currency, locale]);
@@ -58,7 +71,7 @@ const PaypalButtonB2B = ({ placement, amount, currency, locale, isLoaded }: {
 };
 
 // =====================================================================
-// PÁGINA B2B PRINCIPAL - RECONSTRUCCIÓN TOTAL v13.0
+// PÁGINA B2B v14.0 - FIX MAESTRO DE MONEDA Y CARGA
 // =====================================================================
 export default function B2BPage() {
   const [isMounted, setIsMounted] = useState(false);
@@ -76,40 +89,46 @@ export default function B2BPage() {
     setIsMounted(true);
     setSelectedPlacement(adPlacements[0]);
     
-    // 1. Detección de IP y Localización (Idioma y Moneda)
+    // Detección de IP prioritaria
     fetch('/api/geo')
       .then(res => res.json())
       .then(data => setGeoData(data))
       .catch(() => setGeoData({ countryCode: 'PE', currencySymbol: 'S/', currencyCode: 'PEN', rate: 1, locale: 'es_PE', currencyName: 'Soles' }));
   }, [adPlacements]);
 
-  // 2. Cargador Maestro de PayPal (Con Client ID Verificado)
+  // CARGADOR DE PAYPAL (Sincronizado con la Moneda Local)
   useEffect(() => {
     if (!geoData || !isMounted) return;
 
-    const clientId = 'ASALTTzsK9I-m087Qv64N3tPLr_HFAyDKhliwe1bbS'; // ESTA ES LA CLAVE QUE SÍ FUNCIONA
+    // CLIENT ID QUE FUNCIONÓ ANTES
+    const clientId = 'ASALTTzsK9I-m087Qv64N3tPLr_HFAyDKhliwe1bbS'; 
     const currency = geoData.currencyCode || 'USD';
     const locale = geoData.locale || 'es_PE';
 
-    const scriptId = 'paypal-engine-v13-final';
-    if (document.getElementById(scriptId)) {
-        if ((window as any).paypal) setIsPaypalReady(true);
-        return;
-    }
+    // Limpiar previo para asegurar cambio de moneda
+    const existing = document.getElementById('paypal-master-engine');
+    if (existing) existing.remove();
 
     const script = document.createElement('script');
-    script.id = scriptId;
-    script.src = `https://www.paypal.com/sdk/js?client-id=${clientId}&currency=USD&locale=${locale}&components=buttons`;
+    script.id = 'paypal-master-engine';
+    script.src = `https://www.paypal.com/sdk/js?client-id=${clientId}&currency=${currency}&locale=${locale}&components=buttons`;
     script.async = true;
     script.onload = () => {
-        console.log("PayPal System v13 Online");
-        setIsPaypalReady(true);
+      console.log(`PayPal System v14.0 Ready [${currency}]`);
+      setIsPaypalReady(true);
     };
-    script.onerror = () => console.error("PayPal failed to load");
-    document.body.appendChild(script);
+    script.onerror = () => {
+      console.error("Script load error, retrying in USD");
+      const fallback = document.createElement('script');
+      fallback.src = `https://www.paypal.com/sdk/js?client-id=${clientId}&currency=USD&locale=en_US`;
+      fallback.async = true;
+      fallback.onload = () => setIsPaypalReady(true);
+      document.body.appendChild(fallback);
+    };
+    document.head.appendChild(script);
 
     return () => {
-      // Dejamos el script para estabilidad
+      // Dejamos el script
     };
   }, [geoData, isMounted]);
 
@@ -122,24 +141,24 @@ export default function B2BPage() {
       <div className="max-w-6xl mx-auto px-6 pt-40 pb-32">
         {/* TITULACIÓN PRO */}
         <section className="text-center space-y-8 mb-40">
-          <span className="text-cyan-400 font-black uppercase tracking-[0.4em] text-[10px]">HAWKIN ADS MARKETPLACE v13.0</span>
+          <span className="text-cyan-400 font-black uppercase tracking-[0.4em] text-[10px]">HAWKIN ADS MARKETPLACE v14.0</span>
           <h1 className="text-6xl md:text-9xl font-black tracking-tighter leading-none italic uppercase text-center">
             Poder <span className="bg-gradient-to-r from-cyan-400 to-purple-600 bg-clip-text text-transparent">Comercial.</span>
           </h1>
           <p className="text-gray-400 text-xl max-w-3xl mx-auto font-light leading-relaxed text-center">
-             Tu marca en el epicentro de la tecnología. 
-             Localización automática de idioma y moneda por IP.
+             Activación de pauta publicitaria localizada por IP. 
+             Idioma y moneda sincronizados automáticamente.
           </p>
         </section>
 
-        {/* CONSOLA DE SIMULACIÓN Y PAGO */}
+        {/* CONSOLA DE IMPACTO */}
         <div className="grid grid-cols-1 lg:grid-cols-12 gap-12 items-start">
            
            {/* SECTOR PLANES */}
            <div className="lg:col-span-4 space-y-6">
               <div className="flex items-center gap-3 mb-8">
                  <Target className="text-cyan-400" size={20} />
-                 <h3 className="text-xl font-black uppercase italic tracking-tighter">Objetivos Activos</h3>
+                 <h3 className="text-xl font-black uppercase italic tracking-tighter">Puntos de Ataque</h3>
               </div>
               
               {adPlacements.map((ad) => (
@@ -158,13 +177,13 @@ export default function B2BPage() {
                       <p className="text-xl font-black text-white">{geoData?.currencySymbol || 'S/'}{ad.price}</p>
                    </div>
                    <p className="text-[9px] text-gray-500 font-bold uppercase tracking-widest pl-1">
-                      Reach: <span className="text-white">{ad.reach}</span>
+                      Visibilidad: <span className="text-white">{ad.reach}</span>
                    </p>
                 </button>
               ))}
 
               <div className="mt-12 p-8 rounded-[40px] bg-white/[0.02] border border-white/5 flex flex-col gap-2">
-                 <p className="text-[9px] font-black text-gray-600 uppercase tracking-widest">Sincronización IP</p>
+                 <p className="text-[9px] font-black text-gray-600 uppercase tracking-widest">Estado del Radar IP</p>
                  <div className="flex justify-between items-center">
                     <span className="text-xs font-bold text-cyan-400 uppercase italic">{geoData?.countryCode || 'PE'} | {geoData?.currencyName || 'Soles'}</span>
                     <Globe size={16} className="text-cyan-400 animate-spin-slow" />
@@ -175,7 +194,6 @@ export default function B2BPage() {
            {/* SIMULADOR Y PASARELA */}
            <div className="lg:col-span-8 space-y-12">
               
-              {/* SIMULADOR DE VIDEO REALISTA */}
               <div className="relative group">
                  <div className="glass-card border-white/10 p-4 aspect-video rounded-[60px] bg-[#050505] overflow-hidden flex flex-col shadow-2xl border-2">
                     <div className="flex-1 relative rounded-[40px] overflow-hidden bg-gray-900 border border-white/5 flex flex-col justify-center items-center text-center p-12">
@@ -188,9 +206,9 @@ export default function B2BPage() {
                                   <span className="text-[10px] font-black uppercase text-white">LIVE STREAM</span>
                                </div>
                                <Play size={48} className="text-white fill-white opacity-50 mb-6 mx-auto" />
-                               <h4 className="text-2xl font-black uppercase italic leading-tight text-white text-center">Visualización Directa</h4>
+                               <h4 className="text-2xl font-black uppercase italic leading-tight text-white text-center">Modo Transmisión</h4>
                                <div className="absolute bottom-6 right-6 bg-white text-black px-6 py-2.5 rounded-2xl font-black text-[10px] uppercase shadow-2xl flex items-center gap-3">
-                                  <ExternalLink size={14} /> VISITAR TIENDA
+                                  <ExternalLink size={14} /> VISITAR WEB
                                </div>
                             </motion.div>
                           ) : (
@@ -224,18 +242,18 @@ export default function B2BPage() {
                        {!isPaypalReady ? (
                          <div className="flex flex-col items-center gap-4 py-8">
                             <Loader2 className="animate-spin text-cyan-400" size={40} />
-                            <p className="text-[10px] font-black text-gray-600 uppercase tracking-[0.4em] animate-pulse">Activando Pasarela Global...</p>
+                            <p className="text-[10px] font-black text-gray-600 uppercase tracking-[0.4em] animate-pulse">Sincronizando Pasarela...</p>
                          </div>
                        ) : (
                          <div className="space-y-6">
                             <PaypalButtonB2B 
                               placement={selectedPlacement}
-                              amount={(selectedPlacement.price / (geoData?.rate || 3.82)).toFixed(2)}
-                              currency="USD"
+                              amount={selectedPlacement.price.toString()}
+                              currency={geoData?.currencyCode || 'USD'}
                               locale={geoData?.locale || 'es_PE'}
                               isLoaded={isPaypalReady}
                             />
-                            <p className="text-center text-[7px] text-gray-600 font-black uppercase tracking-[0.3em]">Débito Seguro • PayPal Global Network</p>
+                            <p className="text-center text-[7px] text-gray-600 font-black uppercase tracking-[0.3em]">Débito Seguro • PayPal Global Service</p>
                          </div>
                        )}
                     </div>
@@ -249,17 +267,17 @@ export default function B2BPage() {
            <div className="p-12 rounded-[50px] bg-white/[0.01] border border-white/5 space-y-6 text-center">
               <Eye className="text-cyan-400 mx-auto" size={32} />
               <h4 className="text-xl font-black uppercase italic tracking-tighter text-white">Impacto 360</h4>
-              <p className="text-xs text-gray-500 font-light leading-relaxed">Presencia en Radar, Academia y Trading simultáneamente.</p>
+              <p className="text-xs text-gray-500 font-light leading-relaxed">Presencia masiva en todo el ecosistema Hawkin.</p>
            </div>
            <div className="p-12 rounded-[50px] bg-white/[0.01] border border-white/5 space-y-6 text-center">
               <Layout className="text-purple-500 mx-auto" size={32} />
               <h4 className="text-xl font-black uppercase italic tracking-tighter text-white">Clic Directo</h4>
-              <p className="text-xs text-gray-500 font-light leading-relaxed">Botones inteligentes integrados para derivar tráfico a tu web.</p>
+              <p className="text-xs text-gray-500 font-light leading-relaxed">Enlaces inteligentes hacia tu canal de ventas.</p>
            </div>
            <div className="p-12 rounded-[50px] bg-white/[0.01] border border-white/5 space-y-6 text-center">
               <Tv className="text-green-500 mx-auto" size={32} />
-              <h4 className="text-xl font-black uppercase italic tracking-tighter text-white">Alta Fidelidad</h4>
-              <p className="text-xs text-gray-500 font-light leading-relaxed">Soporte para videos 4K, animaciones y artes vectoriales.</p>
+              <h4 className="text-xl font-black uppercase italic tracking-tighter text-white">Fidelidad 4K</h4>
+              <p className="text-xs text-gray-500 font-light leading-relaxed">Soporte para videos de alta calidad y animaciones.</p>
            </div>
         </div>
 
