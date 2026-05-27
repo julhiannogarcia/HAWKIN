@@ -45,12 +45,18 @@ export const INCLUSION_CURRICULUM: InclusionModule[] = [
     ]
   },
   {
-    id: 'exp-5', title: 'Lógica de Robots', icon: '🤖', color: 'bg-[#F5EEF8]', ageGroup: '4-7', phase: 'Creación',
-    description: 'Instrucciones paso a paso.',
+    id: 'exp-robot-1', title: 'Comandos de Robot', icon: '🤖', color: 'bg-[#F5EEF8]', ageGroup: '4-7', phase: 'Creación',
+    description: 'Instrucciones paso a paso para máquinas.',
     steps: [
-      { id: 's1', type: 'intro', title: 'Algoritmos Simples', description: 'Dar órdenes claras.', avatarText: 'Un robot solo hace lo que le dices. Vamos a darle una orden secreta.', content: {} },
-      { id: 's2', type: 'exercise', title: 'Misión: Caminar', description: 'Para que el robot llegue a la meta, ¿qué orden es mejor?', avatarText: 'Piensa como un programador. Si quieres que avance, ¿qué botón pulsarías?', content: { options: ['Girar', 'Caminar Adelante', 'Dormir'], correctOption: 1 } },
-      { id: 's3', type: 'fact', title: 'El Lenguaje del Robot', description: 'Los robots hablan con números.', avatarText: 'Los robots no entienden palabras como nosotros, ellos leen código binario.', content: { fact: 'El código binario solo usa 0 y 1 para crear todo lo que ves en una pantalla.' } }
+      { id: 's1', type: 'intro', title: 'El Lenguaje del Robot', description: 'Dar órdenes claras.', avatarText: 'Los robots no saben qué hacer solos. ¡Tú eres su jefe! Vamos a darle una orden.', content: {} },
+      { id: 's2', type: 'exercise', title: 'Misión: Caminar', description: '¿Qué botón hace que el robot avance?', avatarText: 'Si quieres que el robot llegue a la meta, ¿qué comando usarías?', content: { options: ['Girar', 'Caminar', 'Saltar'], correctOption: 1 } }
+    ]
+  },
+  {
+    id: 'exp-astro-1', title: 'Explorador Solar', icon: '☀️', color: 'bg-[#FEF9E7]', ageGroup: '4-7', phase: 'Descubrimiento',
+    description: 'Planetas y estrellas para pequeños genios.',
+    steps: [
+      { id: 's1', type: 'fact', title: 'El Sol', description: 'Nuestra estrella gigante.', avatarText: 'El Sol es una bola de fuego gigante que nos da luz y calor.', content: { fact: '¡Caben un millón de Tierras dentro del Sol!' } }
     ]
   },
 
@@ -58,21 +64,34 @@ export const INCLUSION_CURRICULUM: InclusionModule[] = [
   // 8-12 AÑOS: CREADORES (CIENCIA, INGENIERÍA Y LÓGICA)
   // ==========================================
   {
-    id: 'cre-1', title: 'Ingeniería Aeroespacial', icon: '🚀', color: 'bg-[#FBFCFC]', ageGroup: '8-12', phase: 'Descubrimiento',
-    description: 'Propulsión y Newton.',
+    id: 'cre-phy-1', title: 'Física de Cohetes', icon: '🚀', color: 'bg-[#FBFCFC]', ageGroup: '8-12', phase: 'Maestría',
+    description: 'Vencer la gravedad con cálculo.',
     steps: [
-      { id: 's1', type: 'intro', title: 'Misión Marte', description: 'Vencer la gravedad.', avatarText: 'Para llegar a Marte necesitamos mucha fuerza. Estudiaremos la Tercera Ley de Newton.', content: {} },
-      { id: 's2', type: 'exercise', title: 'Reto de Empuje', description: 'Si el gas sale hacia abajo con fuerza 10, ¿hacia dónde va el cohete?', avatarText: 'Aplica la física: Acción y Reacción. ¿Hacia dónde apunta el vector de movimiento?', content: { options: ['Abajo', 'Arriba', 'Se queda quieto'], correctOption: 1 } },
-      { id: 's3', type: 'fact', title: 'Propulsores de Plasma', description: 'El futuro de los viajes espaciales.', avatarText: 'Hoy usamos fuego, pero en el futuro usaremos plasma para viajar más rápido.', content: { fact: 'Un motor de plasma puede ser hasta 10 veces más eficiente que uno químico.' } }
+      { id: 's1', type: 'intro', title: 'Acción y Reacción', description: 'La Tercera Ley de Newton.', avatarText: 'Bienvenido, ingeniero. Hoy analizaremos cómo escapar de la gravedad terrestre.', content: {} },
+      { id: 's2', type: 'exercise', title: 'Vector de Empuje', description: 'Si el gas sale hacia abajo, ¿hacia dónde va el cohete?', avatarText: 'Aplica la ley física. ¿Hacia dónde apunta el vector de movimiento?', content: { options: ['Abajo', 'Arriba', 'Se queda quieto'], correctOption: 1 } },
+      { id: 's3', type: 'fact', title: 'Velocidad de Escape', description: 'Cruzar la frontera espacial.', avatarText: 'Para salir de la Tierra necesitamos ir a 11.2 km/s. ¡Es súper rápido!', content: { fact: 'A esa velocidad, podrías cruzar todo el Perú en menos de 2 minutos.' } }
     ]
   },
   {
-    id: 'cre-2', title: 'El Código de Fibonacci', icon: '🐚', color: 'bg-[#FDF2E9]', ageGroup: '8-12', phase: 'Maestría',
-    description: 'Sucesiones matemáticas en la vida.',
+    id: 'cre-math-1', title: 'Secuencia Fibonacci', icon: '🐚', color: 'bg-[#FDF2E9]', ageGroup: '8-12', phase: 'Maestría',
+    description: 'El código matemático de la vida.',
     steps: [
-      { id: 's1', type: 'intro', title: 'La Espiral Secreta', description: 'Números que crean vida.', avatarText: 'Descubriremos el número que hace que las flores y galaxias se vean tan hermosas.', content: {} },
-      { id: 's2', type: 'logic', title: 'Reto de Sucesión', description: '1, 1, 2, 3, 5, 8... ¿Cuál es el siguiente número?', avatarText: 'Suma los dos últimos números para encontrar el secreto.', content: { options: ['10', '13', '21'], correctOption: 1 } },
-      { id: 's3', type: 'fact', title: 'La Proporción Áurea', description: 'El número de oro: 1.618.', avatarText: 'Este número es la firma de la perfección en el diseño del universo.', content: { fact: 'La Proporción Áurea se encuentra incluso en la estructura del ADN humano.' } }
+      { id: 's1', type: 'logic', title: 'Suma Infinita', description: '¿Cuál es el siguiente número?', avatarText: 'Recuerda: cada número es la suma de los dos anteriores. 1, 1, 2, 3, 5, 8... ¿Cuál sigue?', content: { options: ['10', '13', '21'], correctOption: 1 } },
+      { id: 's2', type: 'fact', title: 'La Espiral Dorada', description: 'Arte en la naturaleza.', avatarText: 'Este patrón está en galaxias y caracoles. Es la firma del orden.', content: { fact: 'La Proporción Áurea se usa en el diseño de los autos más rápidos del mundo.' } }
+    ]
+  },
+  {
+    id: 'cre-bio-1', title: 'Células de IA', icon: '🧬', color: 'bg-[#E9F7EF]', ageGroup: '8-12', phase: 'Descubrimiento',
+    description: 'Biología molecular aplicada.',
+    steps: [
+      { id: 's1', type: 'fact', title: 'El ADN', description: 'Tu código fuente.', avatarText: 'Tu cuerpo tiene un libro de instrucciones llamado ADN. Es como el código de un programa.', content: { fact: 'Si estiráramos tu ADN, ¡llegaría de la Tierra a la Luna 6000 veces!' } }
+    ]
+  },
+  {
+    id: 'cre-chem-1', title: 'Laboratorio de Átomos', icon: '🧪', color: 'bg-[#F5EEF8]', ageGroup: '8-12', phase: 'Descubrimiento',
+    description: 'Química elemental para visionarios.',
+    steps: [
+      { id: 's1', type: 'exercise', title: 'La Molécula del Agua', description: '¿De qué está hecha el agua?', avatarText: 'H2O significa que necesitamos dos de Hidrógeno y uno de...', content: { options: ['Helio', 'Oxígeno', 'Carbono'], correctOption: 1 } }
     ]
   },
 
@@ -80,12 +99,33 @@ export const INCLUSION_CURRICULUM: InclusionModule[] = [
   // 13-17+ AÑOS: VISIONARIOS (TECNOLOGÍA DE FRONTERA)
   // ==========================================
   {
-    id: 'vis-1', title: 'Computación Cuántica', icon: '⚛️', color: 'bg-[#FBFCFC]', ageGroup: '13-17', phase: 'Descubrimiento',
-    description: 'Qubits y Superposición.',
+    id: 'vis-quant-1', title: 'Mundo Cuántico', icon: '⚛️', color: 'bg-[#FBFCFC]', ageGroup: '13-17', phase: 'Descubrimiento',
+    description: 'Qubits, Superposición y Entrelazamiento.',
     steps: [
-      { id: 's1', type: 'intro', title: 'Más allá del Bit', description: 'La paradoja de Schrödinger.', avatarText: 'Bienvenido al nivel de Élite. Las computadoras clásicas usan bits (0 o 1). Las cuánticas usan ambos al mismo tiempo.', content: {} },
-      { id: 's2', type: 'exercise', title: 'Lógica del Qubit', description: 'Si un Qubit está en superposición, ¿en qué estado se encuentra?', avatarText: 'Piensa en una moneda girando. ¿Es cara o cruz?', content: { options: ['Solo 0', 'Solo 1', '0 y 1 simultáneamente'], correctOption: 2 } },
-      { id: 's3', type: 'fact', title: 'Entrelazamiento', description: 'Conexión instantánea.', avatarText: 'Dos partículas pueden estar conectadas sin importar la distancia. Es la base de la internet cuántica.', content: { fact: 'El entrelazamiento cuántico permite que el cambio de estado de una partícula afecte a la otra de forma inmediata.' } }
+      { id: 's1', type: 'intro', title: 'Más allá del Bit', description: 'La lógica del futuro.', avatarText: 'Bienvenido al nivel de Élite. Las computadoras normales usan bits. Las cuánticas usan Qubits.', content: {} },
+      { id: 's2', type: 'exercise', title: 'Superposición', description: '¿En qué estado está un Qubit antes de medirlo?', avatarText: 'Piensa en una moneda girando. ¿Es cara o cruz?', content: { options: ['Solo 0', 'Solo 1', '0 y 1 al mismo tiempo'], correctOption: 2 } },
+      { id: 's3', type: 'fact', title: 'Entrelazamiento', description: 'Acción fantasmal.', avatarText: 'Dos partículas pueden estar conectadas sin importar la distancia. Es pura magia física.', content: { fact: 'El entrelazamiento permite teletransportar información instantáneamente.' } }
+    ]
+  },
+  {
+    id: 'vis-sec-1', title: 'Criptografía RSA', icon: '🔐', color: 'bg-[#EAEDED]', ageGroup: '13-17', phase: 'Maestría',
+    description: 'Seguridad basada en números primos gigantes.',
+    steps: [
+      { id: 's1', type: 'logic', title: 'Factorización', description: '¿Por qué RSA es tan seguro?', avatarText: 'La base es que es muy difícil encontrar dos números primos que al multiplicarse den un número gigante.', content: { options: ['Por el firewall', 'Por la dificultad matemática', 'Por la velocidad de internet'], correctOption: 1 } }
+    ]
+  },
+  {
+    id: 'vis-ai-1', title: 'Redes Neuronales', icon: '🧠', color: 'bg-[#FBFCFC]', ageGroup: '13-17', phase: 'Creación',
+    description: 'Arquitectura de transformadores y GPT.',
+    steps: [
+      { id: 's1', type: 'fact', title: 'Auto-Atención', description: 'Cómo la IA entiende el contexto.', avatarText: 'La IA analiza qué palabras son más importantes mediante pesos lógicos. Se llama mecanismo de atención.', content: { fact: 'La arquitectura Transformer cambió el mundo de la IA en 2017.' } }
+    ]
+  },
+  {
+    id: 'vis-fin-1', title: 'Algoritmos Financieros', icon: '💰', color: 'bg-[#F4F6F7]', ageGroup: '13-17', phase: 'Maestría',
+    description: 'Blockchain y descentralización.',
+    steps: [
+      { id: 's1', type: 'fact', title: 'El Ledger', description: 'El libro que nadie puede borrar.', avatarText: 'En el blockchain, la información es inmutable. Nadie puede alterar el pasado.', content: { fact: 'Bitcoin utiliza criptografía de curva elíptica para su seguridad.' } }
     ]
   }
 ];

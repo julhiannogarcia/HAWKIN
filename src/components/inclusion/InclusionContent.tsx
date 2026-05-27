@@ -2,11 +2,12 @@
 
 import React, { useState, useEffect } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
-import { Volume2, VolumeX, Heart, Brain, Sparkles, ChevronRight, Palette, ArrowLeft, CheckCircle2, Trophy, Lightbulb, Settings } from 'lucide-react';
+import { Volume2, VolumeX, Heart, Brain, Sparkles, ChevronRight, LayoutGrid, Palette, ArrowLeft, CheckCircle2, Trophy, Lightbulb, Settings } from 'lucide-react';
 import AIAvatar from '@/components/course/AIAvatar';
-import { INCLUSION_CURRICULUM, InclusionModule, InclusionAgeGroup, InclusionPhase } from '@/lib/inclusionData';
+import { INCLUSION_CURRICULUM, InclusionModule, InclusionStep, InclusionAgeGroup, InclusionPhase } from '@/lib/inclusionData';
 
 export default function InclusionContent() {
+  const [isMounted, setIsMounted] = useState(false);
   const [view, setView] = useState<'onboarding' | 'dashboard' | 'activity'>('onboarding');
   const [ageGroup, setAgeGroup] = useState<InclusionAgeGroup>('8-12');
   const [phase, setPhase] = useState<InclusionPhase>('Descubrimiento');
@@ -14,7 +15,14 @@ export default function InclusionContent() {
   const [currentStepIndex, setCurrentStepIndex] = useState(0);
   const [isAudioEnabled, setIsAudioEnabled] = useState(true);
   const [selectedOption, setSelectedOption] = useState<number | null>(null);
+  const [showFeedback, setShowFeedback] = useState<'correct' | 'wrong' | null>(null);
   const [isSuccess, setIsSuccess] = useState(false);
+
+  useEffect(() => {
+    setIsMounted(true);
+  }, []);
+
+  if (!isMounted) return null;
 
   const filteredModules = INCLUSION_CURRICULUM.filter(mod => mod.ageGroup === ageGroup && mod.phase === phase);
   const currentStep = activeModule?.steps?.[currentStepIndex];
@@ -28,14 +36,11 @@ export default function InclusionContent() {
 
   const handleNext = () => {
     if (!activeModule || !activeModule.steps) return;
-    
-    // Si aún hay pasos pendientes en el módulo actual
     if (currentStepIndex < activeModule.steps.length - 1) {
       setCurrentStepIndex(prev => prev + 1);
       setSelectedOption(null);
       setShowFeedback(null);
     } else {
-      // Solo cuando se llega al final del último paso se muestra el éxito
       setIsSuccess(true);
     }
   };
@@ -44,8 +49,8 @@ export default function InclusionContent() {
     if (!currentStep?.content?.options) return;
     setSelectedOption(index);
     if (index === currentStep.content.correctOption) {
-      // Feedback visual de éxito antes de pasar al siguiente paso
       setShowFeedback('correct');
+      // Navegación Automática tras acertar
       setTimeout(() => {
         handleNext();
       }, 1500);
@@ -213,25 +218,6 @@ export default function InclusionContent() {
                        </div>
 
                        <div className="bg-white rounded-[60px] p-12 border border-[#EAECEE] shadow-xl flex-1 flex flex-col justify-center items-center gap-12 relative overflow-hidden">
-                          {currentStep?.type === 'exercise' && (
-                            <div className="space-y-10 text-center w-full">
-                               <div className="p-8 bg-[#EBF5FB] border border-[#AED6F1] rounded-[40px] text-[#2E86C1] font-bold text-xl shadow-sm">
-                                  {currentStep.content?.question || currentStep.description}
-                               </div>
-                               <div className="grid grid-cols-1 gap-4 max-w-md mx-auto">
-                                  {currentStep.content?.options?.map((opt, i) => (
-                                     <button 
-                                      key={i} 
-                                      onClick={() => handleOptionClick(i)} 
-                                      className={`p-6 rounded-[30px] border-4 font-bold text-lg transition-all ${selectedOption === i ? (i === currentStep.content.correctOption ? 'border-[#27AE60] bg-[#E9F7EF]' : 'border-[#E74C3C] bg-[#FDEDEC] animate-shake') : 'border-[#D5DBDB] bg-white hover:border-[#5DADE2] hover:scale-[1.02]'}`}
-                                     >
-                                        {opt}
-                                     </button>
-                                  ))}
-                               </div>
-                            </div>
-                          )}
-
                           {currentStep?.type === 'pattern' && (
                             <div className="space-y-16 w-full text-center">
                                <div className="flex justify-center gap-8">
@@ -250,6 +236,21 @@ export default function InclusionContent() {
                             </div>
                           )}
 
+                          {currentStep?.type === 'exercise' && (
+                            <div className="space-y-10 text-center w-full">
+                               <div className="p-8 bg-[#EBF5FB] border border-[#AED6F1] rounded-[40px] text-[#2E86C1] font-bold text-xl shadow-sm">
+                                  {currentStep.content?.question || currentStep.description}
+                               </div>
+                               <div className="grid grid-cols-1 gap-4 max-w-md mx-auto">
+                                  {currentStep.content?.options?.map((opt, i) => (
+                                     <button key={i} onClick={() => handleOptionClick(i)} className={`p-6 rounded-[30px] border-4 font-bold text-lg transition-all ${selectedOption === i ? (i === currentStep.content.correctOption ? 'border-[#27AE60] bg-[#E9F7EF]' : 'border-[#E74C3C] bg-[#FDEDEC] animate-shake') : 'border-[#D5DBDB] bg-white hover:border-[#5DADE2] hover:scale-[1.02]'}`}>
+                                        {opt}
+                                     </button>
+                                  ))}
+                               </div>
+                            </div>
+                          )}
+
                           {currentStep?.type === 'fact' && (
                             <div className="space-y-10 text-center max-w-md">
                                <div className="w-32 h-32 bg-[#FEF9E7] rounded-[40px] flex items-center justify-center mx-auto shadow-sm"><Lightbulb className="text-[#F1C40F]" size={64} /></div>
@@ -261,12 +262,15 @@ export default function InclusionContent() {
                           {currentStep?.type === 'logic' && (
                             <div className="space-y-10 text-center w-full">
                                <div className="p-10 bg-[#E8F8F5] border border-[#A3E4D7] rounded-[40px] text-[#16A085] font-sans leading-relaxed text-lg italic whitespace-pre-wrap">{currentStep.content?.longText || ''}</div>
-                               <div className="grid grid-cols-1 gap-4 max-w-xs mx-auto">
-                                  {currentStep.content?.options?.map((opt, i) => (
-                                     <button key={i} onClick={() => handleOptionClick(i)} className={`p-6 rounded-3xl border-4 font-bold text-lg transition-all ${selectedOption === i ? (i === currentStep.content?.correctOption ? 'border-[#27AE60] bg-[#E9F7EF]' : 'border-[#E74C3C] bg-[#FDEDEC]') : 'border-[#D5DBDB] bg-white hover:border-[#5DADE2]'}`}>{opt}</button>
-                                  ))}
-                               </div>
-                               {!currentStep.content?.options && <button onClick={handleNext} className="px-16 py-6 bg-[#27AE60] text-white rounded-[30px] font-bold uppercase tracking-widest text-sm shadow-lg hover:bg-[#229954] transition-all">Siguiente Paso</button>}
+                               {currentStep.content?.options ? (
+                                 <div className="grid grid-cols-1 gap-4 max-w-xs mx-auto">
+                                    {currentStep.content.options.map((opt, i) => (
+                                       <button key={i} onClick={() => handleOptionClick(i)} className={`p-6 rounded-3xl border-4 font-bold text-lg transition-all ${selectedOption === i ? (i === currentStep.content.correctOption ? 'border-[#27AE60] bg-[#E9F7EF]' : 'border-[#E74C3C] bg-[#FDEDEC]') : 'border-[#D5DBDB] bg-white hover:border-[#5DADE2]'}`}>{opt}</button>
+                                    ))}
+                                 </div>
+                               ) : (
+                                 <button onClick={handleNext} className="px-16 py-6 bg-[#27AE60] text-white rounded-[30px] font-bold uppercase tracking-widest text-sm shadow-lg hover:bg-[#229954] transition-all">Continuar Aprendiendo</button>
+                               )}
                             </div>
                           )}
 
@@ -277,6 +281,13 @@ export default function InclusionContent() {
                             </div>
                           )}
                        </div>
+                       
+                       {/* BOTÓN CONTINUAR SOLO PARA PASOS SIN OPCIONES Y QUE NO SEAN INTRO/LOGIC (FACTS, VIDEOS) */}
+                       {currentStep && !currentStep.content?.options && !['intro', 'logic', 'fact'].includes(currentStep.type) && (
+                         <div className="pt-8 w-full flex justify-center">
+                            <button onClick={handleNext} className="px-20 py-6 bg-[#2C3E50] text-white rounded-[30px] font-bold uppercase tracking-widest text-sm shadow-lg hover:bg-black transition-all">Siguiente Lección</button>
+                         </div>
+                       )}
                     </section>
                  </div>
                </>
