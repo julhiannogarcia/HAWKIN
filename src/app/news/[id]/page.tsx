@@ -27,6 +27,23 @@ const MASTER_NEWS: Record<string, any> = {
     image: "https://images.unsplash.com/photo-1677442136019-21780ecad995?auto=format&fit=crop&q=80&w=1200",
     isLocked: true
   },
+  'magnifica-humanitas': {
+    id: 'magnifica-humanitas',
+    title: "Magnifica Humanitas: La Encíclica de la IA",
+    category: "RUMORES & ÉLITE",
+    author: "Julhianno Garcia",
+    date: "25 Mayo, 2026",
+    excerpt: "El Vaticano define la postura ética global sobre la Inteligencia Artificial.",
+    content: `
+      En un documento histórico titulado "Magnifica Humanitas", la Iglesia Católica ha presentado su visión más profunda y disruptiva sobre el papel de la Inteligencia Artificial en el futuro de la civilización. Este documento no solo analiza la técnica, sino la esencia misma de lo que significa ser humano en un mundo de algoritmos.
+
+      La encíclica destaca que estamos "en un momento de cambio histórico" donde la IA no debe ser vista como una amenaza, sino como una herramienta para potenciar la dignidad humana, siempre y cuando esté bajo un control ético estricto. El texto aboga por una "algor-ética", un marco moral que dicte el desarrollo de los sistemas autónomos para evitar la deshumanización de los procesos sociales.
+
+      Para el ecosistema HAWKIN, este documento es una validación de nuestra filosofía: la soberanía intelectual debe ir de la mano con la responsabilidad tecnológica. El Vaticano propone que el acceso a la IA de alta capacidad sea un derecho universal, algo que resuena con nuestra misión de democratizar la inteligencia de élite para nuestros socios.
+    `,
+    image: "https://images.unsplash.com/photo-1519389950473-47ba0277781c?auto=format&fit=crop&q=80&w=1200",
+    isLocked: false
+  },
   'sam-altman-ubr': {
     id: 'sam-altman-ubr',
     title: "La visión de Sam Altman sobre la renta básica universal",
@@ -43,23 +60,6 @@ const MASTER_NEWS: Record<string, any> = {
     `,
     image: "https://images.unsplash.com/photo-1485827404703-89b55fcc595e?auto=format&fit=crop&q=80&w=1200",
     isLocked: true
-  },
-  'nvidia-record': {
-    id: 'nvidia-record',
-    title: "NVIDIA alcanza valoración récord gracias a nuevos chips",
-    category: "MERCADO",
-    author: "Julhianno Garcia",
-    date: "19 Mayo, 2026",
-    excerpt: "La demanda de infraestructura para IA posiciona a NVIDIA como el motor del mundo.",
-    content: `
-      NVIDIA ha vuelto a pulverizar todas las expectativas de Wall Street, alcanzando una capitalización de mercado que desafía la lógica económica tradicional. El motor de este crecimiento explosivo es el despliegue masivo de los chips Blackwell B200, diseñados específicamente para alimentar la próxima generación de modelos de lenguaje a escala trillonaria.
-
-      Jensen Huang, CEO de NVIDIA, describió este momento como la "nueva revolución industrial". A diferencia de la era del software, donde el código era el rey, en la era de la IA generativa, el hardware es el terreno sobre el cual se construye el imperio digital. Las nubes de Azure, AWS y Google han reservado el 90% de la producción de NVIDIA para los próximos 18 meses, creando una barrera de entrada tecnológica insalvable para competidores menores.
-
-      El análisis de Radar HAWKIN sugiere que estamos viendo la formación de un monopolio de infraestructura que dictará los precios de la inteligencia en la próxima década. Para el inversor estratégico, la clave no es solo poseer acciones de NVIDIA, sino entender cómo la eficiencia de estos chips reducirá el costo de entrenar IA personalizada para empresas del ecosistema B2B.
-    `,
-    image: "https://images.unsplash.com/photo-1620712943543-bcc4688e7485?auto=format&fit=crop&q=80&w=1200",
-    isLocked: false
   }
 };
 
@@ -212,13 +212,23 @@ export default function ArticlePage() {
             </div>
 
             <div className="text-xl md:text-2xl leading-relaxed text-gray-300 space-y-12 font-light max-w-2xl mx-auto">
-              <p className="text-white font-medium italic border-l-4 border-cyan-500 pl-8 bg-white/[0.02] py-8 rounded-r-3xl leading-snug">
-                "{article.excerpt}"
-              </p>
-              
               <div className="space-y-10 text-gray-400 leading-relaxed font-light">
-                 {article.content}
+                 {article.content || article.excerpt}
               </div>
+
+              {/* Botón para ver fuente original si es noticia en vivo */}
+              {article.url && (
+                <div className="pt-10">
+                  <a 
+                    href={article.url} 
+                    target="_blank" 
+                    rel="noopener noreferrer"
+                    className="inline-flex items-center gap-3 text-sm font-black uppercase tracking-[0.3em] text-cyan-400 hover:text-white transition-all border-b-2 border-cyan-400/20 pb-2"
+                  >
+                    Leer Reporte Completo en la Fuente <Share2 size={16} />
+                  </a>
+                </div>
+              )}
 
               {/* ANUNCIO DINÁMICO (Se oculta si es premium) */}
               <AdSpace isPremium={isPremium} type="inline" />
