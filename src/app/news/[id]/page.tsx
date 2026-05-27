@@ -8,23 +8,57 @@ import GlobalTicker from '@/components/Ticker';
 import AdSpace from '@/components/AdSpace';
 import { Bookmark, BookmarkCheck, Share2, ThumbsUp, ThumbsDown, MessageSquare, Volume2, ArrowLeft, ShieldAlert, CheckCircle2, Lock } from 'lucide-react';
 
-// BASE DE DATOS MAESTRA PARA ENLACES PERMANENTES
+// BASE DE DATOS MAESTRA PARA ENLACES PERMANENTES - ACTUALIZADA CON HAWKIN LIVE INTEL
 const MASTER_NEWS: Record<string, any> = {
-  'gpt-5-leak': {
-    id: 'gpt-5-leak',
-    title: "OpenAI GPT-5: Filtraciones sobre la nueva arquitectura",
-    category: "BIG TECH",
+  'openai-ipo-breaking': {
+    id: 'openai-ipo-breaking',
+    title: "🚨 EXCLUSIVA: OpenAI Inicia Trámites Confidenciales para IPO",
+    category: "RUMORES & CEOS",
     author: "Julhianno Garcia",
-    date: "19 Mayo, 2026",
-    excerpt: "Análisis profundo sobre el razonamiento System 2 y la memoria persistente.",
+    date: "27 Mayo, 2026",
+    excerpt: "La salida a bolsa más grande de la historia tech se prepara en San Francisco con una valoración de $900B.",
     content: `
-      La carrera por la Inteligencia Artificial General (AGI) ha alcanzado un punto de inflexión crítico con las recientes filtraciones sobre GPT-5. Fuentes internas de OpenAI confirman que la nueva arquitectura, denominada internamente "Artemis", marca el fin de la era de la simple predicción estadística. 
+      En un movimiento que ha sacudido los cimientos de Wall Street, OpenAI ha presentado formalmente una declaración de registro confidencial ante la SEC para su oferta pública inicial (IPO). Fuentes de alta fidelidad indican que la operación está siendo orquestada por un sindicato bancario liderado por Goldman Sachs y Morgan Stanley.
 
-      A diferencia de GPT-4, que opera bajo una lógica de "pensamiento rápido" o System 1, GPT-5 implementa un mecanismo de razonamiento System 2. Esto significa que el modelo ahora es capaz de realizar pausas deliberadas durante la generación de respuestas para verificar la lógica interna y contrastar hechos contra una base de conocimientos verificada en tiempo real. 
+      La valoración objetivo se sitúa en un rango sin precedentes de entre $850,000 y $900,000 millones de dólares. Este hito financiero se produce tras la resolución de varios conflictos legales clave, incluyendo la desestimación de la demanda interpuesta por Elon Musk. Según analistas de HAWKIN Intel, la IPO no solo busca capital, sino consolidar la soberanía de OpenAI en la carrera hacia la Inteligencia Artificial General (AGI).
 
-      Las implicaciones para el mercado global son masivas. Se estima que GPT-5 podrá resolver problemas complejos de ingeniería, medicina y leyes con una tasa de precisión del 99.8%, eliminando prácticamente las alucinaciones que plagaban a sus predecesores. Además, la integración de una "memoria persistente episódica" permitirá que la IA aprenda de cada interacción con el usuario, creando un asistente verdaderamente personalizado que evoluciona junto a la visión del socio de HAWKIN.
+      Se espera que las acciones comiencen a cotizar en el NASDAQ bajo el ticker "OAI" a finales del tercer trimestre de 2026. Para los socios de HAWKIN, este evento representa el punto de inflexión definitivo donde la IA deja de ser una tecnología emergente para convertirse en el pilar central de la economía global.
     `,
     image: "https://images.unsplash.com/photo-1677442136019-21780ecad995?auto=format&fit=crop&q=80&w=1200",
+    isLocked: true
+  },
+  'karpathy-anthropic': {
+    id: 'karpathy-anthropic',
+    title: "Andrej Karpathy Ficha por Anthropic: El Plan de Mejora Auto-Recursiva",
+    category: "RUMORES & CEOS",
+    author: "Julhianno Garcia",
+    date: "27 Mayo, 2026",
+    excerpt: "El cofundador de OpenAI liderará el equipo de entrenamiento avanzado de Claude.",
+    content: `
+      Anthropic ha asestado un golpe maestro en la guerra del talento de Silicon Valley al anunciar la incorporación de Andrej Karpathy. El legendario ingeniero, conocido por su trabajo pionero en OpenAI y por liderar el sistema Autopilot de Tesla, asumirá el cargo de Director de Mejora Auto-Recursiva.
+
+      La misión de Karpathy es tan ambiciosa como disruptiva: utilizar las capacidades actuales de Claude para optimizar y acelerar el pre-entrenamiento de las futuras generaciones de modelos. Este enfoque de "IA entrenando a la IA" promete reducir los tiempos de desarrollo en un 40% y alcanzar niveles de eficiencia en el procesamiento de tokens nunca antes vistos.
+
+      Expertos de la industria sugieren que este movimiento coloca a Anthropic en una posición de ventaja técnica sobre Meta y Google. Karpathy ha declarado que su enfoque se centrará en la "limpieza arquitectónica", buscando modelos que no solo sean más potentes, sino más elegantes y menos costosos de operar a escala masiva.
+    `,
+    image: "https://images.unsplash.com/photo-1591405351990-4726e331f141?auto=format&fit=crop&q=80&w=1200",
+    isLocked: true
+  },
+  'eje-ia-cumbre-trump': {
+    id: 'eje-ia-cumbre-trump',
+    title: "Cumbre en Beijing: Musk, Altman y Huang definen el 'Eje de la IA'",
+    category: "RUMORES & CEOS",
+    author: "Julhianno Garcia",
+    date: "26 Mayo, 2026",
+    excerpt: "La IA es declarada oficialmente como materia de Soberanía Nacional y Seguridad Global.",
+    content: `
+      En una reunión relámpago que ha redefinido la geopolítica del siglo XXI, el presidente Trump, flanqueado por Elon Musk, Sam Altman y Jensen Huang, se ha reunido con altos mandos tecnológicos en Beijing. El resultado: el nacimiento del "Acuerdo de Estabilidad Algorítmica".
+
+      La IA ha dejado de ser tratada como un producto comercial para ser clasificada oficialmente como un activo de Seguridad Nacional. Bajo este nuevo marco, el hardware de NVIDIA (Blackwell) y el poder de cómputo de las grandes redes neuronales se consideran materias primas críticas, equivalentes al petróleo en el siglo XX.
+
+      Musk ha enfatizado la necesidad de una desregulación estratégica en Occidente para evitar que la burocracia frene la innovación frente al avance asiático. Para los observadores del Radar HAWKIN, esto significa que el acceso a la potencia de cálculo será el nuevo indicador de riqueza y poder soberano de las naciones y las empresas de élite.
+    `,
+    image: "https://images.unsplash.com/photo-1451187580459-43490279c0fa?auto=format&fit=crop&q=80&w=1200",
     isLocked: true
   },
   'magnifica-humanitas': {
@@ -43,23 +77,6 @@ const MASTER_NEWS: Record<string, any> = {
     `,
     image: "https://images.unsplash.com/photo-1519389950473-47ba0277781c?auto=format&fit=crop&q=80&w=1200",
     isLocked: false
-  },
-  'sam-altman-ubr': {
-    id: 'sam-altman-ubr',
-    title: "La visión de Sam Altman sobre la renta básica universal",
-    category: "CEO RADAR",
-    author: "Julhianno Garcia",
-    date: "18 Mayo, 2026",
-    excerpt: "Cómo la IA financiará el futuro de la sociedad a través de dividendos de inteligencia.",
-    content: `
-      En una cumbre exclusiva sobre el futuro del capital, Sam Altman ha presentado una propuesta que redefine el contrato social moderno: el Dividendo de Inteligencia Global. La premisa es simple pero radical: a medida que la IA genera una riqueza sin precedentes al automatizar la producción global, una parte de ese valor debe ser redistribuida directamente a los ciudadanos.
-
-      "No estamos hablando de caridad, sino de soberanía", afirmó Altman durante su intervención. Su modelo propone que las grandes corporaciones de IA aporten un porcentaje de su capacidad de cómputo y beneficios a un fondo soberano digital. Este fondo distribuiría activos no solo en moneda fiduciaria, sino en créditos de energía y procesamiento de datos, las dos materias primas más valiosas del siglo XXI.
-
-      Para los socios de HAWKIN, esto representa una oportunidad única de posicionamiento. Aquellos que dominen el uso de estas herramientas hoy, serán los administradores de la abundancia del mañana. La IA no viene a reemplazar al humano, sino a liberar su potencial creativo de las tareas mecánicas, permitiendo una nueva era de exploración intelectual y financiera.
-    `,
-    image: "https://images.unsplash.com/photo-1485827404703-89b55fcc595e?auto=format&fit=crop&q=80&w=1200",
-    isLocked: true
   }
 };
 
@@ -88,8 +105,6 @@ export default function ArticlePage() {
     };
     fetchGeo();
 
-    // Lógica para detectar si el usuario ha pagado (Simulación en Beta)
-    // Buscamos un indicador en localStorage o sesión
     const paidStatus = localStorage.getItem('hawkin_premium_active');
     if (paidStatus === 'true') setIsPremium(true);
   }, []);
@@ -110,11 +125,11 @@ export default function ArticlePage() {
         const allNews = [...(data.news || []), ...(data.shield || []), ...(data.hardware || [])];
         const found = allNews.find((n: any) => n.id === id);
         
-        setArticle(found || MASTER_NEWS['gpt-5-leak']);
+        setArticle(found || MASTER_NEWS['openai-ipo-breaking']);
         setLoading(false);
       } catch (e) {
         console.error("Fetch error", e);
-        setArticle(MASTER_NEWS['gpt-5-leak']);
+        setArticle(MASTER_NEWS['openai-ipo-breaking']);
         setLoading(false);
       }
     };
