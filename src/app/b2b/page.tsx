@@ -52,6 +52,7 @@ export default function B2BPage() {
   const [selectedPlacement, setSelectedPlacement] = useState(adPlacements[0]);
 
   useEffect(() => {
+    // 1. Obtener moneda e IP
     const fetchGeo = async () => {
       try {
         const res = await fetch('/api/geo');
@@ -62,19 +63,29 @@ export default function B2BPage() {
       }
     };
     fetchGeo();
-
-    const clientId = process.env.NEXT_PUBLIC_PAYPAL_CLIENT_ID || 'test';
-    if (!document.getElementById('paypal-sdk-b2b')) {
-      const script = document.createElement('script');
-      script.id = 'paypal-sdk-b2b';
-      script.src = `https://www.paypal.com/sdk/js?client-id=${clientId}&currency=USD`;
-      script.async = true;
-      script.onload = () => setIsPaypalLoaded(true);
-      document.body.appendChild(script);
-    } else {
-      setIsPaypalLoaded(true);
-    }
   }, []);
+
+  useEffect(() => {
+    // 2. Cargar el SDK de PayPal con detección de idioma y modo simplificado
+    const clientId = 'ASALTTzsK9I-m087Qv64N3tPLr_HFAyDKhliwe1bbS'; // Client ID de tu captura
+    const locale = geoData?.countryCode === 'US' ? 'en_US' : 'es_ES'; // Detectar idioma por IP
+    
+    // Eliminar script anterior si existe para actualizar locale
+    const oldScript = document.getElementById('paypal-sdk-b2b');
+    if (oldScript) oldScript.remove();
+
+    const script = document.createElement('script');
+    script.id = 'paypal-sdk-b2b';
+    script.src = `https://www.paypal.com/sdk/js?client-id=${clientId}&currency=USD&locale=${locale}&disable-funding=credit,card`;
+    script.async = true;
+    script.onload = () => setIsPaypalLoaded(true);
+    document.body.appendChild(script);
+
+    return () => {
+      const s = document.getElementById('paypal-sdk-b2b');
+      if (s) s.remove();
+    };
+  }, [geoData]);
 
   const handleFileSelect = () => {
     fileInputRef.current?.click();
@@ -112,13 +123,25 @@ export default function B2BPage() {
       if (isPaypalLoaded && containerRef.current && window.paypal) {
         containerRef.current.innerHTML = '';
         window.paypal.Buttons({
-          style: { layout: 'horizontal', color: 'blue', shape: 'pill', label: 'buynow', height: 45 },
+          style: { 
+            layout: 'vertical', 
+            color: 'gold', 
+            shape: 'rect', 
+            label: 'checkout', 
+            height: 55 
+          },
           createOrder: (data: any, actions: any) => {
             return actions.order.create({
               purchase_units: [{
-                description: `Publicidad HAWKIN - ${planId}`,
-                amount: { value: amount }
-              }]
+                description: `HAWKIN B2B - ${planId}`,
+                amount: { 
+                  currency_code: 'USD',
+                  value: amount 
+                }
+              }],
+              application_context: {
+                shipping_preference: 'NO_SHIPPING' // ELIMINA REQUISITO DE DIRECCIÓN (Más rápido)
+              }
             });
           },
           onApprove: async (data: any, actions: any) => {
@@ -159,7 +182,61 @@ export default function B2BPage() {
           </div>
         </section>
 
-        {/* PREVISUALIZACIÓN DE UBICACIÓN (MODO VIDEO/REALISTA) */}
+        {/* Panel de Gestión Masiva */}
+        <div className="glass-card border-white/5 p-1 bg-gradient-to-br from-white/[0.05] to-transparent rounded-[60px] overflow-hidden shadow-2xl">
+           <div className="bg-black/60 rounded-[59px] p-8 md:p-20">
+              <div className="grid grid-cols-1 lg:grid-cols-3 gap-16">
+                 
+                 <div className="lg:col-span-2 space-y-16">
+                    <h2 className="text-3xl font-black uppercase tracking-widest italic text-white">Alcance <span className="text-cyan-400">Sin Límites</span></h2>
+                    <div className="grid grid-cols-1 md:grid-cols-3 gap-8 text-center">
+                       <div className="p-8 bg-white/[0.02] rounded-3xl border border-white/5">
+                          <p className="text-[10px] font-black text-gray-500 uppercase mb-4 tracking-widest">Tecnología</p>
+                          <h4 className="text-3xl font-black mt-2 text-cyan-400">450K</h4>
+                       </div>
+                       <div className="p-8 bg-white/[0.02] rounded-3xl border border-white/5">
+                          <p className="text-[10px] font-black text-gray-500 uppercase mb-4 tracking-widest">Moda & Estilo</p>
+                          <h4 className="text-3xl font-black mt-2 text-purple-500">320K</h4>
+                       </div>
+                       <div className="p-8 bg-white/[0.02] rounded-3xl border border-white/5">
+                          <p className="text-[10px] font-black text-gray-500 uppercase mb-4 tracking-widest">Retail</p>
+                          <h4 className="text-3xl font-black mt-2 text-green-500">280K</h4>
+                       </div>
+                    </div>
+                 </div>
+
+                 <div className="space-y-10">
+                    <div className="p-10 bg-gradient-to-br from-cyan-400 to-purple-600 text-black rounded-[40px] flex flex-col items-center gap-6 text-center shadow-2xl relative overflow-hidden">
+                       <AnimatePresence mode="wait">
+                         {isUploading ? (
+                           <motion.div key="loader" initial={{opacity:0}} animate={{opacity:1}} exit={{opacity:0}} className="space-y-4">
+                              <Loader2 className="animate-spin mx-auto" size={40} />
+                              <p className="text-[10px] font-black uppercase">Procesando Multimedia ({uploadProgress}%)</p>
+                           </motion.div>
+                         ) : showSuccess ? (
+                           <motion.div key="success" initial={{opacity:0, scale:0.8}} animate={{opacity:1, scale:1}} className="space-y-4">
+                              <FileCheck className="mx-auto" size={40} />
+                              <p className="text-[10px] font-black uppercase text-black italic">¡Tu Anuncio está listo para emitir!</p>
+                           </motion.div>
+                         ) : (
+                           <>
+                             <UploadCloud size={40} className="animate-bounce" />
+                             <div>
+                                <h4 className="text-xl font-black uppercase italic leading-tight">Carga tu Video <br />o Arte Clickable</h4>
+                             </div>
+                             <button onClick={handleFileSelect} className="w-full py-5 bg-black text-white rounded-3xl text-[10px] font-black uppercase tracking-widest hover:scale-105 transition-all shadow-xl">
+                                SELECCIONAR ARCHIVOS
+                             </button>
+                           </>
+                         )}
+                       </AnimatePresence>
+                    </div>
+                 </div>
+              </div>
+           </div>
+        </div>
+
+        {/* PREVISUALIZACIÓN DE UBICACIÓN */}
         <section id="ad-selector" className="mt-40 space-y-24">
            <div className="text-center space-y-4">
               <h2 className="text-4xl md:text-6xl font-black uppercase italic tracking-tighter text-white">Consola de <span className="text-cyan-400">Previsualización</span></h2>
@@ -167,7 +244,6 @@ export default function B2BPage() {
            </div>
 
            <div className="grid grid-cols-1 lg:grid-cols-2 gap-16 items-center bg-white/[0.02] border border-white/5 p-8 md:p-20 rounded-[80px]">
-              {/* LISTA DE OPCIONES CON PLUS */}
               <div className="space-y-6">
                  {adPlacements.map((ad) => (
                     <button 
@@ -203,7 +279,6 @@ export default function B2BPage() {
                  ))}
               </div>
 
-              {/* SIMULADOR DE PANTALLA MODO VIDEO */}
               <div className="relative">
                  <div className="absolute -inset-10 bg-cyan-500/10 blur-[100px] rounded-full" />
                  <div className="glass-card border-white/10 p-4 aspect-[16/10] rounded-[40px] relative overflow-hidden bg-[#050505] flex flex-col shadow-2xl">
@@ -215,7 +290,6 @@ export default function B2BPage() {
                     </div>
                     
                     <div className="flex-1 space-y-4 px-6 overflow-hidden relative">
-                       {/* HEADER SIMULADO */}
                        <div className="flex justify-between items-center mb-6">
                           <div className="h-4 w-20 bg-white/10 rounded-full" />
                           <div className="flex gap-4">
@@ -224,7 +298,6 @@ export default function B2BPage() {
                           </div>
                        </div>
 
-                       {/* MODO VIDEO EN HERO (PLAN 499) */}
                        {selectedPlacement.id === 'live-stream-hero' ? (
                          <motion.div 
                           initial={{ opacity: 0 }} animate={{ opacity: 1 }}
