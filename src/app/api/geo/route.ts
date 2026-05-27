@@ -3,23 +3,26 @@ import { NextResponse } from 'next/server';
 export async function GET(req: Request) {
   const countryCode = req.headers.get('x-vercel-ip-country') || 'US';
   
-  // Mapeo de monedas y tipos de cambio (Promedio simplificado para el lanzamiento)
-  const currencies: Record<string, { symbol: string, rate: number, name: string }> = {
-    'PE': { symbol: 'S/', rate: 3.75, name: 'Soles' },
-    'VE': { symbol: 'Bs', rate: 36.5, name: 'Bolívares' },
-    'MX': { symbol: '$', rate: 17.1, name: 'Pesos MXN' },
-    'ES': { symbol: '€', rate: 0.92, name: 'Euros' },
-    'US': { symbol: '$', rate: 1, name: 'USD' },
-    'DEFAULT': { symbol: '$', rate: 1, name: 'USD' }
+  // Mapeo de monedas, tasas y locales
+  const currencies: Record<string, { symbol: string, rate: number, name: string, code: string, locale: string }> = {
+    'PE': { symbol: 'S/', rate: 3.82, name: 'Soles', code: 'USD', locale: 'es_ES' }, // Usamos USD para cobro PayPal pero mostramos S/
+    'VE': { symbol: 'Bs', rate: 36.5, name: 'Bolívares', code: 'USD', locale: 'es_ES' },
+    'MX': { symbol: '$', rate: 18.1, name: 'Pesos MXN', code: 'MXN', locale: 'es_MX' },
+    'ES': { symbol: '€', rate: 0.92, name: 'Euros', code: 'EUR', locale: 'es_ES' },
+    'US': { symbol: '$', rate: 1, name: 'USD', code: 'USD', locale: 'en_US' },
+    'DEFAULT': { symbol: '$', rate: 1, name: 'USD', code: 'USD', locale: 'en_US' }
   };
 
-  const currency = currencies[countryCode] || currencies['DEFAULT'];
+  const data = currencies[countryCode] || currencies['DEFAULT'];
   
   return NextResponse.json({ 
     countryCode,
-    currencySymbol: currency.symbol,
-    monthlyPrice: (8 * currency.rate).toFixed(2),
-    annualPrice: (4 * currency.rate).toFixed(2),
-    currencyName: currency.name
+    currencySymbol: data.symbol,
+    currencyCode: data.code,
+    rate: data.rate,
+    currencyName: data.name,
+    locale: data.locale,
+    monthlyPrice: (8 * data.rate).toFixed(2),
+    annualPrice: (4 * data.rate).toFixed(2)
   });
 }
