@@ -44,11 +44,13 @@ export default function InclusionPage() {
   };
 
   const handleOptionClick = (index: number) => {
+    if (!currentStep?.content?.options) return;
     setSelectedOption(index);
-    if (index === currentStep?.content.correctOption) {
-      setTimeout(() => {
+    if (index === currentStep.content.correctOption) {
+      const timer = setTimeout(() => {
         handleNext();
       }, 1000);
+      return () => clearTimeout(timer);
     }
   };
 

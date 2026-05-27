@@ -1,5 +1,3 @@
-'use client';
-
 import React from 'react';
 
 export default function InclusionLayout({ children }: { children: React.ReactNode }) {
@@ -22,8 +20,8 @@ export default function InclusionLayout({ children }: { children: React.ReactNod
               <span className="text-[10px] font-bold text-[#BDC3C7] uppercase tracking-tighter">Modo Activo</span>
               <span className="text-sm font-bold text-[#2E86C1]">Enfoque y Calma</span>
            </div>
-           <div className="w-10 h-10 rounded-full border-2 border-[#D5DBDB] bg-[#F4F6F7] flex items-center justify-center shadow-inner">
-              <span className="text-xl">🧩</span>
+           <div className="w-10 h-10 rounded-full border-2 border-[#D5DBDB] bg-[#F4F6F7] flex items-center justify-center shadow-inner text-xl">
+              🧩
            </div>
         </div>
       </header>
