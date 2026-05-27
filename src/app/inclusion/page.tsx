@@ -7,6 +7,7 @@ import AIAvatar from '@/components/course/AIAvatar';
 import { INCLUSION_CURRICULUM, InclusionModule, InclusionStep, InclusionAgeGroup, InclusionPhase } from '@/lib/inclusionData';
 
 export default function InclusionPage() {
+  const [isMounted, setIsMounted] = useState(false);
   const [view, setView] = useState<'onboarding' | 'dashboard' | 'activity'>('onboarding');
   const [ageGroup, setAgeGroup] = useState<InclusionAgeGroup>('8-12');
   const [phase, setPhase] = useState<InclusionPhase>('Descubrimiento');
@@ -16,8 +17,14 @@ export default function InclusionPage() {
   const [selectedOption, setSelectedOption] = useState<number | null>(null);
   const [isSuccess, setIsSuccess] = useState(false);
 
+  useEffect(() => {
+    setIsMounted(true);
+  }, []);
+
+  if (!isMounted) return null;
+
   const filteredModules = INCLUSION_CURRICULUM.filter(mod => mod.ageGroup === ageGroup && mod.phase === phase);
-  const currentStep = activeModule?.steps[currentStepIndex];
+  const currentStep = activeModule?.steps?.[currentStepIndex];
 
   const handleStartModule = (mod: InclusionModule) => {
     setActiveModule(mod);
@@ -227,14 +234,14 @@ export default function InclusionPage() {
                         initial={{ opacity: 0 }} animate={{ opacity: 1 }}
                         className="p-10 bg-[#FDFCF8] rounded-[45px] border border-[#EAECEE] relative z-10"
                        >
-                          <p className="text-[#34495E] text-xl font-medium leading-relaxed italic">"{currentStep?.avatarText}"</p>
+                          <p className="text-[#34495E] text-xl font-medium leading-relaxed italic">"{currentStep?.avatarText || ''}"</p>
                        </motion.div>
                     </section>
 
                     <section className="space-y-10 flex flex-col justify-center min-h-[600px]">
                        <div className="space-y-4">
-                          <h2 className="text-5xl font-black text-[#2C3E50] tracking-tighter leading-tight italic uppercase">{currentStep?.title}</h2>
-                          <p className="text-[#7F8C8D] text-xl font-medium">{currentStep?.description}</p>
+                          <h2 className="text-5xl font-black text-[#2C3E50] tracking-tighter leading-tight italic uppercase">{currentStep?.title || ''}</h2>
+                          <p className="text-[#7F8C8D] text-xl font-medium">{currentStep?.description || ''}</p>
                        </div>
 
                        <div className="bg-white rounded-[60px] p-12 border border-[#EAECEE] shadow-xl flex-1 flex flex-col justify-center items-center gap-12 relative overflow-hidden">
@@ -242,18 +249,18 @@ export default function InclusionPage() {
                           {currentStep?.type === 'pattern' && (
                             <div className="space-y-16 w-full text-center">
                                <div className="flex justify-center gap-8">
-                                  {currentStep.content.pattern?.map((p, i) => (
+                                  {currentStep?.content?.pattern?.map((p, i) => (
                                      <div key={i} className="text-7xl bg-[#F4F6F7] w-28 h-28 rounded-[35px] flex items-center justify-center shadow-inner hover:scale-105 transition-transform cursor-default">{p}</div>
                                   ))}
                                   <div className="text-7xl bg-[#5DADE2]/10 w-28 h-28 rounded-[35px] flex items-center justify-center border-4 border-dashed border-[#5DADE2] text-[#5DADE2] animate-pulse">?</div>
                                </div>
 
                                <div className="flex justify-center gap-6 pt-8">
-                                  {currentStep.content.options?.map((opt, i) => (
+                                  {currentStep?.content?.options?.map((opt, i) => (
                                      <button 
                                       key={i}
                                       onClick={() => handleOptionClick(i)}
-                                      className={`text-6xl w-28 h-28 rounded-[35px] border-4 transition-all shadow-md ${selectedOption === i ? (i === currentStep.content.correctOption ? 'border-[#27AE60] bg-[#E9F7EF] scale-110' : 'border-[#E74C3C] bg-[#FDEDEC] animate-shake') : 'border-[#D5DBDB] bg-white hover:border-[#5DADE2] hover:scale-105'}`}
+                                      className={`text-6xl w-28 h-28 rounded-[35px] border-4 transition-all shadow-md ${selectedOption === i ? (i === currentStep?.content?.correctOption ? 'border-[#27AE60] bg-[#E9F7EF] scale-110' : 'border-[#E74C3C] bg-[#FDEDEC]') : 'border-[#D5DBDB] bg-white hover:border-[#5DADE2] hover:scale-105'}`}
                                      >
                                         {opt}
                                      </button>
@@ -267,7 +274,7 @@ export default function InclusionPage() {
                                <div className="w-32 h-32 bg-[#FEF9E7] rounded-[40px] flex items-center justify-center mx-auto shadow-sm">
                                   <Lightbulb className="text-[#F1C40F]" size={64} />
                                 </div>
-                               <p className="text-[#34495E] text-xl font-bold leading-relaxed">{currentStep.content.fact}</p>
+                               <p className="text-[#34495E] text-xl font-bold leading-relaxed">{currentStep?.content?.fact || ''}</p>
                                <button onClick={handleNext} className="px-16 py-6 bg-[#5DADE2] text-white rounded-[30px] font-bold uppercase tracking-[0.2em] text-sm hover:bg-[#3498DB] transition-all shadow-lg">Entendido</button>
                             </div>
                           )}
@@ -275,16 +282,16 @@ export default function InclusionPage() {
                           {currentStep?.type === 'logic' && (
                             <div className="space-y-10 text-center w-full">
                                <div className="p-10 bg-[#E8F8F5] border border-[#A3E4D7] rounded-[40px] text-[#16A085] font-sans leading-relaxed text-lg italic whitespace-pre-wrap">
-                                  {currentStep.content.longText}
+                                  {currentStep?.content?.longText || ''}
                                </div>
                                <div className="grid grid-cols-1 gap-4 max-w-xs mx-auto">
-                                  {currentStep.content.options?.map((opt, i) => (
-                                     <button key={i} onClick={() => handleOptionClick(i)} className={`p-6 rounded-3xl border-4 font-bold text-lg transition-all ${selectedOption === i ? (i === currentStep.content.correctOption ? 'border-[#27AE60] bg-[#E9F7EF]' : 'border-[#E74C3C] bg-[#FDEDEC]') : 'border-[#D5DBDB] bg-white hover:border-[#5DADE2]'}`}>
+                                  {currentStep?.content?.options?.map((opt, i) => (
+                                     <button key={i} onClick={() => handleOptionClick(i)} className={`p-6 rounded-3xl border-4 font-bold text-lg transition-all ${selectedOption === i ? (i === currentStep?.content?.correctOption ? 'border-[#27AE60] bg-[#E9F7EF]' : 'border-[#E74C3C] bg-[#FDEDEC]') : 'border-[#D5DBDB] bg-white hover:border-[#5DADE2]'}`}>
                                         {opt}
                                      </button>
                                   ))}
                                </div>
-                               {!currentStep.content.options && (
+                               {!currentStep?.content?.options && (
                                  <button onClick={handleNext} className="px-16 py-6 bg-[#27AE60] text-white rounded-[30px] font-bold uppercase tracking-widest text-sm shadow-lg hover:bg-[#229954] transition-all">Siguiente Paso</button>
                                )}
                             </div>
