@@ -19,13 +19,7 @@ export default function LearningLayout({ children }: { children: React.ReactNode
         </div>
 
         <div className="flex items-center gap-8">
-           <div className="hidden md:flex flex-col items-end">
-              <span className="text-[9px] font-black text-gray-600 uppercase tracking-widest">Socio en Formación</span>
-              <span className="text-xs font-bold text-white uppercase italic">Julhianno Garcia</span>
-           </div>
-           <div className="w-10 h-10 rounded-full border border-white/10 bg-white/5 overflow-hidden">
-              <img src="https://images.unsplash.com/photo-1531746020798-e6953c6e8e04?auto=format&fit=crop&q=80&w=100" alt="Profile" className="w-full h-full object-cover" />
-           </div>
+           {/* Perfil eliminado para anonimato */}
         </div>
       </header>
 
