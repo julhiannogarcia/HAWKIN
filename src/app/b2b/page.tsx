@@ -5,7 +5,10 @@ import { useState, useRef, useEffect } from 'react';
 import Header from '@/components/Header';
 import Footer from '@/components/Footer';
 import GlobalTicker from '@/components/Ticker';
-import { BarChart3, UploadCloud, Globe, ShoppingBag, MessageCircle, Play, Loader2, FileCheck, CheckCircle2 } from 'lucide-react';
+import { 
+  BarChart3, UploadCloud, Globe, ShoppingBag, MessageCircle, 
+  Play, Loader2, FileCheck, CheckCircle2, ChevronRight, ArrowLeft 
+} from 'lucide-react';
 
 export default function B2BPage() {
   const [isUploading, setIsUploading] = useState(false);
@@ -15,8 +18,36 @@ export default function B2BPage() {
   const [geoData, setGeoData] = useState<any>(null);
   const fileInputRef = useRef<HTMLInputElement>(null);
 
+  const adPlacements = [
+    { 
+      id: 'top-banner', 
+      title: 'Mega-Banner Hero', 
+      price: 499, 
+      impressions: '1.2M+', 
+      icon: <Globe className="text-cyan-400" />,
+      placement: 'Parte superior de la Página de Inicio'
+    },
+    { 
+      id: 'sidebar-academy', 
+      title: 'Sidebar en Academia', 
+      price: 299, 
+      impressions: '500k+', 
+      icon: <CheckCircle2 className="text-purple-500" />,
+      placement: 'Lateral de todos los cursos'
+    },
+    { 
+      id: 'inline-news', 
+      title: 'Anuncio Nativo en Radar', 
+      price: 199, 
+      impressions: '250k+', 
+      icon: <ShoppingBag className="text-green-500" />,
+      placement: 'Entre noticias del Radar Global'
+    },
+  ];
+
+  const [selectedPlacement, setSelectedPlacement] = useState(adPlacements[0]);
+
   useEffect(() => {
-    // 1. Obtener moneda por IP
     const fetchGeo = async () => {
       try {
         const res = await fetch('/api/geo');
@@ -28,7 +59,6 @@ export default function B2BPage() {
     };
     fetchGeo();
 
-    // 2. Cargar el SDK de PayPal
     const clientId = process.env.NEXT_PUBLIC_PAYPAL_CLIENT_ID || 'test';
     if (!document.getElementById('paypal-sdk-b2b')) {
       const script = document.createElement('script');
@@ -41,12 +71,6 @@ export default function B2BPage() {
       setIsPaypalLoaded(true);
     }
   }, []);
-
-  const adPlacements = [
-    { id: 'top-banner', title: 'Top Banner Explosivo', price: 499, impressions: '500k+', icon: <Globe className="text-cyan-400" /> },
-    { id: 'video-radar', title: 'Video-Anuncio en Radar', price: 399, impressions: '400k+', icon: <Play className="text-purple-500" /> },
-    { id: 'shop-link', title: 'Shopping Link Directo', price: 199, impressions: '150k+', icon: <ShoppingBag className="text-green-500" /> },
-  ];
 
   const handleFileSelect = () => {
     fileInputRef.current?.click();
@@ -77,7 +101,6 @@ export default function B2BPage() {
     window.open(`mailto:julhianno@aihawkin.com?subject=${subject}&body=${body}`, '_self');
   };
 
-  // Componente interno para los botones de PayPal en B2B
   const PaypalButtonB2B = ({ planId, amount }: { planId: string, amount: string }) => {
     const containerRef = useRef<HTMLDivElement>(null);
 
@@ -186,44 +209,87 @@ export default function B2BPage() {
            </div>
         </div>
 
-        {/* SELECTOR DE PLANES CON PAYPAL REAL */}
-        <section id="ad-selector" className="mt-40 space-y-16">
-           <div className="text-center">
-              <h2 className="text-3xl md:text-5xl font-black uppercase italic tracking-tighter text-white">Escoge tu <span className="text-cyan-400">Espacio de Poder</span></h2>
-              <p className="text-gray-500 mt-4 uppercase font-black text-xs tracking-widest">Reserva segura global vía PayPal • {geoData?.currencyName || 'Soles'}</p>
+        {/* PREVISUALIZACIÓN DE UBICACIÓN */}
+        <section id="ad-selector" className="mt-40 space-y-24">
+           <div className="text-center space-y-4">
+              <h2 className="text-4xl md:text-6xl font-black uppercase italic tracking-tighter text-white">Escoge tu <span className="text-cyan-400">Espacio de Poder</span></h2>
+              <p className="text-gray-500 uppercase font-black text-xs tracking-widest">Visualiza dónde dominará tu marca</p>
            </div>
-           
-           <div className="grid grid-cols-1 md:grid-cols-3 gap-8">
-              {adPlacements.map((ad) => (
-                <div key={ad.id} className="p-10 glass-card border-white/5 bg-white/[0.01] rounded-[40px] flex flex-col justify-between hover:border-cyan-400/30 transition-all group">
-                   <div className="space-y-6">
-                      <div className="w-12 h-12 bg-white/5 rounded-2xl flex items-center justify-center group-hover:scale-110 transition-transform">
-                         {ad.icon}
-                      </div>
-                      <h3 className="text-2xl font-black uppercase leading-tight text-white">{ad.title}</h3>
-                      <div className="flex items-baseline gap-2">
-                         <span className="text-3xl font-black text-white">{geoData?.currencySymbol || 'S/'}{(ad.price * (geoData?.rate || 1)).toFixed(2)}</span>
-                         <span className="text-gray-600 text-[10px] font-bold uppercase">/ SEMANA</span>
-                      </div>
-                      <div className="pt-6 border-t border-white/5">
-                         <div className="flex items-center gap-3 text-[10px] font-black text-gray-500 uppercase tracking-widest">
-                            <CheckCircle2 size={12} className="text-cyan-400" /> {ad.impressions} Impresiones
+
+           <div className="grid grid-cols-1 lg:grid-cols-2 gap-16 items-center bg-white/[0.02] border border-white/5 p-12 md:p-20 rounded-[80px]">
+              <div className="space-y-6">
+                 {adPlacements.map((ad) => (
+                    <button 
+                      key={ad.id}
+                      onClick={() => setSelectedPlacement(ad)}
+                      className={`w-full p-8 rounded-[40px] border-2 text-left transition-all flex items-center justify-between group ${selectedPlacement.id === ad.id ? 'border-cyan-400 bg-cyan-400/5' : 'border-white/5 hover:border-white/20 bg-black'}`}
+                    >
+                       <div className="flex items-center gap-6">
+                          <div className={`w-14 h-14 rounded-2xl flex items-center justify-center ${selectedPlacement.id === ad.id ? 'bg-cyan-400 text-black' : 'bg-white/5 text-gray-500'}`}>
+                             {ad.icon}
+                          </div>
+                          <div>
+                             <h4 className="text-xl font-black uppercase italic tracking-tight">{ad.title}</h4>
+                             <p className="text-[10px] text-gray-500 font-bold uppercase tracking-widest">{ad.impressions} Impresiones potenciales</p>
+                          </div>
+                       </div>
+                       <div className="text-right">
+                          <p className="text-2xl font-black">{geoData?.currencySymbol || 'S/'}{(ad.price * (geoData?.rate || 1)).toFixed(0)}</p>
+                          <p className="text-[8px] text-gray-600 font-black uppercase">Semanales</p>
+                       </div>
+                    </button>
+                 ))}
+              </div>
+
+              <div className="relative">
+                 <div className="absolute -inset-10 bg-cyan-500/10 blur-[100px] rounded-full" />
+                 <div className="glass-card border-white/10 p-4 aspect-[4/3] rounded-[40px] relative overflow-hidden bg-black flex flex-col shadow-2xl">
+                    <div className="h-6 w-full border-b border-white/5 flex items-center px-4 gap-2 mb-4">
+                       <div className="w-2 h-2 rounded-full bg-red-500" />
+                       <div className="w-2 h-2 rounded-full bg-yellow-500" />
+                       <div className="w-2 h-2 rounded-full bg-green-500" />
+                       <div className="h-3 w-32 bg-white/5 rounded-full mx-auto" />
+                    </div>
+                    
+                    <div className="flex-1 space-y-4 px-6 overflow-hidden relative">
+                       <div className="h-8 w-1/2 bg-white/10 rounded-xl" />
+                       <div className="grid grid-cols-3 gap-3">
+                          <div className="h-20 bg-white/5 rounded-2xl" />
+                          <div className="h-20 bg-white/5 rounded-2xl" />
+                          <div className="h-20 bg-white/5 rounded-2xl" />
+                       </div>
+
+                       <motion.div 
+                        key={selectedPlacement.id}
+                        initial={{ opacity: 0, scale: 0.9 }}
+                        animate={{ opacity: 1, scale: 1 }}
+                        className={`border-2 border-dashed border-cyan-400 p-6 rounded-3xl flex items-center justify-center text-center bg-cyan-400/10 ${selectedPlacement.id === 'top-banner' ? 'h-32 mb-4' : selectedPlacement.id === 'sidebar-academy' ? 'h-40 w-32 absolute top-20 right-4' : 'h-24 mt-4'}`}
+                       >
+                          <div className="relative z-10">
+                            <p className="text-[8px] font-black text-cyan-400 uppercase tracking-widest mb-1 animate-pulse">Tu Anuncio Aquí</p>
+                            <p className="text-[10px] font-bold text-white uppercase italic leading-none">{selectedPlacement.title}</p>
+                          </div>
+                       </motion.div>
+
+                       <div className="h-4 w-full bg-white/5 rounded-full" />
+                       <div className="h-4 w-3/4 bg-white/5 rounded-full" />
+                    </div>
+                 </div>
+                 <div className="mt-8 text-center md:text-left">
+                    <p className="text-[10px] font-black text-gray-500 uppercase tracking-widest mb-4">Confirmar Ubicación:</p>
+                    <h5 className="text-lg font-bold text-cyan-400 uppercase italic underline decoration-white/20">{selectedPlacement.placement}</h5>
+                    
+                    <div className="mt-10">
+                       {isPaypalLoaded ? (
+                         <PaypalButtonB2B planId={selectedPlacement.id} amount={(selectedPlacement.price).toFixed(2)} />
+                       ) : (
+                         <div className="w-full h-12 bg-white/5 animate-pulse rounded-full flex items-center justify-center text-[9px] text-gray-600 font-black uppercase tracking-widest">
+                           Sincronizando Pasarela de Pago...
                          </div>
-                      </div>
-                   </div>
-                   
-                   {/* BOTÓN DE PAYPAL DINÁMICO */}
-                   <div className="mt-12 min-h-[60px]">
-                      {isPaypalLoaded ? (
-                        <PaypalButtonB2B planId={ad.id} amount={(ad.price).toFixed(2)} />
-                      ) : (
-                        <div className="w-full h-12 bg-white/5 animate-pulse rounded-full flex items-center justify-center text-[9px] text-gray-600 font-black uppercase">
-                          Cargando Pasarela...
-                        </div>
-                      )}
-                   </div>
-                </div>
-              ))}
+                       )}
+                    </div>
+                 </div>
+              </div>
            </div>
         </section>
 
