@@ -1,7 +1,7 @@
 'use client';
 
 import { motion, AnimatePresence } from 'framer-motion';
-import { useState, useRef, useEffect, useMemo } from 'react';
+import { useState, useRef, useEffect } from 'react';
 import Header from '@/components/Header';
 import Footer from '@/components/Footer';
 import GlobalTicker from '@/components/Ticker';
@@ -11,64 +11,19 @@ import {
   ExternalLink, Radio, Tv
 } from 'lucide-react';
 
-// =====================================================================
-// COMPONENTE DE BOTÓN DE PAYPAL (ULTRA-ESTABLE)
-// =====================================================================
-const PaypalButtonB2B = ({ placement, amount, currency, isPaypalLoaded }: { placement: any, amount: string, currency: string, isPaypalLoaded: boolean }) => {
-  const btnContainerRef = useRef<HTMLDivElement>(null);
-
-  useEffect(() => {
-    if (isPaypalLoaded && (window as any).paypal && btnContainerRef.current && placement) {
-      const container = btnContainerRef.current;
-      container.innerHTML = ''; 
-
-      try {
-        (window as any).paypal.Buttons({
-          style: { layout: 'vertical', color: 'gold', shape: 'rect', label: 'pay', height: 50 },
-          createOrder: (data: any, actions: any) => {
-            return actions.order.create({
-              purchase_units: [{
-                description: `HAWKIN B2B - ${placement.title}`,
-                amount: { currency_code: currency, value: amount }
-              }],
-              application_context: { 
-                shipping_preference: 'NO_SHIPPING',
-                brand_name: 'HAWKIN INTELLIGENCE'
-              }
-            });
-          },
-          onApprove: async (data: any, actions: any) => {
-            const order = await actions.order.capture();
-            alert(`¡Reserva Exitosa! Socio, tu espacio publicitario ha sido bloqueado. ID: ${order.id}`);
-            window.location.href = "/b2b?success=true";
-          },
-          onError: (err: any) => {
-            console.error("PayPal Error:", err);
-          }
-        }).render(container);
-      } catch (error) {
-        console.error("PayPal Render Error:", error);
-      }
-    }
-  }, [isPaypalLoaded, placement?.id, amount, currency]);
-
-  return <div ref={btnContainerRef} className="w-full min-h-[50px]" />;
-};
-
-// =====================================================================
-// COMPONENTE PRINCIPAL B2B
-// =====================================================================
 export default function B2BContent() {
+  const [isMounted, setIsMounted] = useState(false);
   const [geoData, setGeoData] = useState<any>(null);
   const [isPaypalLoaded, setIsPaypalLoaded] = useState(false);
-  const [isMounted, setIsMounted] = useState(false);
-  
+  const [selectedPlacement, setSelectedPlacement] = useState<any>(null);
+  const paypalContainerRef = useRef<HTMLDivElement>(null);
+
   const [isUploading, setIsUploading] = useState(false);
   const [uploadProgress, setUploadProgress] = useState(0);
   const [showSuccess, setShowSuccess] = useState(false);
   const fileInputRef = useRef<HTMLInputElement>(null);
 
-  const adPlacements = useMemo(() => [
+  const adPlacements = [
     { 
       id: 'live-stream-hero', 
       title: 'Plus: Streaming & Hero', 
@@ -96,17 +51,15 @@ export default function B2BContent() {
       placement: 'Entre noticias del Radar Global',
       features: ['Formato noticia integrada', 'Alta tasa de clics (CTR)', 'Ideal para lanzamientos']
     },
-  ], []);
-
-  const [selectedPlacement, setSelectedPlacement] = useState(adPlacements[0]);
+  ];
 
   useEffect(() => {
     setIsMounted(true);
+    setSelectedPlacement(adPlacements[0]);
     
     const fetchGeo = async () => {
       try {
         const res = await fetch('/api/geo');
-        if (!res.ok) throw new Error('API Error');
         const data = await res.json();
         setGeoData(data);
       } catch (e) {
@@ -116,26 +69,58 @@ export default function B2BContent() {
     fetchGeo();
   }, []);
 
-  // MOTOR DE CARGA DE PAYPAL: Un solo intento estable
+  // CARGA DE PAYPAL
   useEffect(() => {
     if (!geoData || !isMounted) return;
 
     const clientId = 'ASALTTzsK9I-m087Qv64N3tPLr_HFAyDKhliwe1bbS';
     const currency = geoData.currencyCode || 'USD';
     const locale = geoData.locale || 'es_PE';
-    const scriptId = 'paypal-sdk-script';
 
-    if (!document.getElementById(scriptId)) {
+    if (!(window as any).paypal) {
       const script = document.createElement('script');
-      script.id = scriptId;
+      script.id = 'paypal-sdk-b2b';
       script.src = `https://www.paypal.com/sdk/js?client-id=${clientId}&currency=${currency}&locale=${locale}`;
       script.async = true;
       script.onload = () => setIsPaypalLoaded(true);
       document.body.appendChild(script);
-    } else if ((window as any).paypal) {
+    } else {
       setIsPaypalLoaded(true);
     }
   }, [geoData, isMounted]);
+
+  // RENDERIZADOR DE BOTONES
+  useEffect(() => {
+    if (isPaypalLoaded && (window as any).paypal && paypalContainerRef.current && selectedPlacement && geoData) {
+      const container = paypalContainerRef.current;
+      container.innerHTML = ''; 
+
+      try {
+        (window as any).paypal.Buttons({
+          style: { layout: 'vertical', color: 'gold', shape: 'rect', label: 'pay', height: 50 },
+          createOrder: (data: any, actions: any) => {
+            return actions.order.create({
+              purchase_units: [{
+                description: `HAWKIN B2B - ${selectedPlacement.title}`,
+                amount: { 
+                  currency_code: geoData.currencyCode || 'USD', 
+                  value: (selectedPlacement.price * (geoData.rate || 1)).toFixed(2) 
+                }
+              }],
+              application_context: { shipping_preference: 'NO_SHIPPING' }
+            });
+          },
+          onApprove: async (data: any, actions: any) => {
+            const order = await actions.order.capture();
+            alert(`¡Reserva Exitosa! Socio, tu espacio publicitario ha sido bloqueado. ID: ${order.id}`);
+            window.location.href = "/b2b?success=true";
+          }
+        }).render(container);
+      } catch (err) {
+        console.error("PayPal buttons error", err);
+      }
+    }
+  }, [isPaypalLoaded, selectedPlacement, geoData]);
 
   if (!isMounted) return null;
 
@@ -151,7 +136,7 @@ export default function B2BContent() {
     }, 100);
   };
 
-  const currentPrice = ((selectedPlacement?.price || 0) * (geoData?.rate || 1)).toFixed(2);
+  const handleContact = () => window.open(`mailto:julhianno@aihawkin.com`, '_self');
 
   return (
     <div className="flex-1 flex flex-col items-center w-full min-h-screen bg-black overflow-x-hidden">
@@ -159,31 +144,34 @@ export default function B2BContent() {
       <input type="file" ref={fileInputRef} onChange={handleUpload} className="hidden" />
 
       <div className="max-w-6xl mx-auto px-6 pt-40 pb-32 w-full">
+        {/* TITULACIÓN */}
         <section className="text-center space-y-8 mb-32">
           <span className="text-cyan-400 font-black uppercase tracking-[0.4em] text-[10px]">HAWKIN GLOBAL MEDIA</span>
-          <h1 className="text-6xl md:text-8xl font-black tracking-tighter leading-none italic text-white">
-            Poder <span className="bg-gradient-to-r from-cyan-400 to-purple-600 bg-clip-text text-transparent uppercase">Comercial.</span>
+          <h1 className="text-6xl md:text-8xl font-black tracking-tighter leading-none italic text-white text-center">
+            Poder <span className="bg-gradient-to-r from-cyan-400 to-purple-600 bg-clip-text text-transparent uppercase text-center">Comercial.</span>
           </h1>
-          <p className="text-gray-400 text-xl max-w-2xl mx-auto font-light leading-relaxed">
+          <p className="text-gray-400 text-xl max-w-2xl mx-auto font-light leading-relaxed text-center">
             Publicidad inteligente con moneda local automática por IP. Pago en un solo clic.
           </p>
         </section>
 
+        {/* CONSOLA PRINCIPAL */}
         <section id="previsualizador" className="space-y-20">
-           <div className="text-center space-y-4">
-              <h2 className="text-4xl font-black uppercase italic tracking-tighter text-white">Consola de <span className="text-cyan-400">Impacto Global</span></h2>
+           <div className="text-center">
+              <h2 className="text-4xl font-black uppercase italic tracking-tighter text-white mb-4 text-center">Consola de <span className="text-cyan-400 uppercase">Impacto Global</span></h2>
               <div className="flex items-center justify-center gap-4">
                  <span className="bg-cyan-500/10 text-cyan-400 px-4 py-1 rounded-full text-[10px] font-black uppercase tracking-widest border border-cyan-400/20">
-                   IP Detectada: {geoData?.countryCode || 'PE'}
+                   IP Detectada: {geoData?.countryCode || 'Sincronizando...'}
                  </span>
                  <span className="bg-white/5 text-gray-500 px-4 py-1 rounded-full text-[10px] font-black uppercase tracking-widest">
-                   Moneda: {geoData?.currencyName || 'Soles'}
+                   Moneda: {geoData?.currencyName || 'Cargando...'}
                  </span>
               </div>
            </div>
 
            <div className="grid grid-cols-1 lg:grid-cols-2 gap-16 items-start bg-white/[0.01] border border-white/5 p-8 md:p-16 rounded-[60px] backdrop-blur-3xl shadow-2xl relative overflow-hidden">
-              <div className="space-y-6 z-10 w-full">
+              {/* PLANES */}
+              <div className="space-y-4 z-10 w-full">
                  {adPlacements.map((ad) => (
                     <button 
                       key={ad.id}
@@ -196,8 +184,8 @@ export default function B2BContent() {
                                 {ad.icon}
                              </div>
                              <div>
-                                <h4 className="text-xl font-black uppercase italic tracking-tight">{ad.title}</h4>
-                                <p className="text-[10px] text-cyan-500 font-bold uppercase tracking-widest mt-2">{ad.impressions} Views Semanales</p>
+                                <h4 className="text-xl font-black uppercase italic tracking-tight leading-none">{ad.title}</h4>
+                                <p className="text-[9px] text-cyan-500 font-bold uppercase tracking-widest mt-2">{ad.impressions} Views Semanales</p>
                              </div>
                           </div>
                           <div className="text-right">
@@ -208,7 +196,8 @@ export default function B2BContent() {
                  ))}
               </div>
 
-              <div className="space-y-8 z-10 w-full">
+              {/* SIMULADOR VISUAL */}
+              <div className="space-y-8 z-10 w-full relative">
                  <div className="glass-card border-white/10 p-6 aspect-[16/10] rounded-[50px] relative overflow-hidden bg-black flex flex-col shadow-2xl">
                     <div className="flex-1 flex flex-col justify-center items-center gap-8 relative text-center">
                        {selectedPlacement?.id === 'live-stream-hero' ? (
@@ -237,10 +226,10 @@ export default function B2BContent() {
                     <div className="flex justify-between items-end border-b border-white/5 pb-6 text-center sm:text-left">
                        <div>
                           <p className="text-[10px] font-black text-gray-500 uppercase tracking-widest mb-1">Confirmar Reserva:</p>
-                          <h5 className="text-lg font-bold text-cyan-400 uppercase italic underline">{selectedPlacement?.placement}</h5>
+                          <h5 className="text-lg font-bold text-cyan-400 uppercase italic underline leading-none">{selectedPlacement?.placement}</h5>
                        </div>
                        <div className="text-right hidden sm:block">
-                          <p className="text-2xl font-black text-white">{geoData?.currencySymbol || 'S/'}{currentPrice}</p>
+                          <p className="text-2xl font-black text-white">{geoData?.currencySymbol || 'S/'}{((selectedPlacement?.price || 0) * (geoData?.rate || 1)).toFixed(0)}</p>
                        </div>
                     </div>
                     
@@ -251,12 +240,7 @@ export default function B2BContent() {
                             <p className="text-[10px] font-black text-gray-600 uppercase tracking-[0.3em] animate-pulse">Sincronizando Pasarela Global...</p>
                          </div>
                        ) : (
-                         <PaypalButtonB2B 
-                            placement={selectedPlacement} 
-                            amount={currentPrice} 
-                            currency={geoData?.currencyCode || 'USD'}
-                            isPaypalLoaded={isPaypalLoaded}
-                         />
+                         <div ref={paypalContainerRef} className="w-full" />
                        )}
                     </div>
                     <p className="text-center text-[8px] font-black text-gray-700 uppercase tracking-[0.3em]">Pago seguro HAWKIN • PayPal & Tarjetas</p>
@@ -264,6 +248,40 @@ export default function B2BContent() {
               </div>
            </div>
         </section>
+
+        {/* CARGA DE MATERIAL */}
+        <div className="mt-40 glass-card border-white/5 p-16 md:p-32 rounded-[80px] bg-gradient-to-br from-white/[0.02] to-transparent relative overflow-hidden shadow-2xl">
+           <div className="grid grid-cols-1 lg:grid-cols-2 gap-20 items-center relative z-10">
+              <div className="space-y-8">
+                 <h2 className="text-5xl font-black uppercase italic tracking-tighter text-white leading-none text-left">Tu Marca <br /><span className="text-cyan-400 uppercase">Sin Fronteras.</span></h2>
+                 <p className="text-gray-500 text-xl font-light leading-relaxed text-left">
+                    Sube tu video o arte tras el pago. Nuestro satélite distribuirá tu publicidad en todo el ecosistema automáticamente.
+                 </p>
+              </div>
+
+              <div className="p-16 bg-white text-black rounded-[60px] flex flex-col items-center gap-10 text-center shadow-2xl">
+                 <AnimatePresence mode="wait">
+                    {isUploading ? (
+                      <motion.div key="l" initial={{opacity:0}} animate={{opacity:1}} className="space-y-6">
+                         <div className="w-32 h-2 bg-gray-200 rounded-full overflow-hidden mx-auto"><div className="h-full bg-cyan-500" style={{width: `${uploadProgress}%`}} /></div>
+                         <p className="text-xs font-black uppercase tracking-widest text-center text-black">Transmitiendo Datos...</p>
+                      </motion.div>
+                    ) : showSuccess ? (
+                      <motion.div key="s" initial={{scale:0.8}} animate={{scale:1}} className="space-y-6 text-green-600">
+                         <CheckCircle2 size={80} className="mx-auto" />
+                         <p className="text-lg font-black uppercase italic text-center">Material Sincronizado</p>
+                      </motion.div>
+                    ) : (
+                      <>
+                        <UploadCloud size={80} className="text-gray-300" />
+                        <h4 className="text-3xl font-black uppercase italic tracking-tighter text-black">Cargar Arte</h4>
+                        <button onClick={handleFileSelect} className="px-16 py-6 bg-black text-white rounded-full font-black uppercase tracking-[0.4em] text-xs hover:bg-cyan-500 transition-all shadow-2xl">Seleccionar Archivo</button>
+                      </>
+                    )}
+                 </AnimatePresence>
+              </div>
+           </div>
+        </div>
       </div>
 
       <Footer />
