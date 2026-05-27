@@ -7,30 +7,75 @@ import Footer from '@/components/Footer';
 import GlobalTicker from '@/components/Ticker';
 import { 
   Play, Loader2, MessageCircle, Globe, ShoppingBag, 
-  CheckCircle2, Radio, Target, ExternalLink, Eye, Layout
+  CheckCircle2, Radio, Target, ExternalLink, Eye, Layout, CreditCard
 } from 'lucide-react';
 
 // =====================================================================
-// COMPONENTE DE BOTÓN DE PAYPAL (INDELIBLE v18.0)
+// PÁGINA B2B v19.0 - ACTIVACIÓN REAL CON CLAVE DE 80 CARACTERES
 // =====================================================================
-const PaypalButtonB2B = ({ placement, amountUSD, isLoaded }: { 
-  placement: any, 
-  amountUSD: string, 
-  isLoaded: boolean 
-}) => {
-  const containerRef = useRef<HTMLDivElement>(null);
+export default function B2BPage() {
+  const [isMounted, setIsMounted] = useState(false);
+  const [isPaypalReady, setIsPaypalReady] = useState(false);
+  const [selectedPlacement, setSelectedPlacement] = useState<any>(null);
+  const [geoData, setGeoData] = useState<any>({ countryCode: 'PE', currencySymbol: 'S/', rate: 1, currencyCode: 'PEN' });
+  const paypalRef = useRef<HTMLDivElement>(null);
+
+  const adPlacements = useMemo(() => [
+    { id: 'plus', title: 'Plus: Streaming & Hero', price: 999, placement: 'Banner Principal + Live', reach: '2.5M+ Views', icon: <Radio className="text-red-500 animate-pulse" /> },
+    { id: 'sidebar', title: 'Sidebar en Academia', price: 699, placement: 'Lateral de Cursos', reach: '1M+ Views', icon: <CheckCircle2 className="text-purple-500" /> },
+    { id: 'inline', title: 'Nativo en Radar', price: 399, placement: 'Entre Noticias', reach: '500k+ Clics', icon: <ShoppingBag className="text-green-500" /> },
+  ], []);
 
   useEffect(() => {
-    if (isLoaded && (window as any).paypal && containerRef.current && placement) {
-      containerRef.current.innerHTML = ''; 
+    setIsMounted(true);
+    setSelectedPlacement(adPlacements[0]);
+    
+    // Obtener GeoData real
+    fetch('/api/geo')
+      .then(res => res.json())
+      .then(data => { if(data?.countryCode) setGeoData(data); })
+      .catch(() => console.log("Carga regional básica"));
+  }, [adPlacements]);
+
+  // CARGADOR MAESTRO (CON LA CLAVE COMPLETA DE 80 CARACTERES)
+  useEffect(() => {
+    if (!isMounted || !geoData) return;
+
+    // CLAVE REAL DE 80 CARACTERES RECUPERADA DE LOGS
+    const REAL_CLIENT_ID = 'ASALTTzsK9I-m087Qv64N3tPLr_HFAyDKliwE1bbS33tyoI2QT6Dak6VhvUFdv8fenAfboNfcrs7xas';
+    const currency = geoData.countryCode === 'PE' ? 'PEN' : 'USD';
+    const locale = geoData.countryCode === 'PE' ? 'es_PE' : 'en_US';
+
+    const scriptId = 'paypal-engine-v19-master';
+    const oldScript = document.getElementById(scriptId);
+    if (oldScript) oldScript.remove(); // Limpieza total
+
+    const script = document.createElement('script');
+    script.id = scriptId;
+    script.src = `https://www.paypal.com/sdk/js?client-id=${REAL_CLIENT_ID}&currency=${currency}&locale=${locale}&components=buttons`;
+    script.async = true;
+    script.onload = () => {
+      console.log("PayPal System Online");
+      setIsPaypalReady(true);
+    };
+    document.head.appendChild(script);
+  }, [isMounted, geoData]);
+
+  // RENDERIZADOR DE BOTONES
+  useEffect(() => {
+    if (isPaypalReady && (window as any).paypal && paypalRef.current && selectedPlacement) {
+      paypalRef.current.innerHTML = ''; 
       try {
         (window as any).paypal.Buttons({
-          style: { layout: 'vertical', color: 'gold', shape: 'rect', label: 'checkout', height: 50 },
+          style: { layout: 'vertical', color: 'gold', shape: 'rect', label: 'pay', height: 50 },
           createOrder: (data: any, actions: any) => {
             return actions.order.create({
               purchase_units: [{
-                description: `HAWKIN B2B - ${placement.title}`,
-                amount: { currency_code: 'USD', value: amountUSD }
+                description: `HAWKIN B2B - ${selectedPlacement.title}`,
+                amount: { 
+                  currency_code: geoData.countryCode === 'PE' ? 'PEN' : 'USD', 
+                  value: selectedPlacement.price.toString() 
+                }
               }],
               application_context: { 
                 shipping_preference: 'NO_SHIPPING',
@@ -40,90 +85,17 @@ const PaypalButtonB2B = ({ placement, amountUSD, isLoaded }: {
           },
           onApprove: async (data: any, actions: any) => {
             const order = await actions.order.capture();
-            alert(`¡TRANSACCIÓN EXITOSA! ID: ${order.id}. Su publicidad se activará en breve.`);
+            alert(`¡TRANSACCIÓN EXITOSA! ID: ${order.id}`);
             window.location.href = "/b2b?success=true";
           }
-        }).render(containerRef.current);
+        }).render(paypalRef.current);
       } catch (e) {
-        console.error("PayPal buttons render fail", e);
+        console.error("PayPal Error", e);
       }
     }
-  }, [isLoaded, placement?.id, amountUSD]);
-
-  return <div ref={containerRef} className="w-full" />;
-};
-
-// =====================================================================
-// PÁGINA B2B v18.0 - ACTIVACIÓN TOTAL GARANTIZADA
-// =====================================================================
-export default function B2BPage() {
-  const [isMounted, setIsMounted] = useState(false);
-  const [isPaypalReady, setIsPaypalReady] = useState(false);
-  const [selectedPlacement, setSelectedPlacement] = useState<any>(null);
-  const [geoData, setGeoData] = useState<any>({ countryCode: 'PE', currencySymbol: 'S/', rate: 3.82 });
-  const [showRescue, setShowRescue] = useState(false);
-  const paypalRef = useRef<HTMLDivElement>(null);
-
-  const adPlacements = useMemo(() => [
-    { id: 'plus', title: 'Plus: Streaming & Hero', pricePEN: 999, priceUSD: "262.00", placement: 'Banner Principal + Live', reach: '2.5M+ Views', icon: <Radio className="text-red-500 animate-pulse" /> },
-    { id: 'sidebar', title: 'Sidebar en Academia', pricePEN: 699, priceUSD: "183.00", placement: 'Lateral de Cursos', reach: '1M+ Views', icon: <CheckCircle2 className="text-purple-500" /> },
-    { id: 'inline', title: 'Nativo en Radar', pricePEN: 399, priceUSD: "105.00", placement: 'Entre Noticias', reach: '500k+ Clics', icon: <ShoppingBag className="text-green-500" /> },
-  ], []);
-
-  useEffect(() => {
-    setIsMounted(true);
-    setSelectedPlacement(adPlacements[0]);
-    
-    // IP Detection rápida
-    fetch('/api/geo')
-      .then(res => res.json())
-      .then(data => { if(data?.countryCode) setGeoData(data); })
-      .catch(() => console.log("Carga regional por defecto"));
-
-    // Temporizador de rescate (5 segundos)
-    const timer = setTimeout(() => setShowRescue(true), 5000);
-    return () => clearTimeout(timer);
-  }, [adPlacements]);
-
-  // MOTOR DE CARGA CON DETECCIÓN DE PULSO (ULTRA-RESILIENTE)
-  useEffect(() => {
-    if (!isMounted) return;
-
-    const clientId = 'ASALTTzsK9I-m087Qv64N3tPLr_HFAyDKhliwe1bbS';
-    
-    const checkPaypal = () => {
-      if ((window as any).paypal) {
-        setIsPaypalReady(true);
-        return true;
-      }
-      return false;
-    };
-
-    if (checkPaypal()) return;
-
-    const scriptId = 'paypal-engine-v18-master';
-    if (!document.getElementById(scriptId)) {
-      const script = document.createElement('script');
-      script.id = scriptId;
-      // Usamos USD para evitar errores de moneda en cuentas Latam y asegurar la carga
-      script.src = `https://www.paypal.com/sdk/js?client-id=${clientId}&currency=USD&locale=es_PE`;
-      script.async = true;
-      script.onload = () => setIsPaypalReady(true);
-      document.head.appendChild(script);
-    } else {
-      // Si el script ya existe pero PayPal no está listo, pulsamos hasta que despierte
-      const pulse = setInterval(() => {
-        if (checkPaypal()) clearInterval(pulse);
-      }, 500);
-      return () => clearInterval(pulse);
-    }
-  }, [isMounted]);
+  }, [isPaypalReady, selectedPlacement, geoData]);
 
   if (!isMounted) return null;
-
-  const handleWhatsApp = () => {
-    window.open(`https://wa.me/519XXXXXXXX?text=Hola%20HAWKIN,%20deseo%20activar%20el%20plan%20B2B%20de%20S/${selectedPlacement.pricePEN}.`, '_blank');
-  };
 
   return (
     <div className="min-h-screen bg-[#010101] text-white font-sans selection:bg-cyan-500 overflow-x-hidden">
@@ -131,13 +103,13 @@ export default function B2BPage() {
       
       <div className="max-w-6xl mx-auto px-6 pt-40 pb-32">
         <section className="text-center space-y-8 mb-40">
-          <span className="text-cyan-400 font-black uppercase tracking-[0.4em] text-[10px]">HAWKIN ADS MARKETPLACE v18.0</span>
+          <span className="text-cyan-400 font-black uppercase tracking-[0.4em] text-[10px]">HAWKIN ADS MARKETPLACE v19.0</span>
           <h1 className="text-6xl md:text-9xl font-black tracking-tighter leading-none italic uppercase text-center">
-            Poder <span className="bg-gradient-to-r from-cyan-400 to-purple-600 bg-clip-text text-transparent uppercase">Comercial.</span>
+            Poder <span className="bg-gradient-to-r from-cyan-400 to-purple-600 bg-clip-text text-transparent">Comercial.</span>
           </h1>
           <p className="text-gray-400 text-xl max-w-3xl mx-auto font-light leading-relaxed text-center">
-             Sistema de pauta publicitaria activado. 
-             Localización inteligente y cobro express garantizado.
+             Activación de pauta localizada por IP. 
+             Precios en Soles y cobro instantáneo garantizado.
           </p>
         </section>
 
@@ -147,7 +119,7 @@ export default function B2BPage() {
            <div className="lg:col-span-4 space-y-6">
               <div className="flex items-center gap-3 mb-8">
                  <Target className="text-cyan-400" size={20} />
-                 <h3 className="text-xl font-black uppercase italic tracking-tighter">Planes Activos</h3>
+                 <h3 className="text-xl font-black uppercase italic tracking-tighter">Puntos de Ataque</h3>
               </div>
               
               {adPlacements.map((ad) => (
@@ -163,18 +135,18 @@ export default function B2BPage() {
                          </div>
                          <p className="text-base font-black uppercase italic leading-none">{ad.title}</p>
                       </div>
-                      <p className="text-xl font-black text-white">S/{ad.pricePEN}</p>
+                      <p className="text-xl font-black text-white">S/{ad.price}</p>
                    </div>
                    <p className="text-[9px] text-gray-500 font-bold uppercase tracking-widest pl-1">
-                      Alcance: <span className="text-white">{ad.reach}</span>
+                      Reach: <span className="text-white">{ad.reach}</span>
                    </p>
                 </button>
               ))}
 
-              <div className="mt-12 p-8 rounded-[40px] bg-white/[0.02] border border-white/5 flex flex-col gap-2">
-                 <p className="text-[9px] font-black text-gray-600 uppercase tracking-widest">Sincronización IP</p>
+              <div className="mt-12 p-8 rounded-[40px] bg-white/[0.02] border border-white/5 flex flex-col gap-2 shadow-2xl">
+                 <p className="text-[9px] font-black text-gray-600 uppercase tracking-widest">Estado del Radar IP</p>
                  <div className="flex justify-between items-center">
-                    <span className="text-xs font-bold text-cyan-400 uppercase italic">{geoData?.countryCode || 'PE'} | SOLES</span>
+                    <span className="text-xs font-bold text-cyan-400 uppercase italic">PAÍS: {geoData?.countryCode || 'PE'} | SOLES</span>
                     <Globe size={16} className="text-cyan-400 animate-spin-slow" />
                  </div>
               </div>
@@ -191,10 +163,10 @@ export default function B2BPage() {
                                <img src="https://images.unsplash.com/photo-1541562232579-512a21360020?auto=format&fit=crop&q=80&w=1200" className="w-full h-full object-cover opacity-30" alt="Live" />
                                <div className="absolute top-6 left-6 bg-red-600 px-4 py-1.5 rounded-full flex items-center gap-2 animate-pulse shadow-lg">
                                   <div className="w-1.5 h-1.5 bg-white rounded-full" />
-                                  <span className="text-[10px] font-black uppercase text-white tracking-widest">LIVE STREAM</span>
+                                  <span className="text-[10px] font-black uppercase text-white tracking-widest">LIVE STREAMING</span>
                                </div>
                                <Play size={48} className="text-white fill-white opacity-50 mb-6 mx-auto" />
-                               <h4 className="text-2xl font-black uppercase italic leading-tight text-white text-center">Simulador Activo</h4>
+                               <h4 className="text-2xl font-black uppercase italic leading-tight text-white text-center">Video de Impacto</h4>
                                <div className="absolute bottom-6 right-6 bg-white text-black px-6 py-2.5 rounded-2xl font-black text-[10px] uppercase shadow-2xl flex items-center gap-3">
                                   <ExternalLink size={14} /> VISITAR MARCA
                                </div>
@@ -219,9 +191,9 @@ export default function B2BPage() {
                        <p className="text-[10px] font-black text-gray-600 uppercase tracking-widest leading-none">Reserva Confirmada:</p>
                        <h5 className="text-xl font-black uppercase italic text-white leading-tight underline decoration-cyan-500/30">{selectedPlacement?.placement}</h5>
                     </div>
-                    <div className="pt-8">
+                    <div className="pt-8 text-center sm:text-left">
                        <p className="text-[9px] font-black text-gray-600 uppercase">Inversión Final</p>
-                       <p className="text-4xl font-black text-cyan-400">S/{selectedPlacement?.pricePEN}</p>
+                       <p className="text-4xl font-black text-cyan-400">S/{selectedPlacement?.price}</p>
                     </div>
                  </div>
 
@@ -230,52 +202,44 @@ export default function B2BPage() {
                        {!isPaypalReady ? (
                          <div className="flex flex-col items-center gap-4 py-8">
                             <Loader2 className="animate-spin text-cyan-400" size={40} />
-                            <p className="text-[10px] font-black text-gray-600 uppercase tracking-[0.4em] animate-pulse text-center uppercase">SISTEMA v18.0 ACTIVANDO...</p>
+                            <p className="text-[10px] font-black text-gray-600 uppercase tracking-[0.4em] animate-pulse text-center">ACTIVANDO v19.0...</p>
                          </div>
                        ) : (
                          <div className="space-y-6 w-full">
-                            <PaypalButtonB2B 
-                              placement={selectedPlacement}
-                              amountUSD={selectedPlacement.priceUSD}
-                              isLoaded={isPaypalReady}
-                            />
+                            <div ref={paypalRef} className="w-full" />
                             <p className="text-center text-[7px] text-gray-600 font-black uppercase tracking-[0.3em]">Débito Seguro • PayPal Global Network</p>
                          </div>
                        )}
-                       
-                       {/* BOTÓN DE RESCATE (SIEMPRE DISPONIBLE SI TARDA) */}
-                       {showRescue && (
-                          <div className="mt-4 pt-4 border-t border-white/5 w-full">
-                             <button 
-                               onClick={handleWhatsApp}
-                               className="w-full py-4 bg-green-600/10 border border-green-600/20 text-green-500 rounded-2xl font-black uppercase tracking-widest text-[8px] flex items-center justify-center gap-2 hover:bg-green-600 hover:text-white transition-all shadow-xl"
-                             >
-                                <MessageCircle size={14} /> Soporte Pago Manual
-                             </button>
-                          </div>
-                       )}
+                       <div className="mt-4 pt-4 border-t border-white/5 w-full">
+                          <button 
+                            onClick={() => window.open('https://wa.me/519XXXXXXXX', '_blank')}
+                            className="w-full py-4 bg-green-600/10 border border-green-600/20 text-green-500 rounded-2xl font-black uppercase tracking-widest text-[8px] flex items-center justify-center gap-2 hover:bg-green-600 hover:text-white transition-all shadow-xl"
+                          >
+                             <MessageCircle size={14} /> Soporte Pago WhatsApp
+                          </button>
+                       </div>
                     </div>
                  </div>
               </div>
            </div>
         </div>
 
-        {/* MAPA DE RECURSOS */}
+        {/* MAPA DE IMPACTO */}
         <div className="mt-40 grid grid-cols-1 md:grid-cols-3 gap-8 grayscale hover:grayscale-0 transition-all duration-1000 cursor-default">
            <div className="p-12 rounded-[50px] bg-white/[0.01] border border-white/5 space-y-6 text-center shadow-xl">
               <Eye className="text-cyan-400 mx-auto" size={32} />
               <h4 className="text-xl font-black uppercase italic tracking-tighter text-white">Impacto 360</h4>
-              <p className="text-xs text-gray-500 font-light leading-relaxed text-center">Presencia masiva en Radar, Academia y Trading simultáneamente.</p>
+              <p className="text-xs text-gray-500 font-light leading-relaxed">Presencia en Radar, Academia y Trading simultáneamente.</p>
            </div>
            <div className="p-12 rounded-[50px] bg-white/[0.01] border border-white/5 space-y-6 text-center shadow-xl">
               <Layout className="text-purple-500 mx-auto" size={32} />
-              <h4 className="text-xl font-black uppercase italic tracking-tighter text-white text-center uppercase">Clic Directo</h4>
-              <p className="text-xs text-gray-500 font-light leading-relaxed text-center">Botones inteligentes integrados para derivar tráfico a tu web.</p>
+              <h4 className="text-xl font-black uppercase italic tracking-tighter text-white uppercase">Clic Directo</h4>
+              <p className="text-xs text-gray-500 font-light leading-relaxed">Botones inteligentes integrados para derivar tráfico a tu web.</p>
            </div>
            <div className="p-12 rounded-[50px] bg-white/[0.01] border border-white/5 space-y-6 text-center shadow-xl">
               <Tv className="text-green-500 mx-auto" size={32} />
-              <h4 className="text-xl font-black uppercase italic tracking-tighter text-white text-center uppercase">Calidad 4K</h4>
-              <p className="text-xs text-gray-500 font-light leading-relaxed text-center">Soporte para videos de alta fidelidad y animaciones de marca.</p>
+              <h4 className="text-xl font-black uppercase italic tracking-tighter text-white uppercase">Calidad 4K</h4>
+              <p className="text-xs text-gray-500 font-light leading-relaxed">Soporte para videos de alta calidad y animaciones de marca.</p>
            </div>
         </div>
 
