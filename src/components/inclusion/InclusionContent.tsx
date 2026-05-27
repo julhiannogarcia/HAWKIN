@@ -205,6 +205,25 @@ export default function InclusionContent() {
                        </div>
 
                        <div className="bg-white rounded-[60px] p-12 border border-[#EAECEE] shadow-xl flex-1 flex flex-col justify-center items-center gap-12 relative overflow-hidden">
+                          {currentStep?.type === 'exercise' && (
+                            <div className="space-y-10 text-center w-full">
+                               <div className="p-8 bg-[#EBF5FB] border border-[#AED6F1] rounded-[40px] text-[#2E86C1] font-bold text-xl shadow-sm">
+                                  {currentStep.content?.question || currentStep.description}
+                               </div>
+                               <div className="grid grid-cols-1 gap-4 max-w-md mx-auto">
+                                  {currentStep.content?.options?.map((opt, i) => (
+                                     <button 
+                                      key={i} 
+                                      onClick={() => handleOptionClick(i)} 
+                                      className={`p-6 rounded-[30px] border-4 font-bold text-lg transition-all ${selectedOption === i ? (i === currentStep.content.correctOption ? 'border-[#27AE60] bg-[#E9F7EF]' : 'border-[#E74C3C] bg-[#FDEDEC] animate-shake') : 'border-[#D5DBDB] bg-white hover:border-[#5DADE2] hover:scale-[1.02]'}`}
+                                     >
+                                        {opt}
+                                     </button>
+                                  ))}
+                               </div>
+                            </div>
+                          )}
+
                           {currentStep?.type === 'pattern' && (
                             <div className="space-y-16 w-full text-center">
                                <div className="flex justify-center gap-8">
