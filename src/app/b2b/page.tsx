@@ -8,7 +8,7 @@ import GlobalTicker from '@/components/Ticker';
 import { 
   BarChart3, UploadCloud, Globe, ShoppingBag, MessageCircle, 
   Play, Loader2, FileCheck, CheckCircle2, ChevronRight, ArrowLeft,
-  ExternalLink, Radio, Tv
+  ExternalLink, Radio, Tv, CreditCard
 } from 'lucide-react';
 
 export default function B2BPage() {
@@ -51,8 +51,8 @@ export default function B2BPage() {
 
   const [selectedPlacement, setSelectedPlacement] = useState(adPlacements[0]);
 
+  // 1. OBTENER GEOLOCALIZACIÓN (IP, PAÍS, MONEDA)
   useEffect(() => {
-    // 1. Obtener moneda e IP
     const fetchGeo = async () => {
       try {
         const res = await fetch('/api/geo');
@@ -60,36 +60,42 @@ export default function B2BPage() {
         setGeoData(data);
       } catch (e) {
         console.error("Geo error", e);
+        // Fallback básico
+        setGeoData({ countryCode: 'US', currency: 'USD', locale: 'en_US' });
       }
     };
     fetchGeo();
   }, []);
 
+  // 2. CARGAR PAYPAL DINÁMICAMENTE SEGÚN IP
   useEffect(() => {
-    // 2. Cargar el SDK de PayPal con detección de idioma y modo simplificado
-    const clientId = 'ASALTTzsK9I-m087Qv64N3tPLr_HFAyDKhliwe1bbS'; // Client ID de tu captura
-    const locale = geoData?.countryCode === 'US' ? 'en_US' : 'es_ES'; // Detectar idioma por IP
-    
-    // Eliminar script anterior si existe para actualizar locale
-    const oldScript = document.getElementById('paypal-sdk-b2b');
-    if (oldScript) oldScript.remove();
+    if (!geoData) return;
+
+    const clientId = 'ASALTTzsK9I-m087Qv64N3tPLr_HFAyDKhliwe1bbS';
+    const currency = geoData.currency || 'USD';
+    const locale = geoData.countryCode === 'US' ? 'en_US' : 'es_ES';
+
+    // Limpiar scripts previos para evitar conflictos de carga
+    const existingScript = document.getElementById('paypal-sdk-v5');
+    if (existingScript) existingScript.remove();
 
     const script = document.createElement('script');
-    script.id = 'paypal-sdk-b2b';
-    script.src = `https://www.paypal.com/sdk/js?client-id=${clientId}&currency=USD&locale=${locale}&disable-funding=credit,card`;
+    script.id = 'paypal-sdk-v5';
+    script.src = `https://www.paypal.com/sdk/js?client-id=${clientId}&currency=${currency}&locale=${locale}&disable-funding=credit,card`;
     script.async = true;
-    script.onload = () => setIsPaypalLoaded(true);
+    script.onload = () => {
+      console.log("PayPal SDK Loaded for:", locale, currency);
+      setIsPaypalLoaded(true);
+    };
     document.body.appendChild(script);
 
     return () => {
-      const s = document.getElementById('paypal-sdk-b2b');
+      const s = document.getElementById('paypal-sdk-v5');
       if (s) s.remove();
     };
   }, [geoData]);
 
-  const handleFileSelect = () => {
-    fileInputRef.current?.click();
-  };
+  const handleFileSelect = () => fileInputRef.current?.click();
 
   const handleUpload = (e: React.ChangeEvent<HTMLInputElement>) => {
     const file = e.target.files?.[0];
@@ -102,174 +108,109 @@ export default function B2BPage() {
           clearInterval(interval);
           setIsUploading(false);
           setShowSuccess(true);
-          setTimeout(() => setShowSuccess(false), 5000);
           return 100;
         }
         return prev + 10;
       });
-    }, 150);
+    }, 100);
   };
 
   const handleContact = () => {
-    const subject = encodeURIComponent("Propuesta Comercial - HAWKIN Ads");
-    const body = encodeURIComponent("Hola HAWKIN,\n\nDeseo anunciar mi negocio en la plataforma. Mi marca es [Nombre de Empresa] y estoy interesado en el espacio [Tipo de Anuncio].\n\nQuedo a la espera de sus instrucciones.\n\nSaludos.");
-    window.open(`mailto:julhianno@aihawkin.com?subject=${subject}&body=${body}`, '_self');
+    window.open(`mailto:julhianno@aihawkin.com?subject=B2B Proposal&body=Interesado en pauta corporativa.`, '_self');
   };
 
-  const PaypalButtonB2B = ({ planId, amount }: { planId: string, amount: string }) => {
+  const PaypalButtonB2B = ({ planId, amount, currency }: { planId: string, amount: string, currency: string }) => {
     const containerRef = useRef<HTMLDivElement>(null);
 
     useEffect(() => {
       if (isPaypalLoaded && containerRef.current && window.paypal) {
         containerRef.current.innerHTML = '';
         window.paypal.Buttons({
-          style: { 
-            layout: 'vertical', 
-            color: 'gold', 
-            shape: 'rect', 
-            label: 'checkout', 
-            height: 55 
-          },
+          style: { layout: 'vertical', color: 'blue', shape: 'pill', label: 'checkout', height: 50 },
           createOrder: (data: any, actions: any) => {
             return actions.order.create({
               purchase_units: [{
                 description: `HAWKIN B2B - ${planId}`,
-                amount: { 
-                  currency_code: 'USD',
-                  value: amount 
-                }
+                amount: { currency_code: currency, value: amount }
               }],
-              application_context: {
-                shipping_preference: 'NO_SHIPPING' // ELIMINA REQUISITO DE DIRECCIÓN (Más rápido)
-              }
+              application_context: { shipping_preference: 'NO_SHIPPING' }
             });
           },
           onApprove: async (data: any, actions: any) => {
             const order = await actions.order.capture();
-            alert(`¡Reserva Exitosa! Su espacio publicitario ha sido bloqueado. ID: ${order.id}`);
+            alert(`¡Reserva Exitosa! ID: ${order.id}`);
             window.location.href = "/b2b?success=true";
           }
         }).render(containerRef.current);
       }
-    }, [isPaypalLoaded, planId, amount]);
+    }, [isPaypalLoaded, planId, amount, currency]);
 
-    return <div ref={containerRef} className="mt-8" />;
+    return <div ref={containerRef} className="w-full mt-4" />;
   };
 
   return (
-    <main className="min-h-screen bg-[#010101] text-white selection:bg-cyan-500">
+    <main className="min-h-screen bg-black text-white selection:bg-cyan-500">
       <Header />
-      
-      <input type="file" ref={fileInputRef} onChange={handleUpload} className="hidden" accept="video/*,image/*,.pdf" />
+      <input type="file" ref={fileInputRef} onChange={handleUpload} className="hidden" />
 
-      <div className="max-w-6xl mx-auto px-4 pt-40 pb-32">
+      <div className="max-w-6xl mx-auto px-6 pt-40 pb-32">
+        {/* HERO */}
         <section className="text-center space-y-8 mb-32">
-          <span className="text-cyan-400 font-black uppercase tracking-[0.4em] text-[10px]">HAWKIN MEDIA & ADS</span>
-          <h1 className="text-6xl md:text-8xl font-black tracking-tighter leading-none text-white">
-            Domina el <span className="bg-gradient-to-r from-cyan-400 to-purple-600 bg-clip-text text-transparent italic">Ecosistema.</span>
+          <span className="text-cyan-400 font-black uppercase tracking-[0.4em] text-[10px]">HAWKIN GLOBAL MEDIA</span>
+          <h1 className="text-6xl md:text-8xl font-black tracking-tighter leading-none italic text-white">
+            Domina el <span className="bg-gradient-to-r from-cyan-400 to-purple-600 bg-clip-text text-transparent">Mercado.</span>
           </h1>
-          <p className="text-gray-400 text-xl max-w-2xl mx-auto leading-relaxed font-light">
-            Streaming en vivo, anuncios interactivos y enlaces directos a tu web. 
-            Convierte visualizaciones en ventas reales.
+          <p className="text-gray-400 text-xl max-w-2xl mx-auto font-light leading-relaxed">
+            Streaming en vivo y anuncios inteligentes. Transforma tu marca en autoridad mundial.
           </p>
           <div className="flex flex-col md:flex-row justify-center gap-6 pt-12">
-             <button onClick={() => document.getElementById('ad-selector')?.scrollIntoView({behavior: 'smooth'})} className="btn-glow text-[10px] py-6 px-12 uppercase">
-                Ver Planes y Ubicaciones
+             <button onClick={() => document.getElementById('previsualizador')?.scrollIntoView({behavior: 'smooth'})} className="btn-glow text-[10px] py-6 px-16 uppercase">
+                Empezar Ahora
              </button>
-             <button onClick={handleContact} className="flex items-center justify-center gap-4 px-12 py-6 bg-white/5 border border-white/10 text-white rounded-full text-[10px] font-black uppercase tracking-widest hover:bg-white hover:text-black transition-all">
-               <MessageCircle size={18} /> Tarifas Corporativas
+             <button onClick={handleContact} className="px-16 py-6 bg-white/5 border border-white/10 rounded-full text-[10px] font-black uppercase tracking-widest hover:bg-white hover:text-black transition-all">
+               Tarifas Élite
              </button>
           </div>
         </section>
 
-        {/* Panel de Gestión Masiva */}
-        <div className="glass-card border-white/5 p-1 bg-gradient-to-br from-white/[0.05] to-transparent rounded-[60px] overflow-hidden shadow-2xl">
-           <div className="bg-black/60 rounded-[59px] p-8 md:p-20">
-              <div className="grid grid-cols-1 lg:grid-cols-3 gap-16">
-                 
-                 <div className="lg:col-span-2 space-y-16">
-                    <h2 className="text-3xl font-black uppercase tracking-widest italic text-white">Alcance <span className="text-cyan-400">Sin Límites</span></h2>
-                    <div className="grid grid-cols-1 md:grid-cols-3 gap-8 text-center">
-                       <div className="p-8 bg-white/[0.02] rounded-3xl border border-white/5">
-                          <p className="text-[10px] font-black text-gray-500 uppercase mb-4 tracking-widest">Tecnología</p>
-                          <h4 className="text-3xl font-black mt-2 text-cyan-400">450K</h4>
-                       </div>
-                       <div className="p-8 bg-white/[0.02] rounded-3xl border border-white/5">
-                          <p className="text-[10px] font-black text-gray-500 uppercase mb-4 tracking-widest">Moda & Estilo</p>
-                          <h4 className="text-3xl font-black mt-2 text-purple-500">320K</h4>
-                       </div>
-                       <div className="p-8 bg-white/[0.02] rounded-3xl border border-white/5">
-                          <p className="text-[10px] font-black text-gray-500 uppercase mb-4 tracking-widest">Retail</p>
-                          <h4 className="text-3xl font-black mt-2 text-green-500">280K</h4>
-                       </div>
-                    </div>
-                 </div>
-
-                 <div className="space-y-10">
-                    <div className="p-10 bg-gradient-to-br from-cyan-400 to-purple-600 text-black rounded-[40px] flex flex-col items-center gap-6 text-center shadow-2xl relative overflow-hidden">
-                       <AnimatePresence mode="wait">
-                         {isUploading ? (
-                           <motion.div key="loader" initial={{opacity:0}} animate={{opacity:1}} exit={{opacity:0}} className="space-y-4">
-                              <Loader2 className="animate-spin mx-auto" size={40} />
-                              <p className="text-[10px] font-black uppercase">Procesando Multimedia ({uploadProgress}%)</p>
-                           </motion.div>
-                         ) : showSuccess ? (
-                           <motion.div key="success" initial={{opacity:0, scale:0.8}} animate={{opacity:1, scale:1}} className="space-y-4">
-                              <FileCheck className="mx-auto" size={40} />
-                              <p className="text-[10px] font-black uppercase text-black italic">¡Tu Anuncio está listo para emitir!</p>
-                           </motion.div>
-                         ) : (
-                           <>
-                             <UploadCloud size={40} className="animate-bounce" />
-                             <div>
-                                <h4 className="text-xl font-black uppercase italic leading-tight">Carga tu Video <br />o Arte Clickable</h4>
-                             </div>
-                             <button onClick={handleFileSelect} className="w-full py-5 bg-black text-white rounded-3xl text-[10px] font-black uppercase tracking-widest hover:scale-105 transition-all shadow-xl">
-                                SELECCIONAR ARCHIVOS
-                             </button>
-                           </>
-                         )}
-                       </AnimatePresence>
-                    </div>
-                 </div>
-              </div>
-           </div>
-        </div>
-
-        {/* PREVISUALIZACIÓN DE UBICACIÓN */}
-        <section id="ad-selector" className="mt-40 space-y-24">
+        {/* CONSOLA DE PREVISUALIZACIÓN */}
+        <section id="previsualizador" className="mt-40 space-y-24">
            <div className="text-center space-y-4">
-              <h2 className="text-4xl md:text-6xl font-black uppercase italic tracking-tighter text-white">Consola de <span className="text-cyan-400">Previsualización</span></h2>
-              <p className="text-gray-500 uppercase font-black text-xs tracking-widest">Simula tu impacto comercial en tiempo real</p>
+              <h2 className="text-4xl md:text-6xl font-black uppercase italic tracking-tighter text-white line-none">Consola de <span className="text-cyan-400">Poder B2B</span></h2>
+              <p className="text-gray-600 uppercase font-black text-xs tracking-widest flex items-center justify-center gap-2">
+                 <Globe size={14} /> Sincronización Automática: {geoData?.countryCode || 'INT'} | {geoData?.currency || 'USD'}
+              </p>
            </div>
 
-           <div className="grid grid-cols-1 lg:grid-cols-2 gap-16 items-center bg-white/[0.02] border border-white/5 p-8 md:p-20 rounded-[80px]">
-              <div className="space-y-6">
+           <div className="grid grid-cols-1 lg:grid-cols-2 gap-20 items-center bg-white/[0.01] border border-white/5 p-8 md:p-20 rounded-[80px] backdrop-blur-3xl shadow-2xl relative overflow-hidden">
+              <div className="absolute top-0 right-0 p-12 opacity-5"><BarChart3 size={150} /></div>
+              
+              <div className="space-y-6 relative z-10">
                  {adPlacements.map((ad) => (
                     <button 
                       key={ad.id}
                       onClick={() => setSelectedPlacement(ad)}
-                      className={`w-full p-8 rounded-[40px] border-2 text-left transition-all flex flex-col gap-4 group ${selectedPlacement.id === ad.id ? 'border-cyan-400 bg-cyan-400/5' : 'border-white/5 hover:border-white/20 bg-black'}`}
+                      className={`w-full p-8 rounded-[40px] border-2 text-left transition-all flex flex-col gap-4 group ${selectedPlacement.id === ad.id ? 'border-cyan-400 bg-cyan-400/5' : 'border-white/5 bg-black/40 hover:border-white/20'}`}
                     >
                        <div className="flex items-center justify-between w-full">
                           <div className="flex items-center gap-6">
-                             <div className={`w-14 h-14 rounded-2xl flex items-center justify-center ${selectedPlacement.id === ad.id ? 'bg-cyan-400 text-black' : 'bg-white/5 text-gray-500'}`}>
+                             <div className={`w-14 h-14 rounded-2xl flex items-center justify-center ${selectedPlacement.id === ad.id ? 'bg-cyan-400 text-black shadow-[0_0_20px_#22d3ee]' : 'bg-white/5 text-gray-500'}`}>
                                 {ad.icon}
                              </div>
                              <div>
                                 <h4 className="text-xl font-black uppercase italic tracking-tight">{ad.title}</h4>
-                                <p className="text-[10px] text-cyan-500 font-bold uppercase tracking-widest">{ad.impressions} Views</p>
+                                <p className="text-[10px] text-cyan-500 font-bold uppercase tracking-widest">{ad.impressions} Views Semanales</p>
                              </div>
                           </div>
                           <div className="text-right">
-                             <p className="text-2xl font-black text-white">{geoData?.currencySymbol || 'S/'}{(ad.price * (geoData?.rate || 1)).toFixed(0)}</p>
+                             <p className="text-2xl font-black text-white">{geoData?.currencySymbol || '$'}{(ad.price * (geoData?.rate || 1)).toFixed(0)}</p>
                           </div>
                        </div>
                        
                        {selectedPlacement.id === ad.id && (
-                         <motion.ul initial={{opacity:0}} animate={{opacity:1}} className="pl-20 space-y-2">
+                         <motion.ul initial={{opacity:0, y: -10}} animate={{opacity:1, y: 0}} className="pl-20 space-y-2">
                             {ad.features.map((f, i) => (
-                              <li key={i} className="flex items-center gap-3 text-[9px] font-bold text-gray-400 uppercase tracking-widest">
+                              <li key={i} className="flex items-center gap-3 text-[9px] font-bold text-gray-500 uppercase tracking-widest">
                                  <CheckCircle2 size={10} className="text-cyan-400" /> {f}
                               </li>
                             ))}
@@ -281,90 +222,49 @@ export default function B2BPage() {
 
               <div className="relative">
                  <div className="absolute -inset-10 bg-cyan-500/10 blur-[100px] rounded-full" />
-                 <div className="glass-card border-white/10 p-4 aspect-[16/10] rounded-[40px] relative overflow-hidden bg-[#050505] flex flex-col shadow-2xl">
-                    <div className="h-6 w-full border-b border-white/5 flex items-center px-4 gap-2 mb-4 bg-black/40">
-                       <div className="w-1.5 h-1.5 rounded-full bg-red-500" />
-                       <div className="w-1.5 h-1.5 rounded-full bg-yellow-500" />
-                       <div className="w-1.5 h-1.5 rounded-full bg-green-500" />
-                       <div className="h-2 w-32 bg-white/5 rounded-full mx-auto" />
-                    </div>
-                    
-                    <div className="flex-1 space-y-4 px-6 overflow-hidden relative">
-                       <div className="flex justify-between items-center mb-6">
-                          <div className="h-4 w-20 bg-white/10 rounded-full" />
-                          <div className="flex gap-4">
-                             <div className="h-3 w-10 bg-white/5 rounded-full" />
-                             <div className="h-3 w-10 bg-white/5 rounded-full" />
-                          </div>
-                       </div>
-
+                 <div className="glass-card border-white/10 p-6 aspect-[16/10] rounded-[50px] relative overflow-hidden bg-black flex flex-col shadow-2xl">
+                    <div className="flex-1 flex flex-col justify-center items-center gap-8 relative">
                        {selectedPlacement.id === 'live-stream-hero' ? (
-                         <motion.div 
-                          initial={{ opacity: 0 }} animate={{ opacity: 1 }}
-                          className="w-full h-48 bg-gradient-to-br from-black to-gray-900 rounded-3xl border border-white/10 relative overflow-hidden group cursor-pointer"
-                         >
-                            <div className="absolute inset-0 bg-[url('https://images.unsplash.com/photo-1677442136019-21780ecad995?auto=format&fit=crop&q=80&w=1000')] bg-cover opacity-30 animate-pulse" />
-                            <div className="absolute top-4 left-4 bg-red-600 px-3 py-1 rounded-full flex items-center gap-2 animate-pulse">
-                               <div className="w-1.5 h-1.5 bg-white rounded-full" />
-                               <span className="text-[8px] font-black uppercase tracking-widest text-white">LIVE: TU MARCA</span>
+                         <div className="w-full h-full bg-gray-900 rounded-[30px] border border-white/10 relative overflow-hidden">
+                            <div className="absolute inset-0 bg-[url('https://images.unsplash.com/photo-1541562232579-512a21360020?auto=format&fit=crop&q=80&w=1000')] bg-cover opacity-40 animate-pulse" />
+                            <div className="absolute top-4 left-4 bg-red-600 px-4 py-1.5 rounded-full flex items-center gap-2 animate-pulse shadow-lg">
+                               <div className="w-2 h-2 bg-white rounded-full" />
+                               <span className="text-[9px] font-black uppercase text-white">LIVE STREAM</span>
                             </div>
-                            <div className="absolute inset-0 flex items-center justify-center">
-                               <div className="w-12 h-12 bg-white/10 rounded-full flex items-center justify-center backdrop-blur-md">
-                                  <Play size={20} className="text-white fill-white ml-1" />
-                               </div>
+                            <Play size={40} className="text-white fill-white absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2" />
+                            <div className="absolute bottom-4 right-4 flex items-center gap-2 bg-cyan-500 text-black px-4 py-2 rounded-xl font-black text-[9px] uppercase shadow-xl cursor-pointer hover:bg-white transition-all">
+                               <ExternalLink size={12} /> Ir a mi Tienda
                             </div>
-                            <div className="absolute bottom-4 right-4 flex items-center gap-2 bg-black/60 px-3 py-1.5 rounded-xl border border-white/10 text-cyan-400">
-                               <ExternalLink size={10} />
-                               <span className="text-[8px] font-black uppercase">Visitar Web</span>
-                            </div>
-                         </motion.div>
+                         </div>
                        ) : (
-                         <div className="space-y-4">
-                            <div className="h-32 w-full bg-white/[0.02] rounded-3xl border border-dashed border-white/10 flex items-center justify-center relative group cursor-pointer overflow-hidden">
-                               {selectedPlacement.id === 'sidebar-academy' && (
-                                 <motion.div 
-                                  initial={{ x: 20 }} animate={{ x: 0 }}
-                                  className="absolute top-2 right-2 w-24 h-32 bg-cyan-400/20 border-2 border-dashed border-cyan-400 rounded-2xl flex items-center justify-center text-center p-2"
-                                 >
-                                    <div className="space-y-1">
-                                       <p className="text-[6px] font-black text-white uppercase italic leading-none">Anuncio Academy</p>
-                                       <div className="flex items-center justify-center gap-1 text-cyan-400"><ExternalLink size={8} /> <span className="text-[5px] font-black uppercase">Tu Link</span></div>
-                                    </div>
-                                 </motion.div>
-                               )}
-                               
-                               {selectedPlacement.id === 'inline-news' && (
-                                 <motion.div 
-                                  initial={{ y: 20 }} animate={{ y: 0 }}
-                                  className="h-20 w-3/4 bg-white/5 border-2 border-dashed border-green-500 rounded-2xl flex items-center justify-between px-6"
-                                 >
-                                    <div className="flex items-center gap-4">
-                                       <div className="w-10 h-10 bg-black/40 rounded-lg flex items-center justify-center"><ShoppingBag size={14} className="text-green-500" /></div>
-                                       <p className="text-[8px] font-black uppercase text-white italic">Tu Producto en el Radar</p>
-                                    </div>
-                                    <div className="p-2 rounded-full bg-green-500 text-black"><ExternalLink size={10} /></div>
-                                 </motion.div>
-                               )}
-                               
-                               <span className="text-[8px] font-bold text-gray-700 uppercase tracking-widest">Interface Preview</span>
+                         <div className="w-full h-full flex items-center justify-center border-4 border-dashed border-white/10 rounded-[35px] relative">
+                            <span className="text-[10px] font-black text-gray-700 uppercase tracking-[0.5em] rotate-12">Simulador de Ubicación</span>
+                            <div className={`absolute p-6 rounded-2xl bg-cyan-400/20 border-2 border-cyan-400 flex flex-col items-center gap-2 ${selectedPlacement.id === 'sidebar-academy' ? 'top-6 right-6 w-32 h-40' : 'bottom-6 inset-x-12 h-20 flex-row justify-between'}`}>
+                               <p className="text-[8px] font-black text-white uppercase text-center italic">{selectedPlacement.title}</p>
+                               <div className="w-8 h-8 rounded-full bg-cyan-400 flex items-center justify-center text-black shadow-lg"><ExternalLink size={12} /></div>
                             </div>
                          </div>
                        )}
-
-                       <div className="h-3 w-1/2 bg-white/5 rounded-full" />
-                       <div className="h-3 w-full bg-white/5 rounded-full opacity-40" />
                     </div>
                  </div>
-                 <div className="mt-8 text-center md:text-left">
-                    <p className="text-[10px] font-black text-gray-500 uppercase tracking-widest mb-4">Ubicación Estratégica:</p>
-                    <h5 className="text-lg font-bold text-cyan-400 uppercase italic leading-none">{selectedPlacement.placement}</h5>
+
+                 <div className="mt-12 bg-white/[0.02] border border-white/5 p-8 rounded-[40px] space-y-6">
+                    <div className="flex items-center justify-between">
+                       <p className="text-[10px] font-black text-gray-500 uppercase tracking-widest">Reserva el espacio:</p>
+                       <p className="text-xs font-bold text-cyan-400 uppercase italic underline">{selectedPlacement.placement}</p>
+                    </div>
                     
-                    <div className="mt-10">
+                    <div className="min-h-[60px] flex items-center justify-center">
                        {isPaypalLoaded ? (
-                         <PaypalButtonB2B planId={selectedPlacement.id} amount={(selectedPlacement.price).toFixed(2)} />
+                         <PaypalButtonB2B 
+                            planId={selectedPlacement.id} 
+                            amount={(selectedPlacement.price).toFixed(2)} 
+                            currency={geoData?.currency || 'USD'}
+                         />
                        ) : (
-                         <div className="w-full h-12 bg-white/5 animate-pulse rounded-full flex items-center justify-center text-[9px] text-gray-600 font-black uppercase tracking-widest">
-                           Sincronizando Sistema de Streaming...
+                         <div className="flex flex-col items-center gap-4 text-center">
+                            <Loader2 className="animate-spin text-cyan-400" size={32} />
+                            <p className="text-[9px] font-black text-gray-600 uppercase tracking-[0.3em] animate-pulse">Sincronizando Pasarela Internacional ({geoData?.locale || '...'})</p>
                          </div>
                        )}
                     </div>
@@ -373,50 +273,45 @@ export default function B2BPage() {
            </div>
         </section>
 
-        {/* PANEL DE CARGA DE ARTE Y LINKS */}
-        <div className="mt-40 glass-card border-white/5 p-1 bg-gradient-to-br from-white/[0.05] to-transparent rounded-[60px] overflow-hidden shadow-2xl">
-           <div className="bg-black/60 rounded-[59px] p-8 md:p-20">
-              <div className="grid grid-cols-1 lg:grid-cols-2 gap-16 items-center">
-                 <div className="space-y-8">
-                    <h2 className="text-3xl font-black uppercase tracking-widest italic text-white">Material <span className="text-cyan-400">Interactivo</span></h2>
-                    <p className="text-gray-400 leading-relaxed font-light">
-                       Tras la reserva, sube tu video o imagen. Incluye el enlace de destino para que los socios lleguen directamente a tu plataforma con un solo clic.
-                    </p>
-                    <div className="flex flex-col gap-4">
-                       <div className="flex items-center gap-4 text-[10px] font-black uppercase tracking-widest text-gray-500">
-                          <CheckCircle2 className="text-cyan-400" size={16} /> Soporte Video 4K / GIFs
-                       </div>
-                       <div className="flex items-center gap-4 text-[10px] font-black uppercase tracking-widest text-gray-500">
-                          <CheckCircle2 className="text-cyan-400" size={16} /> Enlaces de Venta Trackeables
+        {/* CARGA DE MATERIAL */}
+        <div className="mt-40 glass-card border-white/5 p-20 rounded-[80px] bg-gradient-to-br from-white/[0.03] to-transparent shadow-2xl relative overflow-hidden">
+           <div className="grid grid-cols-1 lg:grid-cols-2 gap-16 items-center">
+              <div className="space-y-8">
+                 <h2 className="text-3xl md:text-5xl font-black uppercase italic tracking-tighter text-white leading-none">Carga tu <span className="text-cyan-400">Material Pro</span></h2>
+                 <p className="text-gray-400 text-lg leading-relaxed font-light">
+                    Sube tu video o imagen clickable tras el pago. Incluye el enlace de destino para maximizar tu retorno de inversión.
+                 </p>
+                 <div className="flex flex-col gap-4">
+                    <div className="flex items-center gap-4 p-5 bg-white/5 rounded-3xl border border-white/10">
+                       <div className="w-10 h-10 rounded-2xl bg-cyan-400/10 flex items-center justify-center text-cyan-400"><Tv size={20} /></div>
+                       <div>
+                          <p className="text-[10px] font-black uppercase text-white">Soporte Multiformato</p>
+                          <p className="text-[9px] text-gray-500 uppercase font-bold tracking-widest tracking-tighter">MP4, GIF, PNG de Alta Fidelidad</p>
                        </div>
                     </div>
                  </div>
+              </div>
 
-                 <div className="p-12 bg-gradient-to-br from-cyan-400 to-purple-600 text-black rounded-[40px] flex flex-col items-center gap-6 text-center shadow-2xl relative overflow-hidden">
-                    <AnimatePresence mode="wait">
-                      {isUploading ? (
-                        <motion.div key="loader" initial={{opacity:0}} animate={{opacity:1}} exit={{opacity:0}} className="space-y-4">
-                           <Loader2 className="animate-spin mx-auto" size={40} />
-                           <p className="text-[10px] font-black uppercase">Procesando Multimedia ({uploadProgress}%)</p>
-                        </motion.div>
-                      ) : showSuccess ? (
-                        <motion.div key="success" initial={{opacity:0, scale:0.8}} animate={{opacity:1, scale:1}} className="space-y-4">
-                           <FileCheck className="mx-auto" size={40} />
-                           <p className="text-[10px] font-black uppercase text-black italic">¡Tu Anuncio está listo para emitir!</p>
-                        </motion.div>
-                      ) : (
-                        <>
-                          <UploadCloud size={40} className="animate-bounce" />
-                          <div>
-                             <h4 className="text-xl font-black uppercase italic leading-tight">Carga tu Video <br />o Arte Clickable</h4>
-                          </div>
-                          <button onClick={handleFileSelect} className="w-full py-5 bg-black text-white rounded-3xl text-[10px] font-black uppercase tracking-widest hover:scale-105 transition-all shadow-xl">
-                             SELECCIONAR ARCHIVOS
-                          </button>
-                        </>
-                      )}
-                    </AnimatePresence>
-                 </div>
+              <div className="p-12 bg-white text-black rounded-[50px] flex flex-col items-center gap-8 text-center shadow-[0_0_50px_rgba(255,255,255,0.1)] group">
+                 <AnimatePresence mode="wait">
+                    {isUploading ? (
+                      <motion.div key="l" initial={{opacity:0}} animate={{opacity:1}} className="space-y-4">
+                         <div className="w-20 h-2 bg-gray-200 rounded-full overflow-hidden mx-auto"><div className="h-full bg-cyan-500" style={{width: `${uploadProgress}%`}} /></div>
+                         <p className="text-[10px] font-black uppercase tracking-widest">Transmitiendo al Ecosistema...</p>
+                      </motion.div>
+                    ) : showSuccess ? (
+                      <motion.div key="s" initial={{scale:0.8}} animate={{scale:1}} className="space-y-4 text-green-600">
+                         <CheckCircle2 size={60} className="mx-auto" />
+                         <p className="text-xs font-black uppercase italic">Anuncio Configurado con Éxito</p>
+                      </motion.div>
+                    ) : (
+                      <>
+                        <UploadCloud size={60} className="text-gray-300 group-hover:text-cyan-500 transition-colors" />
+                        <h4 className="text-2xl font-black uppercase italic tracking-tighter">Subir Arte Clickable</h4>
+                        <button onClick={handleFileSelect} className="px-12 py-5 bg-black text-white rounded-full text-[11px] font-black uppercase tracking-[0.3em] hover:bg-cyan-500 transition-all shadow-xl">Seleccionar Archivos</button>
+                      </>
+                    )}
+                 </AnimatePresence>
               </div>
            </div>
         </div>
