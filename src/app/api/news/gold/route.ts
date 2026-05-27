@@ -53,6 +53,7 @@ export async function GET() {
             content: (item.contentSnippet || "Analizando el flujo de capital institucional y estrategias de arbitraje...").substring(0, 250) + "...",
             source: source.name,
             date: item.pubDate || new Date().toISOString(),
+            timestamp: item.pubDate ? new Date(item.pubDate).getTime() : Date.now(),
             category: "GOLD INTEL",
             image: getGoldRealImage(item.title || "")
           };

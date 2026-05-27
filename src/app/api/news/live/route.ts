@@ -66,6 +66,7 @@ export async function GET() {
         excerpt: (item.contentSnippet || "Analizando el impacto de esta creación en el ecosistema global...").substring(0, 250) + "...",
         author: item.source?.name || "HAWKIN Intelligence",
         date: item.pubDate ? getTimeAgo(item.pubDate) : "En Vivo",
+        timestamp: item.pubDate ? new Date(item.pubDate).getTime() : Date.now(), // Campo para ordenamiento
         image: getRealImage(item.title, category),
         url: item.link
       };

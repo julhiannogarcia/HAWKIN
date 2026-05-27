@@ -1,7 +1,7 @@
 'use client';
 
 import { motion, AnimatePresence } from 'framer-motion';
-import { useState, useRef, useEffect } from 'react';
+import { useState, useRef, useEffect, useMemo } from 'react';
 import Header from '@/components/Header';
 import Footer from '@/components/Footer';
 import GlobalTicker from '@/components/Ticker';
@@ -11,14 +11,64 @@ import {
   ExternalLink, Radio, Tv
 } from 'lucide-react';
 
+// =====================================================================
+// COMPONENTE DE BOTÓN DE PAYPAL (ULTRA-ESTABLE)
+// =====================================================================
+const PaypalButtonB2B = ({ placement, amount, currency, isPaypalLoaded }: { placement: any, amount: string, currency: string, isPaypalLoaded: boolean }) => {
+  const btnContainerRef = useRef<HTMLDivElement>(null);
+
+  useEffect(() => {
+    if (isPaypalLoaded && (window as any).paypal && btnContainerRef.current && placement) {
+      const container = btnContainerRef.current;
+      container.innerHTML = ''; 
+
+      try {
+        (window as any).paypal.Buttons({
+          style: { layout: 'vertical', color: 'gold', shape: 'rect', label: 'pay', height: 50 },
+          createOrder: (data: any, actions: any) => {
+            return actions.order.create({
+              purchase_units: [{
+                description: `HAWKIN B2B - ${placement.title}`,
+                amount: { currency_code: currency, value: amount }
+              }],
+              application_context: { 
+                shipping_preference: 'NO_SHIPPING',
+                brand_name: 'HAWKIN INTELLIGENCE'
+              }
+            });
+          },
+          onApprove: async (data: any, actions: any) => {
+            const order = await actions.order.capture();
+            alert(`¡Reserva Exitosa! Socio, tu espacio publicitario ha sido bloqueado. ID: ${order.id}`);
+            window.location.href = "/b2b?success=true";
+          },
+          onError: (err: any) => {
+            console.error("PayPal Error:", err);
+          }
+        }).render(container);
+      } catch (error) {
+        console.error("PayPal Render Error:", error);
+      }
+    }
+  }, [isPaypalLoaded, placement?.id, amount, currency]);
+
+  return <div ref={btnContainerRef} className="w-full min-h-[50px]" />;
+};
+
+// =====================================================================
+// COMPONENTE PRINCIPAL B2B
+// =====================================================================
 export default function B2BContent() {
   const [geoData, setGeoData] = useState<any>(null);
   const [isPaypalLoaded, setIsPaypalLoaded] = useState(false);
-  const [selectedPlacement, setSelectedPlacement] = useState<any>(null);
   const [isMounted, setIsMounted] = useState(false);
-  const paypalContainerRef = useRef<HTMLDivElement>(null);
+  
+  const [isUploading, setIsUploading] = useState(false);
+  const [uploadProgress, setUploadProgress] = useState(0);
+  const [showSuccess, setShowSuccess] = useState(false);
+  const fileInputRef = useRef<HTMLInputElement>(null);
 
-  const adPlacements = [
+  const adPlacements = useMemo(() => [
     { 
       id: 'live-stream-hero', 
       title: 'Plus: Streaming & Hero', 
@@ -46,75 +96,46 @@ export default function B2BContent() {
       placement: 'Entre noticias del Radar Global',
       features: ['Formato noticia integrada', 'Alta tasa de clics (CTR)', 'Ideal para lanzamientos']
     },
-  ];
+  ], []);
+
+  const [selectedPlacement, setSelectedPlacement] = useState(adPlacements[0]);
 
   useEffect(() => {
     setIsMounted(true);
-    setSelectedPlacement(adPlacements[0]);
     
     const fetchGeo = async () => {
       try {
         const res = await fetch('/api/geo');
+        if (!res.ok) throw new Error('API Error');
         const data = await res.json();
         setGeoData(data);
       } catch (e) {
-        setGeoData({ countryCode: 'US', currencySymbol: '$', currencyCode: 'USD', rate: 1, locale: 'en_US' });
+        setGeoData({ countryCode: 'US', currencySymbol: '$', currencyCode: 'USD', rate: 1, locale: 'en_US', currencyName: 'USD' });
       }
     };
     fetchGeo();
   }, []);
 
-  // MOTOR DE CARGA FORZADA DE PAYPAL
+  // MOTOR DE CARGA DE PAYPAL: Un solo intento estable
   useEffect(() => {
     if (!geoData || !isMounted) return;
 
     const clientId = 'ASALTTzsK9I-m087Qv64N3tPLr_HFAyDKhliwe1bbS';
     const currency = geoData.currencyCode || 'USD';
     const locale = geoData.locale || 'es_PE';
+    const scriptId = 'paypal-sdk-script';
 
-    // Inyectar el script de forma agresiva
-    const script = document.createElement('script');
-    script.src = `https://www.paypal.com/sdk/js?client-id=${clientId}&currency=${currency}&locale=${locale}&disable-funding=venmo`;
-    script.async = true;
-    script.onload = () => {
-      console.log("PayPal SDK Arrived");
+    if (!document.getElementById(scriptId)) {
+      const script = document.createElement('script');
+      script.id = scriptId;
+      script.src = `https://www.paypal.com/sdk/js?client-id=${clientId}&currency=${currency}&locale=${locale}`;
+      script.async = true;
+      script.onload = () => setIsPaypalLoaded(true);
+      document.body.appendChild(script);
+    } else if ((window as any).paypal) {
       setIsPaypalLoaded(true);
-    };
-    document.body.appendChild(script);
-
-    return () => {
-      document.body.removeChild(script);
-    };
-  }, [geoData, isMounted]);
-
-  // RENDERIZADOR DE BOTONES
-  useEffect(() => {
-    if (isPaypalLoaded && (window as any).paypal && paypalContainerRef.current && selectedPlacement) {
-      const container = paypalContainerRef.current;
-      container.innerHTML = ''; // Limpiar para evitar duplicados
-
-      (window as any).paypal.Buttons({
-        style: { layout: 'vertical', color: 'gold', shape: 'rect', label: 'pay', height: 50 },
-        createOrder: (data: any, actions: any) => {
-          return actions.order.create({
-            purchase_units: [{
-              description: `HAWKIN B2B - ${selectedPlacement.title}`,
-              amount: { 
-                currency_code: geoData.currencyCode || 'USD', 
-                value: (selectedPlacement.price * (geoData.rate || 1)).toFixed(2) 
-              }
-            }],
-            application_context: { shipping_preference: 'NO_SHIPPING' }
-          });
-        },
-        onApprove: async (data: any, actions: any) => {
-          const order = await actions.order.capture();
-          alert(`¡Reserva Exitosa! Socio, tu espacio publicitario ha sido bloqueado. ID: ${order.id}`);
-          window.location.href = "/b2b?success=true";
-        }
-      }).render(container);
     }
-  }, [isPaypalLoaded, selectedPlacement, geoData]);
+  }, [geoData, isMounted]);
 
   if (!isMounted) return null;
 
@@ -130,6 +151,8 @@ export default function B2BContent() {
     }, 100);
   };
 
+  const currentPrice = ((selectedPlacement?.price || 0) * (geoData?.rate || 1)).toFixed(2);
+
   return (
     <div className="flex-1 flex flex-col items-center w-full min-h-screen bg-black overflow-x-hidden">
       <Header />
@@ -139,7 +162,7 @@ export default function B2BContent() {
         <section className="text-center space-y-8 mb-32">
           <span className="text-cyan-400 font-black uppercase tracking-[0.4em] text-[10px]">HAWKIN GLOBAL MEDIA</span>
           <h1 className="text-6xl md:text-8xl font-black tracking-tighter leading-none italic text-white">
-            Domina el <span className="bg-gradient-to-r from-cyan-400 to-purple-600 bg-clip-text text-transparent uppercase">Mercado.</span>
+            Poder <span className="bg-gradient-to-r from-cyan-400 to-purple-600 bg-clip-text text-transparent uppercase">Comercial.</span>
           </h1>
           <p className="text-gray-400 text-xl max-w-2xl mx-auto font-light leading-relaxed">
             Publicidad inteligente con moneda local automática por IP. Pago en un solo clic.
@@ -151,10 +174,10 @@ export default function B2BContent() {
               <h2 className="text-4xl font-black uppercase italic tracking-tighter text-white">Consola de <span className="text-cyan-400">Impacto Global</span></h2>
               <div className="flex items-center justify-center gap-4">
                  <span className="bg-cyan-500/10 text-cyan-400 px-4 py-1 rounded-full text-[10px] font-black uppercase tracking-widest border border-cyan-400/20">
-                   IP Detectada: {geoData?.countryCode || 'Sincronizando...'}
+                   IP Detectada: {geoData?.countryCode || 'PE'}
                  </span>
                  <span className="bg-white/5 text-gray-500 px-4 py-1 rounded-full text-[10px] font-black uppercase tracking-widest">
-                   Moneda: {geoData?.currencyName || 'Cargando...'}
+                   Moneda: {geoData?.currencyName || 'Soles'}
                  </span>
               </div>
            </div>
@@ -178,8 +201,7 @@ export default function B2BContent() {
                              </div>
                           </div>
                           <div className="text-right">
-                             <p className="text-2xl font-black text-white">{geoData?.currencySymbol || '$'}{(ad.price * (geoData?.rate || 1)).toFixed(0)}</p>
-                             <p className="text-[7px] text-gray-500 font-black uppercase">Precio en {geoData?.currencyName || 'USD'}</p>
+                             <p className="text-2xl font-black text-white">{geoData?.currencySymbol || 'S/'}{(ad.price * (geoData?.rate || 3.82)).toFixed(0)}</p>
                           </div>
                        </div>
                     </button>
@@ -218,7 +240,7 @@ export default function B2BContent() {
                           <h5 className="text-lg font-bold text-cyan-400 uppercase italic underline">{selectedPlacement?.placement}</h5>
                        </div>
                        <div className="text-right hidden sm:block">
-                          <p className="text-2xl font-black text-white">{geoData?.currencySymbol || '$'}{((selectedPlacement?.price || 0) * (geoData?.rate || 1)).toFixed(0)}</p>
+                          <p className="text-2xl font-black text-white">{geoData?.currencySymbol || 'S/'}{currentPrice}</p>
                        </div>
                     </div>
                     
@@ -229,7 +251,12 @@ export default function B2BContent() {
                             <p className="text-[10px] font-black text-gray-600 uppercase tracking-[0.3em] animate-pulse">Sincronizando Pasarela Global...</p>
                          </div>
                        ) : (
-                         <div ref={paypalContainerRef} className="w-full" />
+                         <PaypalButtonB2B 
+                            placement={selectedPlacement} 
+                            amount={currentPrice} 
+                            currency={geoData?.currencyCode || 'USD'}
+                            isPaypalLoaded={isPaypalLoaded}
+                         />
                        )}
                     </div>
                     <p className="text-center text-[8px] font-black text-gray-700 uppercase tracking-[0.3em]">Pago seguro HAWKIN • PayPal & Tarjetas</p>

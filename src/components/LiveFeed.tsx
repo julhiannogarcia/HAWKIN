@@ -36,9 +36,9 @@ export default function LiveFeed() {
     return () => clearInterval(interval);
   }, []);
 
-  // Unificamos las noticias del radar general para la pestaña Radar
+  // Unificamos las noticias del radar general para la pestaña Radar usando el timestamp numérico
   const radarItems = [...data.news, ...data.hardware, ...data.shield].sort((a, b) => 
-    new Date(b.date).getTime() - new Date(a.date).getTime()
+    (b.timestamp || 0) - (a.timestamp || 0)
   );
 
   const currentItems = activeTab === 'radar' ? radarItems : goldNews;
