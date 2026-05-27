@@ -14,12 +14,12 @@ export default function Header() {
 
   const navLinks = [
     { name: 'Inicio', href: '/' },
-    { name: 'Radar', href: '/#news' },
+    { name: 'Radar', href: '/#news', special: true, color: 'text-cyan-400' }, 
     { name: 'Academia', href: '/academy' },
-    { name: 'Shield', href: '/shield' },
-    { name: 'Donación', href: '/donacion', special: true, color: 'text-pink-500' }, // Nombre cambiado y color distintivo
+    { name: 'Shield', href: '/shield', special: true, color: 'text-purple-500' },
+    { name: 'Donación', href: '/donacion', special: true, color: 'text-pink-500' }, 
     { name: 'B2B', href: '/b2b' },
-    { name: 'GOLD', href: '/gold', special: true, color: 'text-[#FFD700]' },
+    { name: 'Trading', href: '/gold', special: true, color: 'text-[#FFD700]' },
     { name: 'Contacto', href: '/contacto' },
   ];
 
