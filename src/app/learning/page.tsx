@@ -13,6 +13,7 @@ import {
 } from 'lucide-react';
 
 export default function LearningPage() {
+  const [isMounted, setIsMounted] = useState(false);
   const [activeDay, setActiveDay] = useState<Day>(COURSE_CURRICULUM[0]);
   const [activeModule, setActiveModule] = useState<Module | null>(null);
   const [currentStepIndex, setCurrentStepIndex] = useState(0);
@@ -21,8 +22,9 @@ export default function LearningPage() {
   const [showFeedback, setShowFeedback] = useState<'correct' | 'wrong' | null>(null);
   const [xp, setXp] = useState(1250); // Simulación de progreso real
 
-  const currentLesson = activeModule?.lessons[0];
-  const currentStep = currentLesson?.steps[currentStepIndex];
+  useEffect(() => {
+    setIsMounted(true);
+  }, []);
 
   useEffect(() => {
     if (activeModule && currentStep) {
@@ -30,7 +32,18 @@ export default function LearningPage() {
       setShowFeedback(null);
       setWritingInput('');
     }
-  }, [currentStepIndex, activeModule, currentStep]);
+  }, [currentStepIndex, activeModule]);
+
+  if (!isMounted) return null;
+
+  const currentLesson = activeModule?.lessons[0];
+  const currentStep = currentLesson?.steps[currentStepIndex];
+
+  const handleModuleSelect = (mod: Module) => {
+    setActiveModule(mod);
+    setCurrentStepIndex(0);
+    setView('lesson');
+  };
 
   const handleNext = () => {
     if (!currentLesson) return;
