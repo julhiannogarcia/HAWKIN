@@ -35,11 +35,11 @@ const courses = [
     color: 'from-green-500/20'
   },
   {
-    id: 'inclusion-autismo',
+    id: 'inclusion', // Cambiado para apuntar a /inclusion
     title: 'HAWKIN Inclusion: Estimulación Profesional (TEA)',
     category: 'Inclusión Social',
     price: '$0 (Acceso Socios)',
-    duration: 'Próximamente',
+    duration: 'Ilimitada (Fases)',
     image: '🧩',
     color: 'from-blue-500/20'
   }
@@ -93,9 +93,9 @@ export default function AcademyPage() {
               </div>
 
               <div className="mt-12 flex gap-4">
-                <Link href={course.id === 'learning' ? '/learning' : `/academy/${course.id}`} className="flex-1">
+                <Link href={course.id === 'learning' ? '/learning' : course.id === 'inclusion' ? '/inclusion' : `/academy/${course.id}`} className="flex-1">
                   <button className="w-full py-4 rounded-2xl bg-white text-black font-black uppercase tracking-widest text-[10px] hover:bg-cyan-400 transition-colors">
-                    {course.id === 'inclusion-autismo' ? 'Ver Detalles' : 'Acceder al Curso'}
+                    {course.id === 'inclusion' ? 'Iniciar Sesión Segura' : 'Acceder al Curso'}
                   </button>
                 </Link>
                 <button className="px-6 py-4 rounded-2xl bg-white/5 border border-white/10 text-white font-black uppercase tracking-widest text-[10px] hover:bg-white/10 transition-colors">
