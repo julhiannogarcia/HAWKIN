@@ -5,7 +5,7 @@ export async function GET(req: Request) {
   
   // Mapeo de monedas, tasas y locales
   const currencies: Record<string, { symbol: string, rate: number, name: string, code: string, locale: string }> = {
-    'PE': { symbol: 'S/', rate: 3.82, name: 'Soles', code: 'USD', locale: 'es_ES' }, // Usamos USD para cobro PayPal pero mostramos S/
+    'PE': { symbol: 'S/', rate: 3.82, name: 'Soles', code: 'PEN', locale: 'es_PE' }, 
     'VE': { symbol: 'Bs', rate: 36.5, name: 'Bolívares', code: 'USD', locale: 'es_ES' },
     'MX': { symbol: '$', rate: 18.1, name: 'Pesos MXN', code: 'MXN', locale: 'es_MX' },
     'ES': { symbol: '€', rate: 0.92, name: 'Euros', code: 'EUR', locale: 'es_ES' },

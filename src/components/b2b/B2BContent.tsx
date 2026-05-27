@@ -29,7 +29,7 @@ const PaypalButtonB2B = ({ placement, amount, currency, isPaypalLoaded }: { plac
             layout: 'vertical', 
             color: 'gold', 
             shape: 'rect', 
-            label: 'pay', 
+            label: 'checkout', 
             height: 50 
           },
           createOrder: (data: any, actions: any) => {
@@ -123,15 +123,15 @@ export default function B2BContent() {
     fetchGeo();
   }, []);
 
-  // 2. Verificar disponibilidad de PayPal si el script ya cargó
+  // 2. Corazón de sincronización de PayPal
   useEffect(() => {
-    const checkPaypal = setInterval(() => {
+    const timer = setInterval(() => {
       if ((window as any).paypal) {
         setIsPaypalLoaded(true);
-        clearInterval(checkPaypal);
+        clearInterval(timer);
       }
     }, 500);
-    return () => clearInterval(checkPaypal);
+    return () => clearInterval(timer);
   }, []);
 
   const handleFileSelect = () => fileInputRef.current?.click();
@@ -163,16 +163,16 @@ export default function B2BContent() {
   const payPalLocale = geoData?.locale || 'en_US';
 
   return (
-    <div className="flex-1 flex flex-col items-center">
+    <div className="flex-1 flex flex-col items-center w-full min-h-screen bg-black overflow-x-hidden">
       <Header />
       
-      {/* Script de PayPal con carga forzada y sin restricciones de pago */}
+      {/* Script de PayPal con estrategia forzada */}
       {geoData && (
         <Script 
           id="paypal-sdk-b2b"
-          src={`https://www.paypal.com/sdk/js?client-id=${clientId}&currency=${payPalCurrency}&locale=${payPalLocale}&enable-funding=paylater,venmo`}
+          src={`https://www.paypal.com/sdk/js?client-id=${clientId}&currency=${payPalCurrency}&locale=${payPalLocale}`}
+          strategy="lazyOnload"
           onLoad={() => setIsPaypalLoaded(true)}
-          strategy="afterInteractive"
         />
       )}
 
@@ -181,12 +181,12 @@ export default function B2BContent() {
       <div className="max-w-6xl mx-auto px-6 pt-40 pb-32 w-full">
         {/* HERO */}
         <section className="text-center space-y-8 mb-32">
-          <span className="text-cyan-400 font-black uppercase tracking-[0.4em] text-[10px]">HAWKIN GLOBAL MEDIA</span>
+          <span className="text-cyan-400 font-black uppercase tracking-[0.4em] text-[10px]">HAWKIN MEDIA & ADS</span>
           <h1 className="text-6xl md:text-8xl font-black tracking-tighter leading-none italic text-white text-center">
             Poder <span className="bg-gradient-to-r from-cyan-400 to-purple-600 bg-clip-text text-transparent uppercase">Comercial.</span>
           </h1>
           <p className="text-gray-400 text-xl max-w-2xl mx-auto font-light leading-relaxed text-center">
-            Pauta inteligente con localización automática. Tu marca en el corazón de la IA.
+            Streaming en vivo y anuncios inteligentes que se mueven con la IP del cliente.
           </p>
           <div className="flex flex-col md:flex-row justify-center gap-6 pt-12">
              <button onClick={() => document.getElementById('previsualizador')?.scrollIntoView({behavior: 'smooth'})} className="btn-glow text-[10px] py-6 px-16 uppercase">
@@ -203,7 +203,7 @@ export default function B2BContent() {
            <div className="text-center space-y-4">
               <h2 className="text-4xl md:text-6xl font-black uppercase italic tracking-tighter text-white line-none text-center">Consola de <span className="text-cyan-400 uppercase">Impacto Global</span></h2>
               <p className="text-gray-600 uppercase font-black text-[10px] tracking-widest flex items-center justify-center gap-2">
-                 <Globe size={14} /> Localización Detectada: {geoData?.countryCode || 'Sincronizando...'} | Moneda: {geoData?.currencyName || '...'}
+                 <Globe size={14} /> Localización: {geoData?.countryCode || 'Sincronizando...'} | {geoData?.currencyName || '...'}
               </p>
            </div>
 
@@ -230,16 +230,6 @@ export default function B2BContent() {
                              <p className="text-2xl font-black text-white">{geoData?.currencySymbol || '$'}{(ad.price * (geoData?.rate || 1)).toFixed(0)}</p>
                           </div>
                        </div>
-                       
-                       {selectedPlacement.id === ad.id && (
-                         <motion.ul initial={{opacity:0, y: -10}} animate={{opacity:1, y: 0}} className="pl-20 space-y-2">
-                            {ad.features.map((f, i) => (
-                              <li key={i} className="flex items-center gap-3 text-[9px] font-bold text-gray-400 uppercase tracking-widest">
-                                 <CheckCircle2 size={10} className="text-cyan-400" /> {f}
-                              </li>
-                            ))}
-                         </motion.ul>
-                       )}
                     </button>
                  ))}
               </div>
@@ -258,7 +248,7 @@ export default function B2BContent() {
                             </div>
                             <Play size={40} className="text-white fill-white absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2" />
                             <div className="absolute bottom-4 right-4 flex items-center gap-2 bg-cyan-500 text-black px-4 py-2 rounded-xl font-black text-[9px] uppercase shadow-xl">
-                               <ExternalLink size={12} /> Visitar Web
+                               <ExternalLink size={12} /> Clickable Ad
                             </div>
                          </div>
                        ) : (
@@ -283,7 +273,7 @@ export default function B2BContent() {
                        {!isPaypalLoaded ? (
                          <div className="flex flex-col items-center gap-4 text-center">
                             <Loader2 className="animate-spin text-cyan-400" size={32} />
-                            <p className="text-[9px] font-black text-gray-600 uppercase tracking-[0.3em] animate-pulse">Detectando Moneda por IP...</p>
+                            <p className="text-[9px] font-black text-gray-600 uppercase tracking-[0.3em] animate-pulse text-center">Finalizando Sincronización Global...</p>
                          </div>
                        ) : (
                          <PaypalButtonB2B 
@@ -314,7 +304,7 @@ export default function B2BContent() {
                     {isUploading ? (
                       <motion.div key="l" initial={{opacity:0}} animate={{opacity:1}} className="space-y-4">
                          <div className="w-20 h-2 bg-gray-200 rounded-full overflow-hidden mx-auto"><div className="h-full bg-cyan-500" style={{width: `${uploadProgress}%`}} /></div>
-                         <p className="text-[10px] font-black uppercase tracking-widest">Sincronizando con el Satélite...</p>
+                         <p className="text-[10px] font-black uppercase tracking-widest">Subiendo al Satélite...</p>
                       </motion.div>
                     ) : showSuccess ? (
                       <motion.div key="s" initial={{scale:0.8}} animate={{scale:1}} className="space-y-4 text-green-600">
