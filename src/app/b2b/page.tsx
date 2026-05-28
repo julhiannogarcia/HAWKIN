@@ -1,64 +1,55 @@
 'use client';
 
-import React, { useState, useEffect, useRef, useMemo } from 'react';
+import React, { useState, useEffect, useRef } from 'react';
 import Header from '@/components/Header';
 import Footer from '@/components/Footer';
 import GlobalTicker from '@/components/Ticker';
 import { 
   ShieldCheck, Loader2, MessageCircle, Radio, 
-  Layout, ShoppingBag, Target, Tv, Eye, ExternalLink, RefreshCw
+  Layout, ShoppingBag, Target, Tv, Eye, ExternalLink 
 } from 'lucide-react';
 
 // =====================================================================
-// PÁGINA B2B v27.0 - SOLUCIÓN DE INGENIERÍA FINAL
+// PÁGINA B2B v28.0 - REINSTALACIÓN TOTAL (EXTREMA SIMPLICIDAD)
 // =====================================================================
 export default function B2BPage() {
   const [isMounted, setIsMounted] = useState(false);
   const [isPaypalReady, setIsPaypalReady] = useState(false);
   const [selectedId, setSelectedId] = useState('plus');
-  const [geoData, setGeoData] = useState<any>({ countryCode: 'PE', currencySymbol: 'S/', rate: 3.82 });
   const paypalRef = useRef<HTMLDivElement>(null);
 
-  const AD_PLANS = useMemo(() => [
-    { id: 'plus', title: 'Plus Streaming & Hero', pricePEN: 999, priceUSD: "262.00", placement: 'Banner Principal + Live', icon: <Radio className="text-blue-400" /> },
-    { id: 'sidebar', title: 'Sidebar Académica', pricePEN: 699, priceUSD: "183.00", placement: 'Lateral de Cursos', icon: <Layout className="text-blue-300" /> },
-    { id: 'native', title: 'Pauta Nativa Radar', pricePEN: 399, priceUSD: "105.00", placement: 'Entre Noticias', icon: <ShoppingBag className="text-blue-200" /> },
-  ], []);
+  const AD_PLANS = [
+    { id: 'plus', title: 'Plus Streaming & Hero', pricePEN: 999, priceUSD: "262.00", placement: 'Banner Principal + Live' },
+    { id: 'sidebar', title: 'Sidebar Académica', pricePEN: 699, priceUSD: "183.00", placement: 'Lateral de Cursos' },
+    { id: 'native', title: 'Pauta Nativa Radar', pricePEN: 399, priceUSD: "105.00", placement: 'Entre Noticias' },
+  ];
 
   const selectedPlacement = AD_PLANS.find(p => p.id === selectedId) || AD_PLANS[0];
 
-  // 1. CARGADOR MAESTRO (CON CLAVE DE 80 CARACTERES CORREGIDA)
-  const initPayPal = () => {
-    // ESTA ES LA CLAVE EXACTA RECUPERADA DE LOGS CON LA 'h' INCLUIDA
-    const REAL_CLIENT_ID = 'ASALTTzsK9I-m087Qv64N3tPLr_HFAyDKhliwE1bbS33tyoI2QT6Dak6VhvUFdv8fenAfboNfcrs7xas';
-    const scriptId = 'paypal-ultimate-v27';
-
-    if (document.getElementById(scriptId)) {
-      if ((window as any).paypal) setIsPaypalReady(true);
-      return;
-    }
-
-    const script = document.createElement('script');
-    script.id = scriptId;
-    script.src = `https://www.paypal.com/sdk/js?client-id=${REAL_CLIENT_ID}&currency=USD&locale=es_PE&disable-funding=venmo&v=${Date.now()}`;
-    script.async = true;
-    script.onload = () => {
-      console.log("PayPal SDK v27.0 Ready");
-      setIsPaypalReady(true);
-    };
-    script.onerror = () => {
-      console.error("PayPal load failed");
-      alert("Error de conexión con PayPal. Por favor, revisa tu internet.");
-    };
-    document.head.appendChild(script);
-  };
-
   useEffect(() => {
     setIsMounted(true);
-    initPayPal();
+
+    // CLIENT ID REAL DE 80 CARACTERES (RECUPERADO Y VERIFICADO)
+    const CLIENT_ID = 'ASALTTzsK9I-m087Qv64N3tPLr_HFAyDKhliwE1bbS33tyoI2QT6Dak6VhvUFdv8fenAfboNfcrs7xas';
+    const scriptId = 'paypal-v28-master';
+
+    if (!document.getElementById(scriptId)) {
+      const script = document.createElement('script');
+      script.id = scriptId;
+      // Usamos USD internamente para que PayPal NO BLOQUEE LA CARGA
+      script.src = `https://www.paypal.com/sdk/js?client-id=${CLIENT_ID}&currency=USD&locale=es_PE`;
+      script.async = true;
+      script.onload = () => {
+        console.log("PayPal v28 Ready");
+        setIsPaypalReady(true);
+      };
+      document.body.appendChild(script);
+    } else if ((window as any).paypal) {
+      setIsPaypalReady(true);
+    }
   }, []);
 
-  // 2. RENDERIZADOR DE BOTONES (INDELIBLE)
+  // RENDERIZADOR DE BOTONES (INDELIBLE)
   useEffect(() => {
     if (isPaypalReady && (window as any).paypal && paypalRef.current && isMounted) {
       const container = paypalRef.current;
@@ -78,30 +69,30 @@ export default function B2BPage() {
           },
           onApprove: async (data: any, actions: any) => {
             const order = await actions.order.capture();
-            window.location.href = `/b2b?success=true&id=${order.id}`;
+            window.location.href = "/b2b?success=true";
           }
         }).render(container);
       } catch (e) {
-        console.error("Buttons error", e);
+        console.error("PayPal UI Error", e);
       }
     }
   }, [isPaypalReady, selectedId, isMounted, selectedPlacement]);
 
-  if (!isMounted) return null;
+  if (!isMounted) return <div className="min-h-screen bg-black" />;
 
   return (
     <div className="min-h-screen bg-black text-white font-sans overflow-x-hidden flex flex-col">
       <Header />
       
       <div className="max-w-6xl mx-auto px-6 pt-40 pb-32 w-full flex-1">
-        {/* TITULACIÓN */}
-        <section className="text-center space-y-8 mb-32">
-          <span className="text-blue-500 font-black uppercase tracking-[0.4em] text-[10px]">HAWKIN GLOBAL MEDIA • SISTEMA v27.0</span>
+        {/* TITULACIÓN PRO */}
+        <section className="text-center space-y-8 mb-24">
+          <span className="text-blue-500 font-black uppercase tracking-[0.4em] text-[10px]">HAWKIN GLOBAL MEDIA • SISTEMA v28.0</span>
           <h1 className="text-6xl md:text-8xl font-black tracking-tighter leading-none italic uppercase text-center">
             Poder <span className="text-white border-b-8 border-blue-600">Comercial.</span>
           </h1>
           <p className="text-gray-500 text-xl max-w-2xl mx-auto font-light leading-relaxed text-center">
-             Si todavía no ves el botón, presiona **SHIFT + ACTUALIZAR** para cargar la versión v27.0.
+             Activación de pauta publicitaria. Cobro localizado y activación inmediata.
           </p>
         </section>
 
@@ -117,7 +108,7 @@ export default function B2BPage() {
                 >
                    <div className="flex items-center gap-6">
                       <div className={`w-12 h-12 rounded-full flex items-center justify-center ${selectedId === ad.id ? 'bg-blue-500 text-black' : 'bg-white/5 text-gray-500'}`}>
-                         {ad.icon}
+                         {ad.id === 'plus' ? <Radio size={24} /> : ad.id === 'sidebar' ? <Layout size={24} /> : <ShoppingBag size={24} />}
                       </div>
                       <div>
                          <p className="text-xl font-bold uppercase italic leading-none">{ad.title}</p>
@@ -135,21 +126,18 @@ export default function B2BPage() {
               
               <div className="space-y-4 relative z-10 text-center md:text-left">
                  <p className="text-[10px] font-black text-gray-400 uppercase tracking-widest leading-none">Reserva Confirmada:</p>
-                 <h4 className="text-3xl font-black uppercase italic text-blue-600 leading-tight">{selectedPlacement.title}</h4>
+                 <h4 className="text-3xl font-black uppercase italic leading-tight text-blue-600">{selectedPlacement.title}</h4>
                  <p className="text-5xl font-black text-black mt-8 leading-none">
                     S/{selectedPlacement.pricePEN}
                  </p>
-                 <p className="text-[8px] text-gray-400 font-bold uppercase tracking-widest">Cobro en Soles Sincronizado vía PayPal</p>
+                 <p className="text-[8px] text-gray-400 font-bold uppercase tracking-widest mt-2">Sincronizado vía PayPal Global</p>
               </div>
 
               <div className="min-h-[140px] flex flex-col items-center justify-center w-full relative pt-8 border-t border-gray-100">
                  {!isPaypalReady ? (
                    <div className="flex flex-col items-center gap-6">
                       <Loader2 className="animate-spin text-blue-600" size={50} />
-                      <p className="text-[10px] font-black text-gray-400 uppercase tracking-[0.4em] animate-pulse">AUTENTICANDO v27.0...</p>
-                      <button onClick={initPayPal} className="mt-4 flex items-center gap-2 text-[9px] font-black text-blue-600 uppercase hover:underline">
-                         <RefreshCw size={12} /> Forzar Activación
-                      </button>
+                      <p className="text-[10px] font-black text-gray-400 uppercase tracking-[0.4em] animate-pulse">SISTEMA REINSTALANDO v28.0...</p>
                    </div>
                  ) : (
                    <div ref={paypalRef} className="w-full" />
@@ -157,7 +145,7 @@ export default function B2BPage() {
               </div>
               
               <div className="pt-6 text-center">
-                 <p className="text-[7px] text-gray-400 font-black uppercase tracking-[0.3em]">Débito Seguro • HAWKIN B2B GLOBAL NETWORK</p>
+                 <p className="text-[7px] text-gray-400 font-black uppercase tracking-[0.3em]">Débito Seguro • HAWKIN B2B NETWORK</p>
                  <button 
                   onClick={() => window.open('https://wa.me/519XXXXXXXX', '_blank')}
                   className="mt-6 w-full py-4 bg-green-600 hover:bg-green-500 text-white rounded-2xl font-black uppercase tracking-widest text-[10px] flex items-center justify-center gap-2 transition-all shadow-xl"
