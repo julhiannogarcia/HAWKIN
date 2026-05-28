@@ -92,24 +92,12 @@ export default function B2BPage() {
       <Header />
       
       <div className="max-w-6xl mx-auto px-6 pt-40 pb-32 w-full flex-1">
-        {/* AVISO DE VERSIÓN CRÍTICO (SI NO VES ESTO EN ROJO, SIGUES EN LA VERSIÓN VIEJA) */}
-        <div className="mb-12 bg-red-600 border border-red-500 p-6 rounded-[30px] flex items-center justify-between shadow-[0_0_50px_rgba(220,38,38,0.2)]">
-           <div className="flex items-center gap-4">
-              <AlertCircle className="text-white animate-bounce" size={32} />
-              <div>
-                 <p className="text-sm font-black uppercase tracking-widest text-white leading-none">SISTEMA v32.0 ACTIVADO</p>
-                 <p className="text-[10px] font-bold text-red-100 mt-1 uppercase">PAGOS Y VIDEOS ONLINE</p>
-              </div>
-           </div>
-           <p className="hidden md:block text-[9px] font-black text-white/60 uppercase max-w-[200px] text-right">SI VES V24.0 PRESIONA SHIFT + REFRESCAR</p>
-        </div>
-
         <section className="text-center space-y-8 mb-40">
           <h1 className="text-6xl md:text-9xl font-black tracking-tighter leading-none italic uppercase text-center">
             Poder <span className="bg-gradient-to-r from-blue-400 to-blue-600 bg-clip-text text-transparent">Comercial.</span>
           </h1>
           <p className="text-gray-400 text-xl max-w-3xl mx-auto font-light leading-relaxed">
-             Visualiza tu marca y activa tu pauta al instante. 
+             Visualiza tu marca y activa tu pauta publicitaria al instante. 
              Localización total por IP y cobro express garantizado.
           </p>
         </section>
