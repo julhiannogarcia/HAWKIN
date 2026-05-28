@@ -60,7 +60,7 @@ export default function Pricing() {
     fetchGeo();
 
     // 2. Cargar el SDK de PayPal de forma SEGURA
-    const clientId = process.env.NEXT_PUBLIC_PAYPAL_CLIENT_ID || 'test';
+    const clientId = process.env.NEXT_PUBLIC_PAYPAL_CLIENT_ID || 'ASALTTzsK9I-m087Qv64N3tPLr_HFAyDKliwE1bbS33tyoI2QT6Dak6VhvUFdv8fenAfboNfcrs7xas';
     if (!document.getElementById('paypal-sdk')) {
       const script = document.createElement('script');
       script.id = 'paypal-sdk';

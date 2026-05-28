@@ -1,11 +1,11 @@
 'use client';
 
-// HAWKIN GOLD v4.7 - REPARACIÓN FINAL DE IMPORTACIÓN
+// HAWKIN GOLD v4.8 - REPARACIÓN DE ESTABILIDAD Y FECHAS
 import { motion, AnimatePresence } from 'framer-motion';
 import { useState, useEffect } from 'react';
 import Header from '@/components/Header';
 import Footer from '@/components/Footer';
-import GlobalTicker from '@/components/Ticker'; // Usamos el alias oficial
+import GlobalTicker from '@/components/Ticker';
 import TickerTapeWidget from '@/components/TickerTapeWidget';
 import TradingViewWidget from '@/components/TradingViewWidget';
 import TechnicalGaugeWidget from '@/components/TechnicalGaugeWidget';
@@ -15,36 +15,54 @@ import CryptoHeatMapWidget from '@/components/CryptoHeatMapWidget';
 import { Activity, ShieldCheck, Zap, Globe, Clock, Bell, BellRing, Loader2, BarChart3, TrendingUp, LayoutGrid, Radio, ExternalLink, Info } from 'lucide-react';
 
 export default function GoldPage() {
+  const [isMounted, setIsMounted] = useState(false);
   const [news, setNews] = useState<any[]>([]);
   const [insights, setInsights] = useState<any[]>([]);
   const [loading, setLoading] = useState(true);
   const [isAlertActive, setIsAlertActive] = useState(false);
-  const [showNotification, setShowSuccess] = useState(false);
+  const [showNotification, setShowNotification] = useState(false);
   const [isConnecting, setIsConnecting] = useState(false);
 
   useEffect(() => {
+    setIsMounted(true);
     const loadGoldData = async () => {
       try {
         const res = await fetch('/api/news/gold');
         const data = await res.json();
         setNews(data.news || []);
         setInsights(data.insights || []);
-        setLoading(false);
       } catch (e) {
         console.error("Error loading Gold news", e);
+      } finally {
+        setLoading(false);
       }
     };
     loadGoldData();
   }, []);
+
+  if (!isMounted) return (
+    <div className="min-h-screen bg-black flex items-center justify-center">
+      <Loader2 className="animate-spin text-[#FFD700]" size={40} />
+    </div>
+  );
 
   const handleActivateAlerts = () => {
     setIsConnecting(true);
     setTimeout(() => {
       setIsConnecting(false);
       setIsAlertActive(true);
-      setShowSuccess(true);
-      setTimeout(() => setShowSuccess(false), 5000);
+      setShowNotification(true);
+      setTimeout(() => setShowNotification(false), 5000);
     }, 2000);
+  };
+
+  const formatTime = (dateStr: string) => {
+    try {
+      const d = new Date(dateStr);
+      return isNaN(d.getTime()) ? "Recién lanzado" : d.toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' });
+    } catch (e) {
+      return "En vivo";
+    }
   };
 
   return (
@@ -98,14 +116,12 @@ export default function GoldPage() {
           </button>
         </header>
 
-        {/* --- NIVEL 1: TRADING Y SEÑALES --- */}
         <div className="grid grid-cols-1 lg:grid-cols-12 gap-8 mb-8">
            <div className="lg:col-span-8 glass-card bg-black border-white/10 rounded-[60px] overflow-hidden h-[850px] shadow-[0_60px_120px_rgba(0,0,0,1)] relative">
               <TradingViewWidget />
            </div>
 
            <div className="lg:col-span-4 space-y-8">
-              {/* PANEL DE AYUDA EN INVERSIÓN (RECOMENDACIONES) */}
               <div className="glass-card bg-white/[0.02] border-[#FFD700]/20 p-10 rounded-[60px] flex flex-col justify-between shadow-2xl relative overflow-hidden group">
                  <div className="absolute top-0 right-0 p-4 opacity-5">
                     <TrendingUp size={150} />
@@ -141,7 +157,6 @@ export default function GoldPage() {
            </div>
         </div>
 
-        {/* --- NIVEL 2: NOTICIAS MASIVAS (MÁXIMO ENFOQUE) --- */}
         <div className="space-y-8 mb-20">
            <div className="flex items-center gap-4">
               <div className="w-4 h-4 bg-[#FFD700] rounded-full" />
@@ -161,10 +176,10 @@ export default function GoldPage() {
                     <div>
                        <div className="flex justify-between items-start mb-8">
                           <span className="text-[9px] font-black text-[#FFD700] border border-[#FFD700]/30 px-4 py-1.5 rounded-full uppercase tracking-widest">{item.source}</span>
-                          <span className="text-[9px] font-bold text-gray-600 uppercase italic">{new Date(item.date).toLocaleTimeString()}</span>
+                          <span className="text-[9px] font-bold text-gray-600 uppercase italic">{formatTime(item.date)}</span>
                        </div>
                        <h3 className="text-xl font-black leading-tight group-hover:text-[#FFD700] transition-colors mb-6">{item.title}</h3>
-                       <p className="text-gray-500 text-xs leading-relaxed mb-10 line-clamp-3">{item.content}</p>
+                       <p className="text-gray-500 text-xs leading-relaxed mb-10 line-clamp-3">{item.excerpt || item.content}</p>
                     </div>
                     <a href={item.link} target="_blank" className="p-4 bg-white/5 rounded-2xl text-[9px] font-black uppercase text-gray-400 hover:bg-[#FFD700] hover:text-black transition-all flex items-center justify-center gap-3">
                        Analizar Datos <ExternalLink size={12} />
@@ -175,7 +190,6 @@ export default function GoldPage() {
            )}
         </div>
 
-        {/* --- NIVEL 3: MAPA DE CALOR Y MERCADOS --- */}
         <div className="grid grid-cols-1 lg:grid-cols-12 gap-8">
            <div className="lg:col-span-6 glass-card bg-black border-white/5 rounded-[60px] overflow-hidden h-[600px] shadow-2xl">
               <div className="p-10 border-b border-white/5 flex items-center gap-4 bg-white/[0.01]">

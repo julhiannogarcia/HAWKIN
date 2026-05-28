@@ -1,12 +1,28 @@
 'use client';
 
+import React, { useState, useEffect } from 'react';
 import Header from '@/components/Header';
 import Footer from '@/components/Footer';
 import GlobalTicker from '@/components/Ticker';
 import LiveFeed from '@/components/LiveFeed';
 import NewsCard from '@/components/NewsCard';
+import { Loader2 } from 'lucide-react';
 
 export default function NewsPage() {
+  const [isMounted, setIsMounted] = useState(false);
+
+  useEffect(() => {
+    setIsMounted(true);
+  }, []);
+
+  if (!isMounted) {
+    return (
+      <div className="min-h-screen bg-black flex items-center justify-center">
+        <Loader2 className="animate-spin text-cyan-500" size={40} />
+      </div>
+    );
+  }
+
   const allNews = [
     { 
       id: "gpt-5-leak", 

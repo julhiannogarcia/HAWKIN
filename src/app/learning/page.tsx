@@ -42,7 +42,6 @@ export default function LearningPage() {
   const handleModuleSelect = (mod: Module) => {
     setActiveModule(mod);
     setCurrentStepIndex(0);
-    setView('lesson');
   };
 
   const handleNext = () => {
