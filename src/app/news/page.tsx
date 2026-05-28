@@ -8,10 +8,42 @@ import NewsCard from '@/components/NewsCard';
 
 export default function NewsPage() {
   const allNews = [
-    { id: "gpt-5-leak", title: "OpenAI GPT-5: Filtraciones sobre la nueva arquitectura", excerpt: "Análisis profundo sobre el razonamiento System 2...", category: "BIG TECH", isLocked: true },
-    { id: "sam-altman-ubr", title: "La visión de Sam Altman sobre la RBU", excerpt: "Cómo la IA financiará el futuro...", category: "CEO RADAR", isLocked: true },
-    { id: "nvidia-record", title: "NVIDIA alcanza valoración récord", excerpt: "El motor del mundo IA no tiene freno...", category: "MERCADO", isLocked: false },
-    { id: "linux-trend", title: "Linux y la IA: Modelos locales en tendencia", excerpt: "Guía para correr LLMs en hardware libre...", category: "DEVELOPER", isLocked: false },
+    { 
+      id: "gpt-5-leak", 
+      title: "OpenAI GPT-5: Filtraciones sobre la nueva arquitectura", 
+      excerpt: "Análisis profundo sobre el razonamiento System 2...", 
+      category: "BIG TECH", 
+      isLocked: true,
+      date: "27 Mayo, 2026",
+      author: "Julhianno Garcia"
+    },
+    { 
+      id: "sam-altman-ubr", 
+      title: "La visión de Sam Altman sobre la RBU", 
+      excerpt: "Cómo la IA financiará el futuro...", 
+      category: "CEO RADAR", 
+      isLocked: true,
+      date: "27 Mayo, 2026",
+      author: "Julhianno Garcia"
+    },
+    { 
+      id: "nvidia-record", 
+      title: "NVIDIA alcanza valoración récord", 
+      excerpt: "El motor del mundo IA no tiene freno...", 
+      category: "MERCADO", 
+      isLocked: false,
+      date: "26 Mayo, 2026",
+      author: "HAWKIN Intel"
+    },
+    { 
+      id: "linux-trend", 
+      title: "Linux y la IA: Modelos locales en tendencia", 
+      excerpt: "Guía para correr LLMs en hardware libre...", 
+      category: "DEVELOPER", 
+      isLocked: false,
+      date: "25 Mayo, 2026",
+      author: "HAWKIN Intel"
+    },
   ];
 
   return (

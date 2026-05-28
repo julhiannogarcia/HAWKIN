@@ -50,8 +50,9 @@ export async function GET() {
             id: uniqueId,
             title: item.title,
             link: item.link,
-            content: (item.contentSnippet || "Analizando el flujo de capital institucional y estrategias de arbitraje...").substring(0, 250) + "...",
+            excerpt: (item.contentSnippet || "Analizando el flujo de capital institucional y estrategias de arbitraje...").substring(0, 250) + "...",
             source: source.name,
+            author: source.name, // Añadimos author para NewsCard
             date: item.pubDate || new Date().toISOString(),
             timestamp: item.pubDate ? new Date(item.pubDate).getTime() : Date.now(),
             category: "GOLD INTEL",

@@ -7,22 +7,30 @@ import { Clock, Lock } from 'lucide-react';
 interface NewsCardProps {
   id: string;
   title: string;
-  excerpt: string;
-  category: string;
-  isLocked: boolean;
+  excerpt?: string;
+  category?: string;
+  isLocked?: boolean;
   image?: string;
-  date: string;
-  author: string;
+  date?: string;
+  author?: string;
 }
 
-export default function NewsCard({ id, title, excerpt, category, isLocked, image, date, author }: NewsCardProps) {
+export default function NewsCard({ 
+  id, 
+  title, 
+  excerpt = "Analizando impacto tecnológico...", 
+  category = "RADAR", 
+  isLocked = false, 
+  image, 
+  date = "Recién lanzado", 
+  author = "HAWKIN Intel" 
+}: NewsCardProps) {
   return (
     <Link href={`/news/${id}`}>
       <motion.div 
         whileHover={{ y: -8 }}
         className="glass-card group cursor-pointer relative overflow-hidden h-full flex flex-col p-0 border-white/5 hover:border-cyan-500/40 transition-all duration-500"
       >
-        {/* Imagen de Cabecera Purificada (Sin iconos falsos) */}
         <div className="relative h-48 w-full overflow-hidden bg-gray-900">
           <img 
             src={image || "https://images.unsplash.com/photo-1451187580459-43490279c0fa?auto=format&fit=crop&q=80&w=800"} 
@@ -33,7 +41,7 @@ export default function NewsCard({ id, title, excerpt, category, isLocked, image
           
           <div className="absolute top-4 left-4">
             <span className={`text-[8px] font-black uppercase tracking-widest text-white px-3 py-1 rounded-full shadow-lg ${
-              category === 'GOLD' ? 'bg-[#FFD700] text-black' : 'bg-cyan-600'
+              category === 'GOLD' || category === 'GOLD INTEL' ? 'bg-[#FFD700] text-black' : 'bg-cyan-600'
             }`}>
               {category}
             </span>

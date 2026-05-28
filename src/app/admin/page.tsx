@@ -7,9 +7,17 @@ import {
   Shield, BarChart3, Newspaper, ShoppingBag, Users, 
   TrendingUp, ArrowUpRight, Bell, Settings, Lock, 
   Zap, Globe, DollarSign, Edit3, Sliders, Database,
-  Cpu, Activity, Terminal, Trash2, CheckCircle, AlertCircle
+  Cpu, Activity, Terminal, Trash2, CheckCircle, AlertCircle,
+  Radio, Layout, Loader2
 } from 'lucide-react';
-import { motion } from 'framer-motion';
+import { motion, AnimatePresence } from 'framer-motion';
+
+// Configuración de pauta para el selector (Movido arriba para estabilidad)
+const AD_PLANS = [
+  { id: 'plus', title: 'Plus Streaming', pricePEN: 999 },
+  { id: 'sidebar', title: 'Sidebar Académica', pricePEN: 699 },
+  { id: 'native', title: 'Pauta Nativa Radar', pricePEN: 399 },
+];
 
 export default function AdminDashboard() {
   const [isMounted, setIsMounted] = useState(false);
@@ -19,7 +27,11 @@ export default function AdminDashboard() {
     setIsMounted(true);
   }, []);
 
-  if (!isMounted) return null;
+  if (!isMounted) return (
+    <div className="min-h-screen bg-black flex items-center justify-center">
+       <Loader2 className="animate-spin text-blue-600" size={40} />
+    </div>
+  );
 
   const stats = [
     { label: 'Revenue Global', value: 'S/ 48,250', icon: <DollarSign className="text-green-500" />, trend: '+15.2%' },
@@ -54,12 +66,12 @@ export default function AdminDashboard() {
         </div>
 
         {/* CABECERA DINÁMICA */}
-        <div className="mb-16">
-          <div className="flex items-center gap-3 mb-4">
+        <div className="mb-16 text-center md:text-left">
+          <div className="flex items-center justify-center md:justify-start gap-3 mb-4">
              <div className="w-3 h-3 bg-blue-500 rounded-full animate-pulse shadow-[0_0_15px_rgba(59,130,246,0.5)]" />
              <span className="text-[10px] font-black uppercase tracking-[0.4em] text-blue-400">Consola Maestro • Acceso Total</span>
           </div>
-          <h2 className="text-6xl font-black tracking-tighter leading-none italic uppercase">
+          <h2 className="text-4xl md:text-6xl font-black tracking-tighter leading-none italic uppercase">
              {activeTab === 'overview' ? 'Operaciones Globales.' : 
               activeTab === 'pricing' ? 'Calibración de Mercado.' : 
               activeTab === 'content' ? 'Editor de Inteligencia.' : 
@@ -88,8 +100,8 @@ export default function AdminDashboard() {
               <div className="grid grid-cols-1 lg:grid-cols-3 gap-12">
                  <div className="lg:col-span-2 space-y-8">
                     <h3 className="text-xl font-black uppercase italic tracking-tighter text-blue-400">Últimas Transacciones B2B</h3>
-                    <div className="bg-white/[0.01] border border-white/5 rounded-[50px] overflow-hidden">
-                       <table className="w-full text-left">
+                    <div className="bg-white/[0.01] border border-white/5 rounded-[50px] overflow-x-auto">
+                       <table className="w-full text-left min-w-[600px]">
                           <thead className="bg-white/[0.02] border-b border-white/5">
                              <tr>
                                 <th className="px-10 py-6 text-[10px] font-black uppercase text-gray-500">Empresa</th>
@@ -164,8 +176,8 @@ export default function AdminDashboard() {
 
           {activeTab === 'content' && (
             <motion.div initial={{ opacity: 0, scale: 0.95 }} animate={{ opacity: 1, scale: 1 }} exit={{ opacity: 0, scale: 1.05 }} key="content" className="space-y-8">
-               <div className="flex justify-between items-center bg-white/[0.02] p-8 rounded-[40px] border border-white/5">
-                  <div className="space-y-1">
+               <div className="flex flex-col md:flex-row justify-between items-center gap-6 bg-white/[0.02] p-8 rounded-[40px] border border-white/5">
+                  <div className="space-y-1 text-center md:text-left">
                      <h4 className="text-2xl font-black uppercase italic tracking-tighter">Gestor de Noticias Bomba</h4>
                      <p className="text-xs text-gray-500">Publica o edita reportes de inteligencia en el Radar.</p>
                   </div>
@@ -178,9 +190,9 @@ export default function AdminDashboard() {
                     { t: 'OpenAI prepara salida a bolsa (IPO) histórica', c: 'Finanzas Tech', date: 'Hace 5 horas', status: 'Publicado' },
                     { t: 'Rumor: Apple integrará chips de 2nm en iPhone 17', c: 'Hardware', date: 'Ayer', status: 'Borrador' },
                   ].map((news, i) => (
-                    <div key={i} className="flex items-center justify-between p-8 bg-white/[0.01] border border-white/5 rounded-[30px] hover:bg-white/[0.03] transition-all group">
-                       <div className="flex items-center gap-8">
-                          <div className="w-2 h-2 rounded-full bg-blue-500 group-hover:scale-150 transition-transform" />
+                    <div key={i} className="flex flex-col md:flex-row items-center justify-between p-8 bg-white/[0.01] border border-white/5 rounded-[30px] hover:bg-white/[0.03] transition-all group gap-6">
+                       <div className="flex items-center gap-8 w-full md:w-auto">
+                          <div className="w-2 h-2 rounded-full bg-blue-500 group-hover:scale-150 transition-transform hidden md:block" />
                           <div>
                              <h5 className="text-lg font-bold uppercase italic leading-none mb-2">{news.t}</h5>
                              <div className="flex items-center gap-4">
@@ -201,7 +213,7 @@ export default function AdminDashboard() {
 
           {activeTab === 'system' && (
             <motion.div initial={{ opacity: 0 }} animate={{ opacity: 1 }} key="system" className="space-y-8">
-               <div className="bg-black border border-white/10 rounded-[40px] p-10 font-mono text-sm leading-relaxed relative overflow-hidden">
+               <div className="bg-black border border-white/10 rounded-[40px] p-6 md:p-10 font-mono text-xs md:text-sm leading-relaxed relative overflow-hidden">
                   <div className="absolute top-4 right-8 flex gap-2">
                      <div className="w-3 h-3 rounded-full bg-red-500/20" />
                      <div className="w-3 h-3 rounded-full bg-yellow-500/20" />
@@ -234,10 +246,3 @@ export default function AdminDashboard() {
     </div>
   );
 }
-
-// Configuración de pauta para el selector (Mock para la UI)
-const AD_PLANS = [
-  { id: 'plus', title: 'Plus Streaming', pricePEN: 999 },
-  { id: 'sidebar', title: 'Sidebar Académica', pricePEN: 699 },
-  { id: 'native', title: 'Pauta Nativa Radar', pricePEN: 399 },
-];

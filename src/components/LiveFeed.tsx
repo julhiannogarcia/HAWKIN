@@ -3,14 +3,14 @@
 import { useState, useEffect } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
 import NewsCard from '@/components/NewsCard';
-import { Globe, Coins, ShieldAlert, Laptop, ChevronDown, Sparkles } from 'lucide-react';
+import { Globe, Coins, ShieldAlert, Laptop, ChevronDown, Sparkles, Loader2 } from 'lucide-react';
 
 export default function LiveFeed() {
   const [activeTab, setActiveTab] = useState<'radar' | 'gold'>('radar');
   const [data, setData] = useState<{news: any[], shield: any[], hardware: any[]}>({news: [], shield: [], hardware: []});
   const [goldNews, setGoldNews] = useState<any[]>([]);
   const [loading, setLoading] = useState(true);
-  const [visibleCount, setVisibleCount] = useState(6); // Límite inicial de noticias
+  const [visibleCount, setVisibleCount] = useState(6); 
 
   const fetchAllData = async () => {
     try {
@@ -23,39 +23,39 @@ export default function LiveFeed() {
       const resGold = await fetch('/api/news/gold');
       const jsonGold = await resGold.json();
       setGoldNews(jsonGold.news || []);
-
-      setLoading(false);
     } catch (e) {
       console.error("Error fetching unified news", e);
+    } finally {
+      setLoading(false);
     }
   };
 
   useEffect(() => {
     fetchAllData();
-    const interval = setInterval(fetchAllData, 120000); // Actualizar cada 2 min
+    const interval = setInterval(fetchAllData, 120000); 
     return () => clearInterval(interval);
   }, []);
 
-  // Unificamos las noticias del radar general para la pestaña Radar usando el timestamp numérico
-  const radarItems = [...data.news, ...data.hardware, ...data.shield].sort((a, b) => 
-    (b.timestamp || 0) - (a.timestamp || 0)
-  );
+  // Blindaje contra datos nulos o indefinidos
+  const radarItems = [
+    ...(data?.news || []),
+    ...(data?.hardware || []),
+    ...(data?.shield || [])
+  ].sort((a: any, b: any) => (Number(b.timestamp) || 0) - (Number(a.timestamp) || 0));
 
   const currentItems = activeTab === 'radar' ? radarItems : goldNews;
 
   if (loading) {
     return (
-      <div className="grid grid-cols-1 md:grid-cols-3 gap-8 opacity-20">
-        {[...Array(3)].map((_, i) => (
-          <div key={i} className="h-80 bg-white/5 rounded-[40px] animate-pulse" />
-        ))}
+      <div className="flex flex-col items-center justify-center py-20 gap-6">
+        <Loader2 className="animate-spin text-cyan-500" size={40} />
+        <p className="text-[10px] text-gray-500 font-black uppercase tracking-[0.4em] animate-pulse">Sincronizando Radar Inteligente...</p>
       </div>
     );
   }
 
   return (
     <div className="space-y-12">
-      {/* NAVEGACIÓN POR PESTAÑAS (TABS) */}
       <div className="flex flex-wrap justify-center gap-4 mb-16">
         <button 
           onClick={() => { setActiveTab('radar'); setVisibleCount(6); }}
@@ -79,7 +79,6 @@ export default function LiveFeed() {
         </button>
       </div>
 
-      {/* GRID DINÁMICO DE NOTICIAS */}
       <motion.div 
         layout
         className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8"
@@ -99,7 +98,6 @@ export default function LiveFeed() {
         </AnimatePresence>
       </motion.div>
 
-      {/* BOTÓN VER MÁS / CARGAR MÁS */}
       {currentItems.length > visibleCount && (
         <div className="flex justify-center pt-12">
           <button 
@@ -114,7 +112,6 @@ export default function LiveFeed() {
         </div>
       )}
 
-      {/* NOTA DE PIE DE RADAR */}
       <div className="pt-20 text-center">
          <div className="inline-flex items-center gap-3 p-6 bg-white/[0.02] border border-white/5 rounded-3xl">
             <Sparkles className="text-cyan-400" size={16} />

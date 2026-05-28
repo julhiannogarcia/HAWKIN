@@ -2,38 +2,44 @@
 
 import { motion } from 'framer-motion';
 import { ShoppingBag, Laptop, Shirt, ExternalLink } from 'lucide-react';
+import { useState, useEffect } from 'react';
 
 interface AdSpaceProps {
   isPremium: boolean;
   type?: 'banner' | 'inline' | 'sidebar';
 }
 
+const ADS = [
+  { 
+    title: 'Nueva Colección Elite Style', 
+    desc: 'Tienda de Ropa HAWKIN. 20% OFF Socios.', 
+    icon: <Shirt className="text-purple-400" />,
+    color: 'from-purple-500/10'
+  },
+  { 
+    title: 'MacBook M5 Pro en Oferta', 
+    desc: 'Laptops de última generación. Envío gratis.', 
+    icon: <Laptop className="text-cyan-400" />,
+    color: 'from-cyan-500/10'
+  },
+  { 
+    title: 'Smartphones IA 2026', 
+    desc: 'Lo nuevo de Samsung y Apple está aquí.', 
+    icon: <ShoppingBag className="text-green-500" />,
+    color: 'from-green-500/10'
+  }
+];
+
 export default function AdSpace({ isPremium, type = 'banner' }: AdSpaceProps) {
+  const [ad, setAd] = useState<any>(null);
+
+  useEffect(() => {
+    // Seleccionamos el anuncio solo en el cliente para evitar hidratación mismatch
+    setAd(ADS[Math.floor(Math.random() * ADS.length)]);
+  }, []);
+
   // REGLA DE ORO: Si es premium, no hay anuncios.
-  if (isPremium) return null;
-
-  const ads = [
-    { 
-      title: 'Nueva Colección Elite Style', 
-      desc: 'Tienda de Ropa HAWKIN. 20% OFF Socios.', 
-      icon: <Shirt className="text-purple-400" />,
-      color: 'from-purple-500/10'
-    },
-    { 
-      title: 'MacBook M5 Pro en Oferta', 
-      desc: 'Laptops de última generación. Envío gratis.', 
-      icon: <Laptop className="text-cyan-400" />,
-      color: 'from-cyan-500/10'
-    },
-    { 
-      title: 'Smartphones IA 2026', 
-      desc: 'Lo nuevo de Samsung y Apple está aquí.', 
-      icon: <ShoppingBag className="text-green-500" />,
-      color: 'from-green-500/10'
-    }
-  ];
-
-  const ad = ads[Math.floor(Math.random() * ads.length)];
+  if (isPremium || !ad) return null;
 
   if (type === 'inline') {
     return (
@@ -60,7 +66,7 @@ export default function AdSpace({ isPremium, type = 'banner' }: AdSpaceProps) {
   }
 
   return (
-    <div className="w-full h-24 bg-white/[0.02] border border-dashed border-white/10 rounded-2xl flex items-center justify-center overflow-hidden group hover:border-cyan-500/30 transition-all cursor-pointer">
+    <div className="w-full h-24 bg-white/[0.02] border border-dashed border-white/10 rounded-2xl flex items-center justify-center overflow-hidden group hover:border-cyan-500/30 transition-all cursor-pointer relative">
       <span className="absolute top-2 right-4 text-[7px] uppercase tracking-[0.3em] text-gray-700 font-black">HAWKIN Ads Network</span>
       <div className="text-gray-600 font-black tracking-tighter text-lg group-hover:text-cyan-400 transition-colors uppercase italic flex items-center gap-4">
         {ad.icon} {ad.title}
