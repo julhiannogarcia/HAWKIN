@@ -186,14 +186,6 @@ export default function B2BPage() {
                             <p className="text-center text-[7px] text-gray-400 font-black uppercase tracking-[0.3em]">Débito Seguro • PayPal Global Network</p>
                          </div>
                        )}
-                 <div className="mt-4 pt-4 border-t border-gray-100 w-full">
-                          <button 
-                            onClick={() => window.open('mailto:julhianno@aihawkin.com?subject=Reserva B2B - Soporte Manual', '_self')}
-                            className="w-full py-4 bg-blue-600 hover:bg-blue-500 text-white rounded-2xl font-black uppercase tracking-widest text-[8px] flex items-center justify-center gap-2 transition-all shadow-xl"
-                          >
-                             <MessageCircle size={14} /> Soporte Pago Vía Correo
-                          </button>
-                       </div>
                     </div>
                  </div>
               </div>
