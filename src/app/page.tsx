@@ -9,6 +9,8 @@ import Header from '@/components/Header';
 import Footer from '@/components/Footer';
 import Pricing from '@/components/Pricing';
 import LiveFeed from '@/components/LiveFeed';
+import VisionSection from '@/components/VisionSection';
+import AdSpace from '@/components/AdSpace';
 import { Loader2 } from 'lucide-react';
 
 export default function Home() {
@@ -35,14 +37,7 @@ export default function Home() {
         
         {/* Espacio Publicitario Premium */}
         <div className="mt-40 max-w-5xl mx-auto w-full px-4">
-          <div className="relative h-24 w-full bg-white/5 border border-dashed border-white/20 rounded-2xl flex items-center justify-center overflow-hidden group hover:border-cyan-500/30 transition-all">
-            <span className="absolute top-2 right-4 text-[7px] uppercase tracking-[0.3em] text-gray-600 font-black">
-              HAWKIN Ads Network
-            </span>
-            <div className="text-gray-600 font-black tracking-tighter text-xl group-hover:text-cyan-400 transition-colors uppercase italic">
-              Anuncia tu Empresa Aquí
-            </div>
-          </div>
+          <AdSpace isPremium={false} type="banner" />
         </div>
 
         <Hero />
@@ -64,6 +59,7 @@ export default function Home() {
           <LiveFeed />
         </section>
 
+        <VisionSection />
         <FounderZone />
         <Pricing />
         <Footer />

@@ -55,7 +55,10 @@ export default function Hero() {
           </p>
 
           <div className="flex flex-col md:flex-row items-center justify-center gap-6 pt-10">
-            <button className="btn-glow text-[11px] py-6 px-12 group flex items-center gap-4">
+            <button 
+              onClick={() => document.getElementById('planes')?.scrollIntoView({behavior: 'smooth'})}
+              className="btn-glow text-[11px] py-6 px-12 group flex items-center gap-4"
+            >
                COMENZAR AHORA <Shield size={18} className="group-hover:rotate-12 transition-transform" />
             </button>
           </div>
