@@ -137,11 +137,10 @@ export default function AdminContent() {
       {/* ACCESO TOTAL A GESTIÓN */}
       <div className="mt-24 space-y-8">
          <h3 className="text-xl font-black uppercase italic tracking-tighter text-blue-400">Acceso Total a Módulos</h3>
-         <div className="grid grid-cols-1 md:grid-cols-3 gap-8">
+         <div className="grid grid-cols-1 md:grid-cols-2 gap-8">
             {[
                { t: 'Editor de Noticias', d: 'Publica reportes bomba al Radar.', i: <Newspaper />, h: '/admin/news', c: 'bg-cyan-500' },
                { t: 'Gestor B2B', d: 'Sube artes y aprueba pagos.', i: <ShoppingBag />, h: '/admin/b2b', c: 'bg-blue-600' },
-               { t: 'Control Academia', d: 'Edita cursos y mira el progreso.', i: <BarChart3 />, h: '/admin/courses', c: 'bg-purple-600' }
             ].map((m, i) => (
                <button 
                   key={i}

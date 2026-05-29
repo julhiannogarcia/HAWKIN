@@ -16,9 +16,6 @@ export default function AdminLayout({ children }: { children: React.ReactNode })
           <Link href="/admin/news" className="p-3 rounded-lg hover:bg-white/5 transition-colors text-sm font-medium border border-transparent hover:border-cyan-500/30">
             Gestionar Noticias
           </Link>
-          <Link href="/admin/courses" className="p-3 rounded-lg hover:bg-white/5 transition-colors text-sm font-medium border border-transparent hover:border-cyan-500/30">
-            Gestionar Cursos
-          </Link>
           <Link href="/admin/b2b" className="p-3 rounded-lg hover:bg-white/5 transition-colors text-sm font-medium border border-transparent hover:border-cyan-500/30">
             Publicidad B2B
           </Link>

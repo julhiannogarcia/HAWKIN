@@ -90,7 +90,7 @@ export default function Pricing() {
       symbol: geoData.currencySymbol,
       period: '/año',
       description: 'El plan definitivo para líderes tecnológicos.',
-      features: ['Todo lo del mensual', 'Cursos de Élite', 'Certificación Oficial'],
+      features: ['Todo lo del mensual', 'Reportes Exclusivos', 'Soporte Prioritario'],
       popular: true
     }
   ];

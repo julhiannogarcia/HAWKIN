@@ -22,7 +22,7 @@ export default function B2BPage() {
 
   const AD_PLANS = useMemo(() => [
     { id: 'plus', title: 'Plus Streaming & Hero', pricePEN: 999, priceUSD: "265.00", placement: 'Banner Principal + Live', reach: '2.5M+ Views', desc: 'Tu marca en la cabecera principal con video en tiempo real.', icon: <Radio className="text-blue-400" /> },
-    { id: 'sidebar', title: 'Sidebar Académica', pricePEN: 699, priceUSD: "185.00", placement: 'Lateral de Cursos', reach: '1M+ Views', desc: 'Presencia constante al lado de cada lección educativa.', icon: <Layout className="text-blue-300" /> },
+    { id: 'sidebar', title: 'Sidebar de Impacto', pricePEN: 699, priceUSD: "185.00", placement: 'Lateral del Ecosistema', reach: '1M+ Views', desc: 'Presencia constante al lado de reportes y herramientas de élite.', icon: <Layout className="text-blue-300" /> },
     { id: 'native', title: 'Pauta Nativa Radar', pricePEN: 399, priceUSD: "105.00", placement: 'Entre Noticias', reach: '500k+ Clics', desc: 'Anuncio integrado orgánicamente en el feed de inteligencia.', icon: <ShoppingBag className="text-blue-200" /> },
   ], []);
 
@@ -193,7 +193,7 @@ export default function B2BPage() {
         </div>
 
         <div className="mt-40 grid grid-cols-1 md:grid-cols-3 gap-8">
-           {[{ title: 'Visibilidad 360', icon: <Eye size={32} />, text: 'Presencia en todo el ecosistema.' }, { title: 'Clic Directo', icon: <ExternalLink size={32} />, text: 'Botones inteligentes a tu web.' }, { title: 'Calidad 4K', icon: <Tv size={32} />, text: 'Soporte para videos de alta fidelidad.' }].map((item, i) => (
+           {[{ title: 'Visibilidad 360', icon: <Eye size={32} />, text: 'Presencia masiva en el Radar, Trading y zonas Alpha.' }, { title: 'Clic Directo', icon: <ExternalLink size={32} />, text: 'Botones inteligentes a tu web.' }, { title: 'Calidad 4K', icon: <Tv size={32} />, text: 'Soporte para videos de alta fidelidad.' }].map((item, i) => (
              <div key={i} className="p-12 rounded-[50px] bg-white/[0.01] border border-white/5 space-y-6 text-center hover:bg-white/[0.03] transition-all">
                 <div className="text-blue-500 mx-auto w-fit">{item.icon}</div>
                 <h4 className="text-xl font-black uppercase italic tracking-tighter text-white">{item.title}</h4>
