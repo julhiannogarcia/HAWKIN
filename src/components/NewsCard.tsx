@@ -50,7 +50,7 @@ export default function NewsCard({
 
         <div className="p-7 flex flex-col flex-1">
           <div className="flex items-center gap-3 text-[9px] font-black text-gray-500 uppercase tracking-widest mb-4">
-            <span className="text-cyan-400">✦</span> {date} • {author}
+            <Clock size={12} className="text-cyan-500" /> {date} • {author}
           </div>
           
           <h3 className="text-xl font-black mb-4 leading-tight group-hover:text-cyan-400 transition-colors line-clamp-2 italic uppercase tracking-tighter">

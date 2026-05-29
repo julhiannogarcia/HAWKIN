@@ -45,6 +45,8 @@ export async function GET() {
 
     const formatItems = (items: any[], category: string) => items.slice(0, 12).map((item) => {
       const uniqueId = generateShortId(item.link);
+      const pubDate = new Date(item.pubDate);
+      const specificTime = pubDate.toLocaleTimeString('es-PE', { hour: '2-digit', minute: '2-digit' });
       
       const getRealImage = (title: string, cat: string) => {
         const t = title.toLowerCase();
@@ -65,10 +67,11 @@ export async function GET() {
         category: category,
         excerpt: (item.contentSnippet || "Analizando el impacto de esta creación en el ecosistema global...").substring(0, 250) + "...",
         author: item.source?.name || "HAWKIN Intelligence",
-        date: item.pubDate ? getTimeAgo(item.pubDate) : "En Vivo",
-        timestamp: item.pubDate ? new Date(item.pubDate).getTime() : Date.now(), // Campo para ordenamiento
+        date: item.pubDate ? `${getTimeAgo(item.pubDate)} (${specificTime})` : "En Vivo",
+        timestamp: item.pubDate ? pubDate.getTime() : Date.now(), // Campo para ordenamiento
         image: getRealImage(item.title, category),
-        url: item.link
+        url: item.link,
+        source: item.source?.name || "Fuente Global"
       };
     });
 

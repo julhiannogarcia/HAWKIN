@@ -46,15 +46,19 @@ export async function GET() {
             return `${base}photo-1639762681485-074b7f938ba0?auto=format&fit=crop&q=80&w=1000&sig=${uniqueId}`;
           };
 
+          const pubDate = new Date(item.pubDate || new Date());
+          const specificTime = pubDate.toLocaleTimeString('es-PE', { hour: '2-digit', minute: '2-digit' });
+
           return {
             id: uniqueId,
             title: item.title,
             link: item.link,
+            url: item.link, // Para compatibilidad
             excerpt: (item.contentSnippet || "Analizando el flujo de capital institucional y estrategias de arbitraje...").substring(0, 250) + "...",
             source: source.name,
             author: source.name, // Añadimos author para NewsCard
-            date: item.pubDate || new Date().toISOString(),
-            timestamp: item.pubDate ? new Date(item.pubDate).getTime() : Date.now(),
+            date: item.pubDate ? `${new Date(item.pubDate).toLocaleDateString('es-PE')} (${specificTime})` : "En vivo",
+            timestamp: pubDate.getTime(),
             category: "GOLD INTEL",
             image: getGoldRealImage(item.title || "")
           };
