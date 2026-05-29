@@ -6,6 +6,8 @@ import Header from '@/components/Header';
 import Footer from '@/components/Footer';
 import GlobalTicker from '@/components/Ticker';
 import AdSpace from '@/components/AdSpace';
+import Paywall from '@/components/news/Paywall';
+import { useSession } from 'next-auth/react';
 import { 
   Share2, ThumbsUp, ThumbsDown, ArrowLeft, Bookmark, Lock, Zap, Target, Globe, TrendingUp, MessageCircle, ExternalLink, Clock, User
 } from 'lucide-react';
@@ -57,17 +59,29 @@ const MASTER_NEWS: Record<string, any> = {
 };
 
 export default function NewsDetailContent() {
+  const { data: session } = useSession();
   const router = useRouter();
   const params = useParams();
   const [article, setArticle] = useState<any>(null);
   const [loading, setLoading] = useState(true);
-  const [isPremium, setIsPremium] = useState(false); 
+  const [showPaywall, setShowPaywall] = useState(false);
   const [likes, setLikes] = useState(0);
   const [dislikes, setDislikes] = useState(0);
   const [userVote, setUserVote] = useState<'like' | 'dislike' | null>(null);
   const [comments, setComments] = useState<any[]>([]);
   const [newComment, setNewComment] = useState("");
   const [showShareToast, setShowShareToast] = useState(false);
+  const [geoData, setGeoData] = useState<any>(null);
+
+  // Lógica de Paywall: Si no es socio, disparar a los 8 segundos
+  useEffect(() => {
+    if (article?.isLocked && !session) {
+      const timer = setTimeout(() => {
+        setShowPaywall(true);
+      }, 8000); // 8 segundos de "gracia"
+      return () => clearTimeout(timer);
+    }
+  }, [article, session]);
 
   useEffect(() => {
     const fetchArticle = async () => {
@@ -75,6 +89,10 @@ export default function NewsDetailContent() {
       if (!id) return;
 
       try {
+        const resGeo = await fetch('/api/geo');
+        const dataGeo = await resGeo.json();
+        setGeoData(dataGeo);
+
         if (MASTER_NEWS[id]) {
           setArticle(MASTER_NEWS[id]);
           setLoading(false);
@@ -96,9 +114,6 @@ export default function NewsDetailContent() {
 
     fetchArticle();
 
-    const paidStatus = typeof window !== 'undefined' ? localStorage.getItem('hawkin_premium_active') : null;
-    if (paidStatus === 'true') setIsPremium(true);
-
     // Mock initial data
     setLikes(Math.floor(Math.random() * 500) + 100);
     setDislikes(Math.floor(Math.random() * 50));
@@ -109,6 +124,7 @@ export default function NewsDetailContent() {
   }, [params]);
 
   const handleVote = (type: 'like' | 'dislike') => {
+    if (!session) { setShowPaywall(true); return; }
     if (userVote === type) {
       setUserVote(null);
       if (type === 'like') setLikes(l => l - 1);
@@ -132,10 +148,11 @@ export default function NewsDetailContent() {
 
   const handleAddComment = (e: React.FormEvent) => {
     e.preventDefault();
+    if (!session) { setShowPaywall(true); return; }
     if (!newComment.trim()) return;
     const comment = {
       id: Date.now(),
-      user: "Tú (Socio)",
+      user: session.user?.name || "Socio",
       text: newComment,
       date: "Ahora"
     };
@@ -146,15 +163,22 @@ export default function NewsDetailContent() {
   if (loading || !article) return (
     <div className="min-h-screen bg-black flex flex-col items-center justify-center gap-6 text-center">
       <Loader2 className="animate-spin text-cyan-500" size={40} />
-      <p className="text-cyan-500 font-black tracking-[0.4em] uppercase text-[10px] animate-pulse">Sincronizando Archivos de Inteligencia...</p>
+      <p className="text-cyan-400 font-black tracking-[0.4em] uppercase text-[10px] animate-pulse">Sincronizando Archivos de Inteligencia...</p>
     </div>
   );
 
   return (
-    <main className="min-h-screen bg-[#010101] text-white selection:bg-cyan-500 selection:text-black overflow-x-hidden">
+    <main className="min-h-screen bg-[#010101] text-white selection:bg-cyan-500 selection:text-black overflow-x-hidden relative">
       <Header />
       
-      <div className="max-w-4xl mx-auto px-6 pt-40 pb-32">
+      {/* Paywall Flotante */}
+      <AnimatePresence>
+        {showPaywall && (
+          <Paywall price={geoData?.currencySymbol ? `${geoData.currencySymbol} ${geoData.monthlyPrice}` : "S/ 8.00"} />
+        )}
+      </AnimatePresence>
+
+      <div className={`max-w-4xl mx-auto px-6 pt-40 pb-32 transition-all duration-1000 ${showPaywall ? 'blur-xl pointer-events-none' : ''}`}>
         <button onClick={() => router.back()} className="flex items-center gap-3 text-gray-500 hover:text-white transition-all mb-16 text-[9px] font-black uppercase tracking-widest group">
           <ArrowLeft size={16} className="group-hover:-translate-x-1 transition-transform" /> Volver al Radar Global
         </button>
@@ -237,7 +261,6 @@ export default function NewsDetailContent() {
                    )}
                 </div>
 
-                {/* BOTÓN DE FUENTE ORIGINAL */}
                 {article.url && (
                   <div className="pt-8">
                     <a 
@@ -253,7 +276,6 @@ export default function NewsDetailContent() {
                   </div>
                 )}
 
-                {/* SISTEMA DE REACCIONES */}
                 <div className="flex items-center gap-8 py-10 border-y border-white/5">
                    <div className="flex items-center gap-4">
                       <button 
@@ -278,7 +300,6 @@ export default function NewsDetailContent() {
                    </div>
                 </div>
 
-                {/* SECCIÓN DE COMENTARIOS */}
                 <div className="space-y-12">
                    <h3 className="text-xl font-black uppercase italic tracking-tighter text-white">Debate Alpha</h3>
                    
@@ -312,26 +333,8 @@ export default function NewsDetailContent() {
                    </div>
                 </div>
 
-                {article.isLocked && !isPremium && (
-                  <div className="p-12 rounded-[50px] bg-gradient-to-br from-cyan-500/10 to-purple-600/10 border-2 border-white/5 text-center space-y-8 backdrop-blur-xl">
-                     <div className="w-20 h-20 bg-white/5 rounded-full flex items-center justify-center mx-auto border border-white/10 shadow-2xl">
-                        <Lock className="text-cyan-400" size={32} />
-                     </div>
-                     <div className="space-y-2">
-                        <h4 className="text-2xl font-black uppercase italic tracking-tighter">Acceso Restringido</h4>
-                        <p className="text-gray-500 text-sm max-w-xs mx-auto">Este nivel de inteligencia profunda solo está disponible para Socios Alpha con suscripción activa.</p>
-                     </div>
-                     <button 
-                      onClick={() => router.push('/#planes')}
-                      className="px-12 py-5 bg-white text-black rounded-full font-black text-[10px] uppercase tracking-[0.4em] hover:bg-cyan-400 transition-all shadow-xl"
-                     >
-                       Suscribirse Ahora
-                     </button>
-                  </div>
-                )}
-
                 <div className="pt-20 border-t border-white/5">
-                   <AdSpace isPremium={isPremium} type="inline" />
+                   <AdSpace isPremium={!!session} type="inline" />
                 </div>
              </div>
 

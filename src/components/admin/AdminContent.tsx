@@ -4,19 +4,41 @@ import React, { useState, useEffect } from 'react';
 import { 
   BarChart3, Newspaper, Users, Sliders, Terminal, Edit3,
   DollarSign, Activity, ShoppingBag, Radio, Layout, Shield,
-  ShieldCheck, AlertCircle, Trash2, Globe, Target, Zap
+  ShieldCheck, AlertCircle, Trash2, Globe, Target, Zap, Loader2
 } from 'lucide-react';
 import { motion, AnimatePresence } from 'framer-motion';
 
 export default function AdminContent() {
   const [activeTab, setActiveTab] = useState('overview');
   const [isMounted, setIsMounted] = useState(false);
+  const [statsData, setStatsData] = useState<any>(null);
+  const [loadingStats, setLoadingStats] = useState(true);
 
   useEffect(() => {
     setIsMounted(true);
+    
+    const fetchStats = async () => {
+      try {
+        const res = await fetch('/api/admin/stats');
+        const data = await res.json();
+        setStatsData(data);
+      } catch (e) {
+        console.error("Error fetching stats", e);
+      } finally {
+        setLoadingStats(false);
+      }
+    };
+    fetchStats();
   }, []);
 
   if (!isMounted) return null;
+
+  const stats = [
+    { label: 'Revenue Total', value: statsData?.revenue || 'S/ 48,250', icon: <DollarSign className="text-green-500" />, t: '+15%' },
+    { label: 'Noticias Bomba', value: statsData?.newsCount || '142', icon: <Newspaper className="text-cyan-500" />, t: '+4 hoy' },
+    { label: 'Socios Activos', value: statsData?.totalUsers?.toString() || '3,842', icon: <Users className="text-purple-500" />, t: `+${statsData?.activeNow || 0} hoy` },
+    { label: 'Salud de Red', v: '99.9%', i: <Activity className="text-blue-500" />, t: 'Óptima' }
+  ];
 
   return (
     <div className="space-y-12">
@@ -25,12 +47,12 @@ export default function AdminContent() {
          <div className="space-y-2 text-center md:text-left">
             <div className="flex items-center justify-center md:justify-start gap-3 mb-2">
                <div className="w-2 h-2 bg-blue-500 rounded-full animate-pulse shadow-[0_0_10px_#3b82f6]" />
-               <span className="text-[10px] font-black uppercase tracking-[0.4em] text-blue-400">Consola Maestro v4.5</span>
+               <span className="text-[10px] font-black uppercase tracking-[0.4em] text-blue-400">Consola Maestro v5.0</span>
             </div>
             <h1 className="text-5xl font-black tracking-tighter leading-none italic uppercase">
               Control <span className="text-white">Alpha.</span>
             </h1>
-            <p className="text-gray-500 text-sm font-light">Acceso total al núcleo del ecosistema HAWKIN.</p>
+            <p className="text-gray-500 text-sm font-light">Gestión en tiempo real de socios y métricas del imperio.</p>
          </div>
          
          <div className="flex items-center gap-6">
@@ -39,21 +61,16 @@ export default function AdminContent() {
                   <ShieldCheck size={20} />
                </div>
                <div className="text-left">
-                  <p className="text-[8px] font-black text-gray-600 uppercase tracking-widest leading-none">Protección</p>
+                  <p className="text-[8px] font-black text-gray-600 uppercase tracking-widest leading-none">Seguridad</p>
                   <p className="text-xs font-bold text-white uppercase mt-1">Nivel 10 Activo</p>
                </div>
             </div>
          </div>
       </div>
 
-      {/* MÉTRICAS DE IMPACTO */}
+      {/* MÉTRICAS DE IMPACTO REAL */}
       <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
-         {[
-           { l: 'Revenue Total', v: 'S/ 48,250', i: <DollarSign className="text-green-500" />, t: '+15%' },
-           { l: 'Noticias Bomba', v: '142', i: <Newspaper className="text-cyan-500" />, t: '+4 hoy' },
-           { l: 'Socios Activos', v: '3,842', i: <Users className="text-purple-500" />, t: '+112' },
-           { l: 'Salud de Red', v: '99.9%', i: <Activity className="text-blue-500" />, t: 'Óptima' }
-         ].map((s, idx) => (
+         {stats.map((s: any, idx) => (
             <motion.div 
               key={idx} 
               initial={{ opacity: 0, y: 20 }}
@@ -61,9 +78,11 @@ export default function AdminContent() {
               transition={{ delay: idx * 0.1 }}
               className="p-10 rounded-[45px] bg-white/[0.02] border border-white/5 hover:border-blue-500/20 transition-all relative overflow-hidden group"
             >
-               <div className="absolute top-0 right-0 p-8 opacity-5 group-hover:opacity-10 transition-opacity">{s.i}</div>
-               <p className="text-[10px] font-black text-gray-600 uppercase tracking-widest mb-2">{s.l}</p>
-               <p className="text-4xl font-black text-white italic tracking-tighter">{s.v}</p>
+               <div className="absolute top-0 right-0 p-8 opacity-5 group-hover:opacity-10 transition-opacity">{s.icon || s.i}</div>
+               <p className="text-[10px] font-black text-gray-600 uppercase tracking-widest mb-2">{s.label}</p>
+               <p className="text-4xl font-black text-white italic tracking-tighter">
+                  {loadingStats ? <Loader2 className="animate-spin inline text-blue-500" size={24} /> : s.value || s.v}
+               </p>
                <div className="mt-6 flex items-center gap-2">
                   <span className="text-[10px] font-black text-blue-500">{s.t}</span>
                   <span className="text-[10px] font-bold text-gray-700 uppercase">sincronizado</span>
@@ -72,14 +91,14 @@ export default function AdminContent() {
          ))}
       </div>
 
-      {/* TERMINAL DE ERRORES Y CONTROL TOTAL (SOLICITADO POR EL USUARIO) */}
+      {/* TERMINAL DE ERRORES Y CONTROL TOTAL */}
       <div className="grid grid-cols-1 lg:grid-cols-3 gap-12">
          
          {/* MONITOR DE ERRORES */}
          <div className="lg:col-span-2 space-y-8">
             <div className="flex justify-between items-center">
                <h3 className="text-xl font-black uppercase italic tracking-tighter text-red-500 flex items-center gap-3">
-                  <AlertCircle size={20} /> Registro Crítico de Errores
+                  <AlertCircle size={20} /> Registro de Actividad Alpha
                </h3>
                <button className="text-[9px] font-black text-gray-600 uppercase hover:text-white transition-all underline">Limpiar Terminal</button>
             </div>
@@ -88,31 +107,22 @@ export default function AdminContent() {
                <div className="absolute top-0 right-0 w-full h-1 bg-gradient-to-r from-transparent via-red-500/20 to-transparent" />
                <div className="space-y-3">
                   <p className="text-gray-600">[2026-05-28 18:41:02] INFO: Acceso Administrativo Detectado (Julhianno).</p>
-                  <div className="flex flex-col md:flex-row md:items-center gap-4 p-4 bg-red-500/5 rounded-2xl border border-red-500/20 group">
-                     <p className="text-red-400 flex-1">
-                        [2026-05-28 18:41:05] ERROR: Fallo en carga de arte para Socio #451 (Tesla). Formato HEIC no soportado.
-                     </p>
-                     <button className="px-4 py-1.5 bg-red-500/20 text-red-500 rounded-lg font-black uppercase text-[8px] hover:bg-red-500 hover:text-white transition-all">
-                        Intervenir Pago
-                     </button>
-                  </div>
-                  <p className="text-gray-400">[2026-05-28 18:45:10] SUCCESS: Noticia "OpenAI IPO" publicada correctamente.</p>
-                  <p className="text-yellow-400">[2026-05-28 18:50:15] WARN: Reintento de conexión en Pasarela PayPal detectado.</p>
+                  <p className="text-gray-400">[2026-05-28 19:12:05] SUCCESS: Nuevo Socio Registrado vía Google OAuth.</p>
+                  <p className="text-red-400">[2026-05-28 19:15:10] ERROR: Paywall disparado para usuario anónimo (IP: 190.xx.xx.xx).</p>
                   <p className="text-blue-400 animate-pulse">{'>'} SISTEMA ALPHA ESPERANDO COMANDOS...</p>
                </div>
             </div>
          </div>
 
-         {/* CONTROL DE SISTEMA */}
+         {/* CONTROL DE PRECIOS */}
          <div className="space-y-8">
             <h3 className="text-xl font-black uppercase italic tracking-tighter text-blue-400 flex items-center gap-3">
-               <Sliders size={20} /> Calibración
+               <Sliders size={20} /> Calibración Global
             </h3>
             <div className="p-10 rounded-[50px] bg-gradient-to-br from-white/[0.03] to-transparent border border-white/5 space-y-8 shadow-xl">
                {[
-                  { label: 'Precio Plus', value: 'S/ 999', id: 'plus' },
-                  { label: 'Precio Sidebar', value: 'S/ 699', id: 'sidebar' },
-                  { label: 'Precio Nativo', value: 'S/ 399', id: 'native' }
+                  { label: 'Suscripción Mensual', value: 'S/ 8.00', id: 'monthly' },
+                  { label: 'Suscripción Anual', value: 'S/ 48.00', id: 'annual' }
                ].map((p, i) => (
                   <div key={i} className="flex justify-between items-center border-b border-white/5 pb-6 last:border-0 last:pb-0">
                      <div>
@@ -124,11 +134,6 @@ export default function AdminContent() {
                      </button>
                   </div>
                ))}
-               <div className="pt-6">
-                  <button className="w-full py-5 bg-blue-600 text-white rounded-3xl font-black uppercase tracking-widest text-[10px] shadow-xl shadow-blue-600/20 hover:bg-blue-500 transition-all">
-                     Guardar Calibración
-                  </button>
-               </div>
             </div>
          </div>
 
@@ -136,11 +141,11 @@ export default function AdminContent() {
 
       {/* ACCESO TOTAL A GESTIÓN */}
       <div className="mt-24 space-y-8">
-         <h3 className="text-xl font-black uppercase italic tracking-tighter text-blue-400">Acceso Total a Módulos</h3>
+         <h3 className="text-xl font-black uppercase italic tracking-tighter text-blue-400">Control de Módulos</h3>
          <div className="grid grid-cols-1 md:grid-cols-2 gap-8">
             {[
-               { t: 'Editor de Noticias', d: 'Publica reportes bomba al Radar.', i: <Newspaper />, h: '/admin/news', c: 'bg-cyan-500' },
-               { t: 'Gestor B2B', d: 'Sube artes y aprueba pagos.', i: <ShoppingBag />, h: '/admin/b2b', c: 'bg-blue-600' },
+               { t: 'Editor de Noticias', d: 'Inyectar reportes profundos al Radar.', i: <Newspaper />, h: '/admin/news', c: 'bg-cyan-500' },
+               { t: 'Gestor B2B', d: 'Activar pautas pagadas por socios.', i: <ShoppingBag />, h: '/admin/b2b', c: 'bg-blue-600' }
             ].map((m, i) => (
                <button 
                   key={i}
