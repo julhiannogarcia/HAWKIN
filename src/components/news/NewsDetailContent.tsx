@@ -9,9 +9,18 @@ import AdSpace from '@/components/AdSpace';
 import Paywall from '@/components/news/Paywall';
 import { useSession } from 'next-auth/react';
 import { 
-  Share2, ThumbsUp, ThumbsDown, ArrowLeft, Bookmark, Lock, Zap, Target, Globe, TrendingUp, MessageCircle, ExternalLink, Clock, User
+  Share2, ThumbsUp, ThumbsDown, ArrowLeft, Bookmark, Lock, Zap, Target, Globe, TrendingUp, MessageCircle, ExternalLink, Clock, User, ShieldCheck
 } from 'lucide-react';
 import { motion, AnimatePresence } from 'framer-motion';
+
+// =====================================================================
+// COMPONENTES AUXILIARES (DEFINIDOS ANTES PARA EVITAR ERRORES)
+// =====================================================================
+const CustomLoader = ({ className, size }: { className?: string, size?: number }) => (
+  <motion.div animate={{ rotate: 360 }} transition={{ duration: 1, repeat: Infinity, ease: "linear" }} className={className}>
+    <Zap size={size} />
+  </motion.div>
+);
 
 // =====================================================================
 // BASE DE DATOS DE REPORTES PROFUNDOS (MASTER INTELLIGENCE)
@@ -104,7 +113,16 @@ export default function NewsDetailContent() {
         const allNews = [...(data.news || []), ...(data.shield || []), ...(data.hardware || [])];
         const found = allNews.find((n: any) => n.id === id);
         
-        setArticle(found || MASTER_NEWS['openai-ipo-breaking']);
+        if (found) {
+          setArticle(found);
+        } else {
+          // Intentar buscar en Master Intel
+          const resIntel = await fetch('/api/news/master-intel');
+          const dataIntel = await resIntel.json();
+          const intelNews = dataIntel.topNews || [];
+          const foundIntel = intelNews.find((n: any) => n.id === id);
+          setArticle(foundIntel || MASTER_NEWS['openai-ipo-breaking']);
+        }
       } catch (e) {
         setArticle(MASTER_NEWS['openai-ipo-breaking']);
       } finally {
@@ -141,6 +159,7 @@ export default function NewsDetailContent() {
   };
 
   const handleShare = () => {
+    if (typeof window === 'undefined') return;
     navigator.clipboard.writeText(window.location.href);
     setShowShareToast(true);
     setTimeout(() => setShowShareToast(false), 3000);
@@ -162,7 +181,7 @@ export default function NewsDetailContent() {
 
   if (loading || !article) return (
     <div className="min-h-screen bg-black flex flex-col items-center justify-center gap-6 text-center">
-      <Loader2 className="animate-spin text-cyan-500" size={40} />
+      <CustomLoader className="animate-spin text-cyan-500" size={40} />
       <p className="text-cyan-400 font-black tracking-[0.4em] uppercase text-[10px] animate-pulse">Sincronizando Archivos de Inteligencia...</p>
     </div>
   );
@@ -257,7 +276,7 @@ export default function NewsDetailContent() {
                         <p key={i}>{line}</p>
                       ))
                    ) : (
-                      <p>{article.excerpt || "Analizando el impacto de este desarrollo..."}</p>
+                      <p>{article.excerpt || article.summary || "Analizando el impacto de este desarrollo..."}</p>
                    )}
                 </div>
 
@@ -366,9 +385,3 @@ export default function NewsDetailContent() {
     </main>
   );
 }
-
-const Loader2 = ({ className, size }: { className?: string, size?: number }) => (
-  <motion.div animate={{ rotate: 360 }} transition={{ duration: 1, repeat: Infinity, ease: "linear" }} className={className}>
-    <Zap size={size} />
-  </motion.div>
-);
