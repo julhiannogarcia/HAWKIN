@@ -7,7 +7,7 @@ import {
   Zap, TrendingUp, TriangleAlert, Users, Target, 
   Cpu, Rocket, Loader2, Sparkles, Swords, Info, 
   ArrowUpRight, Globe, ShieldCheck, Flame, Search, 
-  Clock, Activity, Terminal, ExternalLink, Filter
+  Clock, Activity, Terminal, ExternalLink, Filter, X
 } from 'lucide-react';
 
 export default function MasterIntel() {
@@ -65,10 +65,36 @@ export default function MasterIntel() {
 
   const filteredNews = useMemo(() => {
     if (!intel?.topNews) return [];
-    return intel.topNews.filter((n: any) => 
-      n.title.toLowerCase().includes(searchQuery.toLowerCase()) ||
-      n.summary.toLowerCase().includes(searchQuery.toLowerCase()) ||
-      n.companies?.some((c: string) => c.toLowerCase().includes(searchQuery.toLowerCase()))
+    if (!searchQuery.trim()) return intel.topNews;
+
+    const query = searchQuery.toLowerCase().trim();
+    return intel.topNews.filter((n: any) => {
+      const titleMatch = String(n.title || "").toLowerCase().includes(query);
+      const summaryMatch = String(n.summary || "").toLowerCase().includes(query);
+      const companyMatch = Array.isArray(n.companies) && n.companies.some((c: any) => String(c).toLowerCase().includes(query));
+      const peopleMatch = Array.isArray(n.people) && n.people.some((p: any) => String(p).toLowerCase().includes(query));
+      
+      return titleMatch || summaryMatch || companyMatch || peopleMatch;
+    });
+  }, [intel, searchQuery]);
+
+  const filteredRumors = useMemo(() => {
+    if (!intel?.rumors) return [];
+    if (!searchQuery.trim()) return intel.rumors;
+    const query = searchQuery.toLowerCase().trim();
+    return intel.rumors.filter((r: any) => 
+      String(r.text || "").toLowerCase().includes(query) || 
+      String(r.source || "").toLowerCase().includes(query)
+    );
+  }, [intel, searchQuery]);
+
+  const filteredBattles = useMemo(() => {
+    if (!intel?.battles) return [];
+    if (!searchQuery.trim()) return intel.battles;
+    const query = searchQuery.toLowerCase().trim();
+    return intel.battles.filter((b: any) => 
+      String(b.competitors || "").toLowerCase().includes(query) || 
+      String(b.motive || "").toLowerCase().includes(query)
     );
   }, [intel, searchQuery]);
 
@@ -134,9 +160,14 @@ export default function MasterIntel() {
                value={searchQuery}
                onChange={(e) => setSearchQuery(e.target.value)}
                placeholder="BUSCAR EN EL ARCHIVO DE INTELIGENCIA (EJ: SAM ALTMAN, NVIDIA, RUMORES...)"
-               className="w-full bg-[#080808] border-2 border-white/5 group-hover:border-cyan-500/30 focus:border-cyan-500 p-8 pl-20 rounded-[40px] text-lg font-bold uppercase tracking-widest outline-none transition-all shadow-2xl"
+               className={`w-full bg-[#080808] border-2 group-hover:border-cyan-500/30 focus:border-cyan-500 p-8 pl-20 rounded-[40px] text-lg font-bold uppercase tracking-widest outline-none transition-all shadow-2xl ${searchQuery ? 'border-cyan-500/50 shadow-[0_0_30px_rgba(34,211,238,0.1)]' : 'border-white/5'}`}
             />
             <div className="absolute right-8 top-1/2 -translate-y-1/2 flex items-center gap-4">
+               {searchQuery && (
+                 <button onClick={() => setSearchQuery('')} className="p-2 hover:bg-white/10 rounded-full transition-all">
+                    <X size={20} className="text-gray-500 hover:text-white" />
+                 </button>
+               )}
                <span className="text-[10px] font-black text-gray-700 uppercase hidden sm:block">Filtro Alpha Activo</span>
                <Filter size={20} className="text-gray-700" />
             </div>
@@ -159,72 +190,88 @@ export default function MasterIntel() {
         </div>
 
         <div className="grid grid-cols-1 lg:grid-cols-2 gap-10">
-          {filteredNews.slice(0, 10).map((news: any, i: number) => (
-            <motion.div 
-              key={i}
-              initial={{ opacity: 0, scale: 0.98 }}
-              whileInView={{ opacity: 1, scale: 1 }}
-              viewport={{ once: true }}
-              className="group relative"
-            >
-              <Link href={`/news/${news.id}`} className="block h-full">
-                <div className="p-12 rounded-[60px] bg-[#050505] border border-white/[0.03] hover:border-cyan-500/40 transition-all duration-700 group-hover:shadow-[0_40px_100px_rgba(0,0,0,0.8)] relative overflow-hidden flex flex-col h-full">
-                  
-                  {/* Neón lateral dinámico por importancia */}
-                  <div className={`absolute top-0 left-0 w-1 h-full ${news.importance === 'CRITICO' ? 'bg-red-600 shadow-[5px_0_20px_rgba(220,38,38,0.5)]' : 'bg-cyan-500 shadow-[5px_0_20px_rgba(34,211,238,0.5)]'}`} />
-                  
-                  <div className="flex justify-between items-center mb-10 relative z-10">
-                    <span className={`text-[9px] font-black px-5 py-2 rounded-full tracking-widest ${news.importance === 'CRITICO' ? 'bg-red-600 text-white' : 'bg-cyan-500 text-black'}`}>
-                      {news.importance || 'ALTO'}
-                    </span>
-                    <div className="flex items-center gap-3">
-                       <span className="text-xs font-black text-white italic">IMPACTO {news.impact}/10</span>
-                       <div className="w-10 h-10 rounded-full bg-white/5 flex items-center justify-center text-gray-500 group-hover:text-cyan-400 group-hover:rotate-45 transition-all">
-                          <ArrowUpRight size={20} />
+          {filteredNews.length > 0 ? (
+            filteredNews.slice(0, 10).map((news: any, i: number) => (
+              <motion.div 
+                key={i}
+                initial={{ opacity: 0, scale: 0.98 }}
+                whileInView={{ opacity: 1, scale: 1 }}
+                viewport={{ once: true }}
+                className="group relative"
+              >
+                <Link href={`/news/${news.id}`} className="block h-full">
+                  <div className="p-12 rounded-[60px] bg-[#050505] border border-white/[0.03] hover:border-cyan-500/40 transition-all duration-700 group-hover:shadow-[0_40px_100px_rgba(0,0,0,0.8)] relative overflow-hidden flex flex-col h-full">
+                    
+                    {/* Neón lateral dinámico por importancia */}
+                    <div className={`absolute top-0 left-0 w-1 h-full ${news.importance === 'CRITICO' ? 'bg-red-600 shadow-[5px_0_20px_rgba(220,38,38,0.5)]' : 'bg-cyan-500 shadow-[5px_0_20px_rgba(34,211,238,0.5)]'}`} />
+                    
+                    <div className="flex justify-between items-center mb-10 relative z-10">
+                      <span className={`text-[9px] font-black px-5 py-2 rounded-full tracking-widest ${news.importance === 'CRITICO' ? 'bg-red-600 text-white' : 'bg-cyan-500 text-black'}`}>
+                        {news.importance || 'ALTO'}
+                      </span>
+                      <div className="flex items-center gap-3">
+                         <span className="text-xs font-black text-white italic">IMPACTO {news.impact}/10</span>
+                         <div className="w-10 h-10 rounded-full bg-white/5 flex items-center justify-center text-gray-500 group-hover:text-cyan-400 group-hover:rotate-45 transition-all">
+                            <ArrowUpRight size={20} />
+                         </div>
+                      </div>
+                    </div>
+
+                    <h3 className="text-3xl font-black uppercase italic leading-[0.95] text-white group-hover:text-cyan-400 transition-colors mb-8 tracking-tighter">
+                      {news.title}
+                    </h3>
+                    
+                    <p className="text-gray-400 text-base font-light mb-10 leading-relaxed line-clamp-3">
+                      {news.summary}
+                    </p>
+
+                    <div className="mt-auto space-y-8 relative z-10">
+                       <div className="grid grid-cols-2 gap-6 border-y border-white/5 py-8">
+                          <div>
+                             <p className="text-[8px] font-black text-gray-600 uppercase tracking-widest mb-2">Empresas Foco</p>
+                             <div className="flex flex-wrap gap-2">
+                                {news.companies?.map((c: string, idx: number) => (
+                                  <span key={idx} className="text-[8px] bg-white/5 px-3 py-1 rounded text-white font-bold">{c}</span>
+                                ))}
+                             </div>
+                          </div>
+                          <div>
+                             <p className="text-[8px] font-black text-gray-600 uppercase tracking-widest mb-2">Líderes Activos</p>
+                             <div className="flex flex-wrap gap-2">
+                                {news.people?.map((p: string, idx: number) => (
+                                  <span key={idx} className="text-[8px] bg-cyan-500/10 px-3 py-1 rounded text-cyan-400 font-bold">{p}</span>
+                                ))}
+                             </div>
+                          </div>
+                       </div>
+                       <div className="p-6 bg-purple-500/5 rounded-3xl border border-purple-500/10">
+                          <p className="text-[10px] text-purple-400 font-black uppercase italic leading-tight">
+                             <Sparkles className="inline mr-3" size={14} /> Consecuencia: {news.consequence}
+                          </p>
+                       </div>
+                       <div className="flex items-center gap-3 text-[10px] font-black text-gray-600 uppercase">
+                          <Clock size={12} className="text-cyan-500" /> Inyectado: {new Date(news.timestamp).toLocaleTimeString('es-PE')}
                        </div>
                     </div>
                   </div>
-
-                  <h3 className="text-3xl font-black uppercase italic leading-[0.95] text-white group-hover:text-cyan-400 transition-colors mb-8 tracking-tighter">
-                    {news.title}
-                  </h3>
-                  
-                  <p className="text-gray-400 text-base font-light mb-10 leading-relaxed line-clamp-3">
-                    {news.summary}
-                  </p>
-
-                  <div className="mt-auto space-y-8 relative z-10">
-                     <div className="grid grid-cols-2 gap-6 border-y border-white/5 py-8">
-                        <div>
-                           <p className="text-[8px] font-black text-gray-600 uppercase tracking-widest mb-2">Empresas Foco</p>
-                           <div className="flex flex-wrap gap-2">
-                              {news.companies?.map((c: string, idx: number) => (
-                                <span key={idx} className="text-[8px] bg-white/5 px-3 py-1 rounded text-white font-bold">{c}</span>
-                              ))}
-                           </div>
-                        </div>
-                        <div>
-                           <p className="text-[8px] font-black text-gray-600 uppercase tracking-widest mb-2">Líderes Activos</p>
-                           <div className="flex flex-wrap gap-2">
-                              {news.people?.map((p: string, idx: number) => (
-                                <span key={idx} className="text-[8px] bg-cyan-500/10 px-3 py-1 rounded text-cyan-400 font-bold">{p}</span>
-                              ))}
-                           </div>
-                        </div>
-                     </div>
-                     <div className="p-6 bg-purple-500/5 rounded-3xl border border-purple-500/10">
-                        <p className="text-[10px] text-purple-400 font-black uppercase italic leading-tight">
-                           <Sparkles className="inline mr-3" size={14} /> Consecuencia: {news.consequence}
-                        </p>
-                     </div>
-                     <div className="flex items-center gap-3 text-[10px] font-black text-gray-600 uppercase">
-                        <Clock size={12} className="text-cyan-500" /> Inyectado: {new Date(news.timestamp).toLocaleTimeString('es-PE')}
-                     </div>
-                  </div>
-                </div>
-              </Link>
-            </motion.div>
-          ))}
+                </Link>
+              </motion.div>
+            ))
+          ) : (
+            <div className="col-span-full py-20 text-center space-y-6 bg-white/[0.01] rounded-[60px] border border-dashed border-white/10">
+               <Search className="text-gray-700 mx-auto" size={50} />
+               <div className="space-y-2">
+                  <p className="text-lg font-black uppercase tracking-widest text-gray-500">No se encontraron reportes Alpha</p>
+                  <p className="text-xs text-gray-700 font-bold uppercase tracking-[0.3em]">Intenta con otros parámetros de inteligencia</p>
+               </div>
+               <button 
+                  onClick={() => setSearchQuery('')}
+                  className="px-8 py-3 bg-white/5 hover:bg-white/10 rounded-full text-[9px] font-black uppercase tracking-widest text-cyan-500 transition-all"
+               >
+                  Limpiar Búsqueda
+               </button>
+            </div>
+          )}
         </div>
       </section>
 
@@ -239,7 +286,7 @@ export default function MasterIntel() {
                <TriangleAlert size={32} className="text-purple-600 animate-pulse" />
             </div>
             <div className="space-y-8">
-               {intel.rumors?.map((r: any, i: number) => (
+               {filteredRumors.length > 0 ? filteredRumors.map((r: any, i: number) => (
                  <motion.div 
                     key={i} 
                     whileHover={{ x: 10 }}
@@ -255,7 +302,9 @@ export default function MasterIntel() {
                        <span className="bg-purple-600 text-white px-5 py-2 rounded-full text-[9px] font-black uppercase tracking-widest shadow-[0_0_20px_rgba(147,51,234,0.3)]">Probabilidad: {r.probability}</span>
                     </div>
                  </motion.div>
-               ))}
+               )) : (
+                 <p className="text-center py-10 text-gray-700 font-bold uppercase tracking-widest text-xs">Sin rumores coincidentes</p>
+               )}
             </div>
          </section>
 
@@ -268,7 +317,7 @@ export default function MasterIntel() {
                <Swords size={32} className="text-red-600 animate-bounce" />
             </div>
             <div className="space-y-8">
-               {intel.battles?.map((b: any, i: number) => (
+               {filteredBattles.length > 0 ? filteredBattles.map((b: any, i: number) => (
                  <motion.div 
                     key={i} 
                     whileHover={{ x: -10 }}
@@ -290,7 +339,9 @@ export default function MasterIntel() {
                        </div>
                     </div>
                  </motion.div>
-               ))}
+               )) : (
+                 <p className="text-center py-10 text-gray-700 font-bold uppercase tracking-widest text-xs">Sin conflictos coincidentes</p>
+               )}
             </div>
          </section>
       </div>
