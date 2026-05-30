@@ -9,7 +9,7 @@ import { useSession } from 'next-auth/react';
 import { 
   ChevronRight, ArrowLeft, CheckCircle2, AlertCircle, 
   Brain, MessageSquare, Flame, 
-  Play, BookOpen, Zap, Star, Settings, Loader2
+  Play, BookOpen, Zap, Star, Settings, Loader2, Target
 } from 'lucide-react';
 
 export default function LearningPage() {
