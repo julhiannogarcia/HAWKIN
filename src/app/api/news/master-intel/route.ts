@@ -80,7 +80,14 @@ export async function GET() {
       response_format: { type: "json_object" }
     });
 
-    const intelReport = JSON.parse(chatCompletion.choices[0]?.message?.content || "{}");
+    const content = chatCompletion.choices[0]?.message?.content || "{}";
+    let intelReport;
+    try {
+      intelReport = JSON.parse(content);
+    } catch (e) {
+      console.error("Failed to parse AI JSON:", content);
+      return NextResponse.json({ error: "Error en el formato de inteligencia" }, { status: 500 });
+    }
 
     cachedIntel = intelReport;
     lastUpdate = now;

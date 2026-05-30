@@ -2,9 +2,9 @@
 
 import React, { useState, useEffect } from 'react';
 import { 
-  BarChart3, Newspaper, Users, Sliders, Terminal, Edit3,
-  DollarSign, Activity, ShoppingBag, Radio, Layout, Shield,
-  ShieldCheck, AlertCircle, Trash2, Globe, Target, Zap, Loader2
+  BarChart, Newspaper, Users, Sliders, Terminal, Edit3,
+  DollarSign, Activity, ShoppingBag, Radio, LayoutDashboard, Shield,
+  ShieldCheck, CircleAlert, Trash2, Globe, Target, Zap, Loader2
 } from 'lucide-react';
 import { motion, AnimatePresence } from 'framer-motion';
 
@@ -98,7 +98,7 @@ export default function AdminContent() {
          <div className="lg:col-span-2 space-y-8">
             <div className="flex justify-between items-center">
                <h3 className="text-xl font-black uppercase italic tracking-tighter text-red-500 flex items-center gap-3">
-                  <AlertCircle size={20} /> Registro de Actividad Alpha
+                  <CircleAlert size={20} /> Registro de Actividad Alpha
                </h3>
                <button className="text-[9px] font-black text-gray-600 uppercase hover:text-white transition-all underline">Limpiar Terminal</button>
             </div>
