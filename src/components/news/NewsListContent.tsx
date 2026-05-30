@@ -6,7 +6,8 @@ import Footer from '@/components/Footer';
 import GlobalTicker from '@/components/Ticker';
 import LiveFeed from '@/components/LiveFeed';
 import NewsCard from '@/components/NewsCard';
-import { Loader2 } from 'lucide-react';
+import MasterIntel from '@/components/news/MasterIntel';
+import { Loader2, Radio } from 'lucide-react';
 
 export default function NewsPage() {
   const [isMounted, setIsMounted] = useState(false);
@@ -23,56 +24,41 @@ export default function NewsPage() {
     );
   }
 
-  const allNews = [
-    { 
-      id: "gpt-5-leak", 
-      title: "OpenAI GPT-5: Filtraciones sobre la nueva arquitectura", 
-      excerpt: "Análisis profundo sobre el razonamiento System 2...", 
-      category: "BIG TECH", 
-      isLocked: true,
-      date: "27 Mayo, 2026",
-      author: "Julhianno Garcia"
-    },
-    { 
-      id: "sam-altman-ubr", 
-      title: "La visión de Sam Altman sobre la RBU", 
-      excerpt: "Cómo la IA financiará el futuro...", 
-      category: "CEO RADAR", 
-      isLocked: true,
-      date: "27 Mayo, 2026",
-      author: "Julhianno Garcia"
-    },
-    { 
-      id: "nvidia-record", 
-      title: "NVIDIA alcanza valoración récord", 
-      excerpt: "El motor del mundo IA no tiene freno...", 
-      category: "MERCADO", 
-      isLocked: false,
-      date: "26 Mayo, 2026",
-      author: "HAWKIN Intel"
-    },
-    { 
-      id: "linux-trend", 
-      title: "Linux y la IA: Modelos locales en tendencia", 
-      excerpt: "Guía para correr LLMs en hardware libre...", 
-      category: "DEVELOPER", 
-      isLocked: false,
-      date: "25 Mayo, 2026",
-      author: "HAWKIN Intel"
-    },
-  ];
-
   return (
-    <main className="min-h-screen bg-black">
+    <main className="min-h-screen bg-black text-white selection:bg-cyan-500">
       <Header />
+      
       <div className="max-w-6xl mx-auto px-4 pt-40 pb-32">
-        <h1 className="text-5xl font-black tracking-tighter text-white mb-12 uppercase italic">Radar HAWKIN</h1>
-        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
-          {allNews.map((news, i) => (
-            <NewsCard key={i} {...news} />
-          ))}
+        {/* CABECERA DEL COMANDO CENTRAL */}
+        <section className="mb-32 text-center md:text-left space-y-6">
+           <div className="flex items-center justify-center md:justify-start gap-4">
+              <div className="px-4 py-1.5 bg-red-500/10 border border-red-500/30 rounded-full flex items-center gap-3">
+                 <Radio className="text-red-500 animate-pulse" size={14} />
+                 <span className="text-[10px] font-black text-red-500 uppercase tracking-[0.4em]">Global Intel Live</span>
+              </div>
+           </div>
+           <h1 className="text-6xl md:text-8xl font-black tracking-tighter uppercase italic leading-none">
+              Command <span className="bg-gradient-to-r from-cyan-400 to-blue-600 bg-clip-text text-transparent">Center.</span>
+           </h1>
+           <p className="text-gray-500 text-lg max-w-2xl font-light italic border-l-2 border-cyan-500 pl-6 mx-auto md:mx-0 text-left">
+              Reportes de inteligencia procesados en tiempo real por el núcleo HAWKIN. 
+              Análisis, rumores y predicciones del ecosistema global de IA.
+           </p>
+        </section>
+
+        {/* MOTOR DE INTELIGENCIA MAESTRO */}
+        <MasterIntel />
+
+        {/* FEED DE NOTICIAS TRADICIONAL (ELIMINADO MOCK HARDCODED PARA USAR LIVEFEED) */}
+        <div className="mt-40 space-y-16">
+           <div className="flex items-center gap-4">
+              <div className="w-4 h-4 bg-cyan-500 rounded-full" />
+              <h2 className="text-4xl font-black uppercase italic tracking-tighter">Archivo de <span className="text-gray-600">Inteligencia</span></h2>
+           </div>
+           <LiveFeed />
         </div>
       </div>
+
       <Footer />
       <GlobalTicker />
     </main>

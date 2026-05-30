@@ -13,6 +13,7 @@ interface NewsCardProps {
   image?: string;
   date?: string;
   author?: string;
+  source?: string;
 }
 
 export default function NewsCard({ 
@@ -23,7 +24,8 @@ export default function NewsCard({
   isLocked = false, 
   image, 
   date = "Recién lanzado", 
-  author = "HAWKIN Intel" 
+  author = "HAWKIN Intel",
+  source 
 }: NewsCardProps) {
   return (
     <Link href={`/news/${id}`}>
@@ -50,7 +52,7 @@ export default function NewsCard({
 
         <div className="p-7 flex flex-col flex-1">
           <div className="flex items-center gap-3 text-[9px] font-black text-gray-500 uppercase tracking-widest mb-4">
-            <Clock size={12} className="text-cyan-500" /> {date} • {author}
+            <Clock size={12} className="text-cyan-500" /> {date} {source && `• ${source}`}
           </div>
           
           <h3 className="text-xl font-black mb-4 leading-tight group-hover:text-cyan-400 transition-colors line-clamp-2 italic uppercase tracking-tighter">
