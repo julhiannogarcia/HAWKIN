@@ -7,110 +7,110 @@ export const revalidate = 0;
 
 const parser = new Parser();
 
-// Caching layer to avoid hitting API limits
+// Caching layer para no saturar pero manteniendo frescura
 let cachedIntel: any = null;
 let lastUpdate = 0;
-const CACHE_DURATION = 1000 * 60 * 30; // 30 min para mayor frescura
+const CACHE_DURATION = 1000 * 60 * 10; // 10 minutos para el análisis profundo de IA
 
 function generateId(title: string) {
-  return title.toLowerCase().replace(/[^a-z0-9]+/g, '-').replace(/(^-|-$)/g, '').substring(0, 50);
+  return title.toLowerCase().replace(/[^a-z0-9]+/g, '-').replace(/(^-|-$)/g, '').substring(0, 50) + '-' + Math.random().toString(36).substring(2, 5);
 }
 
 export async function GET() {
   try {
     const apiKey = process.env.GROQ_API_KEY;
-    if (!apiKey) {
-      return NextResponse.json({ error: "Socio, falta el núcleo de energía de IA." }, { status: 500 });
+    if (!apiKey) return NextResponse.json({ error: "Socio, falta el núcleo de energía de IA." }, { status: 500 });
+
+    const now = Date.now();
+    if (cachedIntel && (now - lastUpdate < CACHE_DURATION)) {
+      return NextResponse.json({ ...cachedIntel, lastUpdate: new Date(lastUpdate).toLocaleTimeString('es-PE') });
     }
 
     const groq = new Groq({ apiKey });
 
-    const now = Date.now();
-    if (cachedIntel && (now - lastUpdate < CACHE_DURATION)) {
-      return NextResponse.json(cachedIntel);
-    }
-
-    // 1. RECOPILAR INTELIGENCIA BRUTA (RSS)
+    // 1. RECOPILAR INTELIGENCIA BRUTA (FUENTES DE ALTA CREDIBILIDAD)
     const FEEDS = [
-      'https://news.google.com/rss/search?q=OpenAI+NVIDIA+Tesla+Anthropic+startups+AI+AGI+breaking&hl=es-419&gl=US&ceid=US:es-419',
-      'https://news.google.com/rss/search?q=Sam+Altman+Elon+Musk+Jensen+Huang+Satya+Nadella+tech+CEO+scoop&hl=es-419&gl=US&ceid=US:es-419'
+      'https://news.google.com/rss/search?q=OpenAI+NVIDIA+Tesla+Anthropic+startups+AI+AGI+breaking&hl=en-US&gl=US&ceid=US:en',
+      'https://news.google.com/rss/search?q=Sam+Altman+Elon+Musk+Jensen+Huang+tech+CEO+leak+rumor&hl=en-US&gl=US&ceid=US:en',
+      'https://hnrss.org/frontpage?q=AI'
     ];
 
     const results = await Promise.all(FEEDS.map(url => parser.parseURL(url)));
-    const rawItems = results.flatMap(res => res.items).slice(0, 15).map(item => ({
+    const rawItems = results.flatMap(res => res.items).slice(0, 20).map(item => ({
       title: item.title,
-      content: item.contentSnippet,
-      date: item.pubDate,
+      snippet: item.contentSnippet?.substring(0, 300),
+      source: item.source?.name || "Global Intel",
       link: item.link
     }));
 
-    // 2. PROCESAMIENTO CON MASTER PROMPT (MOTOR ALPHA)
+    // 2. MOTOR DE INTELIGENCIA DE GRADO MILITAR (MASTER PROMPT)
     const MASTER_PROMPT = `
       Actúa como un sistema de inteligencia periodística mundial especializado exclusivamente en Inteligencia Artificial.
-      Tu misión es monitorear, analizar y reportar en tiempo real las noticias más importantes sobre IA, tecnología avanzada, robótica, computación cuántica, startups tecnológicas, AGI y guerras tecnológicas.
+      Analiza los siguientes datos y genera un reporte estructurado en JSON.
 
       OBJETIVOS:
-      1. Detectar noticias bomba y rumores.
-      2. Analizar conflictos entre empresas y CEOs.
-      3. Identificar tecnologías disruptivas.
+      1. Detectar noticias bomba, rumores y filtraciones.
+      2. Analizar conflictos entre empresas y CEOs (OpenAI vs Google, etc).
+      3. Identificar tecnologías disruptivas y startups a vigilar.
 
-      FORMATO DE SALIDA (JSON ESTRICTO):
+      FORMATO JSON REQUERIDO:
       {
         "topNews": [
-          { "id": "crear-slug-unico", "title": "TITULO", "summary": "RESUMEN", "impact": 1-10, "companies": [], "people": [], "consequence": "POSIBLE CONSECUENCIA", "importance": "ALTO/CRITICO", "url": "URL_ORIGINAL" }
+          { "title": "TITULO", "summary": "RESUMEN", "impact": 1-10, "companies": ["EMPRESA"], "people": ["PERSONA"], "consequence": "POSIBLE CONSECUENCIA", "importance": "CRITICO/ALTO/MEDIO", "url": "URL" }
         ],
         "rumors": [
           { "text": "RUMOR", "source": "FUENTE", "credibility": "ALTO/MEDIO", "probability": "0-100%" }
         ],
         "battles": [
-          { "competitors": "Empresa A vs Empresa B", "motive": "MOTIVO", "status": "SITUACION ACTUAL", "winners": "POSIBLES GANADORES" }
+          { "competitors": "Empresa A vs Empresa B", "motive": "MOTIVO", "status": "SITUACION ACTUAL", "winners": "LIDER ACTUAL" }
         ],
         "trendingCEOs": [
-          { "name": "Nombre", "company": "Empresa", "reason": "Motivo" }
+          { "name": "Nombre", "company": "Empresa", "reason": "Motivo de tendencia" }
         ],
-        "emergingTech": [],
-        "prediction": { "dominance": "EMPRESA DOMINANTE", "ceo": "CEO INFLUYENTE", "tech": "TECNOLOGIA CLAVE", "risk": "RIESGO" }
+        "emergingTech": ["Tecnología A", "Tech B"],
+        "startups": ["Startup A (Crecimiento X%)"],
+        "prediction": { "dominance": "EMPRESA DOMINANTE", "ceo": "CEO INFLUYENTE", "tech": "TECNOLOGIA CLAVE", "risk": "RIESGO MAYOR" }
       }
 
-      NOTICIAS PARA ANALIZAR: ${JSON.stringify(rawItems)}
+      NOTICIAS PARA PROCESAR: ${JSON.stringify(rawItems)}
     `;
 
     const chatCompletion = await groq.chat.completions.create({
       messages: [
-        { role: "system", content: "Eres el Command Center de HAWKIN. Responde siempre en JSON puro. Asegúrate de incluir los campos 'id' (slug) y 'url' para cada noticia." },
+        { role: "system", content: "Eres el HAWKIN WAR ROOM COMMAND CENTER. Genera inteligencia de élite en JSON puro." },
         { role: "user", content: MASTER_PROMPT }
       ],
       model: "llama-3.3-70b-versatile",
-      temperature: 0.5,
+      temperature: 0.3, // Menos creatividad, más precisión
       response_format: { type: "json_object" }
     });
 
     const content = chatCompletion.choices[0]?.message?.content || "{}";
     let intelReport;
+    
     try {
       intelReport = JSON.parse(content);
-      // Post-procesamiento para asegurar IDs
+      
+      // Enriquecimiento de datos para el UI
       if (intelReport.topNews) {
         intelReport.topNews = intelReport.topNews.map((n: any) => ({
           ...n,
-          id: n.id || generateId(n.title),
-          category: "CENTRO DE MANDO",
-          date: new Date().toLocaleTimeString('es-PE', { hour: '2-digit', minute: '2-digit' }),
-          author: "HAWKIN Engine"
+          id: generateId(n.title),
+          timestamp: new Date().toISOString()
         }));
       }
     } catch (e) {
       console.error("Failed to parse AI JSON:", content);
-      return NextResponse.json({ error: "Error en el formato de inteligencia" }, { status: 500 });
+      return NextResponse.json({ error: "Sincronizando flujos de datos..." }, { status: 500 });
     }
 
     cachedIntel = intelReport;
     lastUpdate = now;
 
-    return NextResponse.json(intelReport);
+    return NextResponse.json({ ...intelReport, lastUpdate: new Date(now).toLocaleTimeString('es-PE') });
 
   } catch (error: any) {
-    console.error("Intel Engine Error:", error);
-    return NextResponse.json({ error: "Sincronizando Sistema Alpha..." }, { status: 500 });
+    console.error("War Room API Error:", error);
+    return NextResponse.json({ error: "Interferencia en el canal de inteligencia." }, { status: 500 });
   }
 }
