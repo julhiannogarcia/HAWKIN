@@ -15,17 +15,32 @@ model User {
   emailVerified DateTime?
   image         String?
   role          Role      @default(USER)
+  xp            Int       @default(0)     // Experiencia acumulada
+  streak        Int       @default(0)     // Racha de días activos
   subscription  Subscription?
   accounts      Account[]
   sessions      Session[]
   savedNews     News[]    @relation("UserSavedNews")
   donations     Donation[]
+  progress      UserProgress[]            // Registro de lecciones completadas
 }
 
 enum Role {
   USER
   ADMIN
   ADVERTISER
+}
+
+model UserProgress {
+  id        String   @id @default(cuid())
+  userId    String
+  user      User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+  lessonId  String   // ID de la lección (referencia a objeto en JS o DB)
+  courseId  String?  // ID del curso al que pertenece
+  completed Boolean  @default(true)
+  createdAt DateTime @default(now())
+
+  @@unique([userId, lessonId]) // Evita duplicados
 }
 
 model Subscription {

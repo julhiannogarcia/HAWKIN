@@ -3,20 +3,23 @@ import { prisma } from "@/lib/prisma";
 
 export async function GET() {
   try {
+    // 1. Contar usuarios reales en la DB
     const userCount = await prisma.user.count();
-    const activeUsers = await prisma.session.count(); // Aproximación de usuarios con sesión activa
-    const totalRevenue = await prisma.adCampaign.aggregate({
-      _sum: {
-        clicks: true, // Esto es solo un ejemplo, deberíamos tener un campo de monto real
-      }
-    });
+    
+    // 2. Contar sesiones activas (aproximación de usuarios online)
+    const activeSessions = await prisma.session.count();
+
+    // 3. Contar noticias publicadas
+    const newsCount = await prisma.news.count();
 
     return NextResponse.json({
       totalUsers: userCount,
-      activeNow: activeUsers,
-      revenue: "S/ 48,250", // Mantengo el mock por ahora hasta tener pagos reales en DB
+      activeNow: activeSessions,
+      newsCount: newsCount,
+      revenue: "S/ 48,250", // Esto se automatizará cuando Stripe/PayPal guarden en DB
     });
   } catch (error) {
+    console.error("Stats API Error:", error);
     return NextResponse.json({ error: "Fallo al obtener métricas" }, { status: 500 });
   }
 }
