@@ -7,7 +7,7 @@ import VoiceRecorder from '@/components/course/VoiceRecorder';
 import { COURSE_CURRICULUM, Day, Module, Lesson, LessonStep, AgeGroup, LessonLevel } from '@/lib/courseData';
 import GlobalTicker from '@/components/Ticker';
 import { 
-  ChevronRight, ArrowLeft, CheckCircle2, AlertCircle, 
+  ChevronRight, ArrowLeft, CircleCheckBig, CircleAlert, 
   BookOpen, Trophy, Mic, Star, Calendar, User, Laptop, Rocket,
   Clock, Brain, MessageSquare, Headphones, PenTool, Flame
 } from 'lucide-react';
@@ -329,7 +329,7 @@ export default function CoursePrototypePage() {
                       {currentStep.uiContent?.options?.map((opt, i) => (
                         <button key={i} onClick={() => { setSelectedOption(i); setShowFeedback(i === currentStep.uiContent?.correctOption ? 'correct' : 'wrong'); }} className={`p-8 rounded-[30px] border text-left transition-all flex justify-between items-center group ${selectedOption === i ? (i === currentStep.uiContent?.correctOption ? 'bg-cyan-500/10 border-cyan-400' : 'bg-red-500/10 border-red-500') : 'bg-white/5 border-white/5 hover:border-white/20'}`}>
                            <span className={`font-bold text-base ${selectedOption === i ? 'text-white' : 'text-gray-500 group-hover:text-white'}`}>{opt}</span>
-                           {selectedOption === i && (i === currentStep.uiContent?.correctOption ? <CheckCircle2 className="text-cyan-400" /> : <AlertCircle className="text-red-500" />)}
+                           {selectedOption === i && (i === currentStep.uiContent?.correctOption ? <CircleCheckBig className="text-cyan-400" /> : <CircleAlert className="text-red-500" />)}
                         </button>
                       ))}
                     </div>

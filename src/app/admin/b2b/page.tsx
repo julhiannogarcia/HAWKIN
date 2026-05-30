@@ -1,7 +1,7 @@
 'use client';
 
 import { useState, useEffect } from 'react';
-import { ShoppingBag, UploadCloud, CheckCircle2, Clock, Trash2, Edit3, Globe, Target, DollarSign, Loader2, ShieldCheck } from 'lucide-react';
+import { ShoppingBag, UploadCloud, Clock, Trash2, Edit3, Globe, Target, DollarSign, Loader2, ShieldCheck } from 'lucide-react';
 import { motion, AnimatePresence } from 'framer-motion';
 
 export default function ManageAds() {

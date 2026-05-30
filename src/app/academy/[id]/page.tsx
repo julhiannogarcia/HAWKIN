@@ -5,7 +5,7 @@ import { useParams, useRouter } from 'next/navigation';
 import Header from '@/components/Header';
 import Footer from '@/components/Footer';
 import Ticker from '@/components/Ticker';
-import { PlayCircle, CheckCircle2, Lock, ArrowRight, Award, BookOpen, Volume2, ShieldAlert } from 'lucide-react';
+import { CirclePlay, Lock, ArrowRight, Award, BookOpen, Volume2, ShieldAlert } from 'lucide-react';
 
 // FUENTES DE ÉLITE VERIFICADAS (PERMITEN INSERTAR/EMBED)
 const COURSES_DATA: Record<string, any> = {
@@ -101,7 +101,7 @@ export default function CourseLMS({ params }: { params: Promise<{ id: string }> 
                   {module.lessons.map((lesson: any) => (
                     <div key={lesson.id} className={`p-4 rounded-xl flex items-center justify-between ${lesson.isCurrent ? 'bg-white/5 border border-white/10' : 'text-gray-500'}`}>
                       <div className="flex items-center gap-3">
-                        <PlayCircle size={16} className={lesson.isCurrent ? 'text-cyan-400' : ''} />
+                        <CirclePlay size={16} className={lesson.isCurrent ? 'text-cyan-400' : ''} />
                         <span className="text-xs font-bold">{lesson.title}</span>
                       </div>
                     </div>

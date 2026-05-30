@@ -12,7 +12,7 @@ import TechnicalGaugeWidget from '@/components/TechnicalGaugeWidget';
 import MarketOverviewWidget from '@/components/MarketOverviewWidget';
 import EconomicCalendarWidget from '@/components/EconomicCalendarWidget';
 import CryptoHeatMapWidget from '@/components/CryptoHeatMapWidget';
-import { Activity, ShieldCheck, Zap, Globe, Clock, Bell, BellRing, Loader2, BarChart3, TrendingUp, LayoutGrid, Radio, ExternalLink, Info } from 'lucide-react';
+import { Activity, ShieldCheck, Zap, Globe, Clock, Bell, BellRing, Loader2, ChartNoAxesColumn, TrendingUp, LayoutGrid, Radio, ExternalLink, Info } from 'lucide-react';
 
 export default function GoldPage() {
   const [isMounted, setIsMounted] = useState(false);

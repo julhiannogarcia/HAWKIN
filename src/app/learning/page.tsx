@@ -7,7 +7,7 @@ import VoiceRecorder from '@/components/course/VoiceRecorder';
 import { COURSE_CURRICULUM, Day, Module, Lesson, LessonStep } from '@/lib/courseData';
 import { useSession } from 'next-auth/react';
 import { 
-  ChevronRight, ArrowLeft, CheckCircle2, AlertCircle, 
+  ChevronRight, ArrowLeft, CircleCheckBig, CircleAlert, 
   Brain, MessageSquare, Flame, 
   Play, BookOpen, Zap, Star, Settings, Loader2, Target
 } from 'lucide-react';
@@ -126,7 +126,7 @@ export default function LearningPage() {
                             <span className={`text-xs font-black ${activeDay.dayNumber === day.dayNumber ? 'text-cyan-400' : 'text-gray-500'}`}>D{day.dayNumber}</span>
                             <span className="text-xs font-bold uppercase truncate max-w-[120px]">{day.title}</span>
                          </div>
-                         {allDayModulesCompleted && <CheckCircle2 size={14} className="text-green-500" />}
+                         {allDayModulesCompleted && <CircleCheckBig size={14} className="text-green-500" />}
                       </button>
                     );
                  })}
@@ -180,7 +180,7 @@ export default function LearningPage() {
                       >
                          <div className="flex justify-between items-start">
                             <div className={`w-16 h-16 rounded-3xl flex items-center justify-center text-3xl transition-all ${isCompleted ? 'bg-green-500 text-black' : 'bg-white/5 group-hover:bg-cyan-500 group-hover:text-black'}`}>
-                               {isCompleted ? <CheckCircle2 size={32} /> : mod.icon}
+                               {isCompleted ? <CircleCheckBig size={32} /> : mod.icon}
                             </div>
                             {isCompleted && <span className="text-[8px] font-black text-green-500 uppercase tracking-widest bg-green-500/10 px-2 py-1 rounded-full">Completado</span>}
                          </div>
@@ -268,7 +268,7 @@ export default function LearningPage() {
                         </motion.div>
                       ) : (
                         <motion.div key="success-content" initial={{ scale: 0.8, opacity: 0 }} animate={{ scale: 1, opacity: 1 }} className="text-center space-y-12">
-                           <CheckCircle2 className="text-green-500 mx-auto" size={100} />
+                           <CircleCheckBig className="text-green-500 mx-auto" size={100} />
                            <h2 className="text-5xl font-black uppercase italic italic">¡Excelente Precisión!</h2>
                            <button onClick={handleNext} className="w-full py-8 bg-white text-black rounded-[35px] font-black uppercase tracking-[0.4em] text-[12px] hover:bg-cyan-400">Continuar</button>
                         </motion.div>

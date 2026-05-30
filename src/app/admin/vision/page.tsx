@@ -4,8 +4,8 @@ import { useState, useEffect } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
 import { 
   Users, DollarSign, ShieldAlert, Globe, FileSpreadsheet, 
-  BarChart3, LayoutDashboard, History, Settings, ExternalLink, 
-  Eye, Lock, Key, AlertCircle, ShoppingBag, Heart 
+  LayoutDashboard, History, Settings, ExternalLink, 
+  Eye, Lock, Key, CircleAlert, ShoppingBag, Heart 
 } from 'lucide-react';
 import { LineChart, Line, XAxis, YAxis, CartesianGrid, Tooltip, ResponsiveContainer, AreaChart, Area } from 'recharts';
 import * as XLSX from 'xlsx';
@@ -243,7 +243,7 @@ export default function AdminVision() {
             <h2 className="text-4xl font-black uppercase italic">Salud y <span className="text-red-500">Mantenimiento.</span></h2>
             <div className="p-10 bg-black border border-red-500/20 rounded-[50px] space-y-6">
                <div className="flex items-center gap-4 text-red-500 mb-8">
-                  <AlertCircle />
+                  <CircleAlert />
                   <span className="text-[10px] font-black uppercase tracking-widest">Logs de Error en Tiempo Real</span>
                </div>
                <div className="space-y-4">

@@ -2,7 +2,7 @@
 
 import React, { useState, useEffect, useCallback, useRef } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
-import { Mic, MicOff, RotateCcw, CheckCircle2, AlertCircle } from 'lucide-react';
+import { Mic, MicOff, RotateCcw, CircleCheckBig, CircleAlert } from 'lucide-react';
 
 interface VoiceRecorderProps {
   targetPhrase: string;
@@ -130,7 +130,7 @@ export default function VoiceRecorder({ targetPhrase, onResult, lang = 'en-US' }
 
         {error && (
           <p className="text-red-500 text-[9px] font-black uppercase flex items-center justify-center gap-2">
-            <AlertCircle size={14} /> {error}
+            <CircleAlert size={14} /> {error}
           </p>
         )}
       </div>

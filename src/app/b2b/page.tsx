@@ -7,7 +7,7 @@ import GlobalTicker from '@/components/Ticker';
 import { motion, AnimatePresence } from 'framer-motion';
 import { 
   ShieldCheck, Loader2, MessageCircle, Radio, 
-  Layout, ShoppingBag, Target, Tv, Eye, ExternalLink, Play, AlertCircle
+  LayoutDashboard, ShoppingBag, Target, Tv, Eye, ExternalLink, Play
 } from 'lucide-react';
 
 // =====================================================================
@@ -22,7 +22,7 @@ export default function B2BPage() {
 
   const AD_PLANS = useMemo(() => [
     { id: 'plus', title: 'Plus Streaming & Hero', pricePEN: 999, priceUSD: "265.00", placement: 'Banner Principal + Live', reach: '2.5M+ Views', desc: 'Tu marca en la cabecera principal con video en tiempo real.', icon: <Radio className="text-blue-400" /> },
-    { id: 'sidebar', title: 'Sidebar de Impacto', pricePEN: 699, priceUSD: "185.00", placement: 'Lateral del Ecosistema', reach: '1M+ Views', desc: 'Presencia constante al lado de reportes y herramientas de élite.', icon: <Layout className="text-blue-300" /> },
+    { id: 'sidebar', title: 'Sidebar de Impacto', pricePEN: 699, priceUSD: "185.00", placement: 'Lateral del Ecosistema', reach: '1M+ Views', desc: 'Presencia constante al lado de reportes y herramientas de élite.', icon: <LayoutDashboard className="text-blue-300" /> },
     { id: 'native', title: 'Pauta Nativa Radar', pricePEN: 399, priceUSD: "105.00", placement: 'Entre Noticias', reach: '500k+ Clics', desc: 'Anuncio integrado orgánicamente en el feed de inteligencia.', icon: <ShoppingBag className="text-blue-200" /> },
   ], []);
 

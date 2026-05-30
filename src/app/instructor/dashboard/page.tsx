@@ -5,7 +5,7 @@ import { useState, useEffect, useRef } from 'react';
 import Header from '@/components/Header';
 import Footer from '@/components/Footer';
 import GlobalTicker from '@/components/Ticker';
-import { UploadCloud, DollarSign, Users, BookOpen, CheckCircle, Clock, BarChart3, PlusCircle, FileCheck, Loader2 } from 'lucide-react';
+import { UploadCloud, DollarSign, Users, BookOpen, CheckCircle, Clock, ChartNoAxesColumn, CirclePlus, FileCheck, Loader2 } from 'lucide-react';
 
 export default function InstructorDashboard() {
   const [isUploading, setIsUploading] = useState(false);
@@ -17,7 +17,7 @@ export default function InstructorDashboard() {
     { label: 'Ventas Totales', value: '$2,450', icon: <DollarSign className="text-green-500" />, detail: 'Tu ganancia (60%)' },
     { label: 'Estudiantes', value: '128', icon: <Users className="text-cyan-400" />, detail: 'Inscritos este mes' },
     { label: 'Cursos Activos', value: '3', icon: <BookOpen className="text-purple-500" />, detail: 'En el Marketplace' },
-    { label: 'Comisión HAWKIN', value: '$980', icon: <BarChart3 className="text-gray-500" />, detail: 'Plataforma (40%)' },
+    { label: 'Comisión HAWKIN', value: '$980', icon: <ChartNoAxesColumn className="text-gray-500" />, detail: 'Plataforma (40%)' },
   ];
 
   const myCourses = [
@@ -71,7 +71,7 @@ export default function InstructorDashboard() {
             <h1 className="text-5xl md:text-7xl font-black tracking-tighter mt-4 leading-none italic">Instructor <span className="text-gray-500">Dashboard</span></h1>
           </div>
           <button onClick={handleFileSelect} className="btn-glow flex items-center gap-3 text-[10px] py-5 px-10">
-            <PlusCircle size={16} /> SUBIR NUEVO CURSO
+            <CirclePlus size={16} /> SUBIR NUEVO CURSO
           </button>
         </header>
 

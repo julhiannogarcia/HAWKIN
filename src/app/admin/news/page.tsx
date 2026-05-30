@@ -1,7 +1,7 @@
 'use client';
 
 import { useState } from 'react';
-import { Loader2, CheckCircle2, AlertCircle, Newspaper, Sparkles, Send, Globe } from 'lucide-react';
+import { Loader2, CircleCheckBig, CircleAlert, Newspaper, Sparkles, Send, Globe } from 'lucide-react';
 import { motion, AnimatePresence } from 'framer-motion';
 
 export default function CreateNews() {
@@ -77,13 +77,13 @@ export default function CreateNews() {
       <AnimatePresence>
          {showSuccess && (
             <motion.div initial={{opacity:0, y:-20}} animate={{opacity:1, y:0}} exit={{opacity:0}} className="bg-green-500/10 border border-green-500/30 p-6 rounded-3xl flex items-center gap-4">
-               <CheckCircle2 className="text-green-500" size={24} />
+               <CircleCheckBig className="text-green-500" size={24} />
                <p className="text-sm font-bold text-green-400 uppercase tracking-tighter">¡Noticia Inyectada con Éxito al Radar!</p>
             </motion.div>
          )}
          {error && (
             <motion.div initial={{opacity:0, y:-20}} animate={{opacity:1, y:0}} exit={{opacity:0}} className="bg-red-500/10 border border-red-500/30 p-6 rounded-3xl flex items-center gap-4">
-               <AlertCircle className="text-red-500" size={24} />
+               <CircleAlert className="text-red-500" size={24} />
                <p className="text-sm font-bold text-red-400 uppercase tracking-tighter">{error}</p>
             </motion.div>
          )}

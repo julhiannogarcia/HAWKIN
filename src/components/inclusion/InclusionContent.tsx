@@ -2,7 +2,7 @@
 
 import React, { useState, useEffect } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
-import { Volume2, VolumeX, Heart, Brain, Sparkles, ChevronRight, LayoutGrid, Palette, ArrowLeft, CheckCircle2, Trophy, Lightbulb, Settings, Loader2 } from 'lucide-react';
+import { Volume2, VolumeX, Heart, Brain, Sparkles, ChevronRight, LayoutGrid, Palette, ArrowLeft, CircleCheckBig, Trophy, Lightbulb, Settings, Loader2 } from 'lucide-react';
 import AIAvatar from '@/components/course/AIAvatar';
 import { useSession } from 'next-auth/react';
 import { INCLUSION_CURRICULUM, InclusionModule, InclusionStep, InclusionAgeGroup, InclusionPhase } from '@/lib/inclusionData';
@@ -178,7 +178,7 @@ export default function InclusionContent() {
                       <button key={mod.id} onClick={() => handleStartModule(mod)} className={`group p-10 rounded-[50px] ${mod.color} border-2 border-white transition-all text-left flex flex-col justify-between min-h-[420px] shadow-sm ${isCompleted ? 'opacity-80' : 'hover:shadow-2xl'}`}>
                          <div className="space-y-8">
                             <div className="w-24 h-24 bg-white rounded-[35px] flex items-center justify-center text-5xl shadow-sm">
-                               {isCompleted ? <CheckCircle2 className="text-green-500" /> : mod.icon}
+                               {isCompleted ? <CircleCheckBig className="text-green-500" /> : mod.icon}
                             </div>
                             <h3 className="text-3xl font-bold text-[#2C3E50]">{mod.title}</h3>
                             {isCompleted && <span className="text-[10px] font-black text-green-600 uppercase">Superado</span>}
