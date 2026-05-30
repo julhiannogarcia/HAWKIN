@@ -63,6 +63,7 @@ model News {
   excerpt     String?
   category    String
   image       String?
+  url         String?  // Enlace a la fuente original
   isUrgent    Boolean  @default(false)
   isLocked    Boolean  @default(true)
   published   Boolean  @default(false)

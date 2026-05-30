@@ -3,7 +3,7 @@ import { prisma } from "@/lib/prisma";
 
 export async function POST(req: Request) {
   try {
-    const { title, content, excerpt, category, isUrgent, isLocked, image } = await req.json();
+    const { title, content, excerpt, category, isUrgent, isLocked, image, url } = await req.json();
 
     if (!title || !content) {
       return NextResponse.json({ error: "Título y contenido son requeridos" }, { status: 400 });
@@ -14,11 +14,12 @@ export async function POST(req: Request) {
         title,
         content,
         excerpt: excerpt || content.substring(0, 150) + "...",
-        category,
-        isUrgent,
-        isLocked,
+        category: category || "NOTICIA",
+        isUrgent: !!isUrgent,
+        isLocked: !!isLocked,
         image: image || "https://images.unsplash.com/photo-1451187580459-43490279c0fa?auto=format&fit=crop&q=80&w=800",
-        published: true, // Por ahora publicamos directamente
+        url: url || null,
+        published: true, 
       }
     });
 
@@ -37,5 +38,21 @@ export async function GET() {
     return NextResponse.json(news);
   } catch (error) {
     return NextResponse.json({ error: "Error al obtener las noticias" }, { status: 500 });
+  }
+}
+
+export async function DELETE(req: Request) {
+  try {
+    const { id } = await req.json();
+    if (!id) return NextResponse.json({ error: "ID requerido" }, { status: 400 });
+
+    await prisma.news.delete({
+      where: { id }
+    });
+
+    return NextResponse.json({ status: "success" });
+  } catch (error) {
+    console.error("Error deleting news:", error);
+    return NextResponse.json({ error: "Error al eliminar la noticia" }, { status: 500 });
   }
 }
