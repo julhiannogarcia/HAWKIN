@@ -11,14 +11,12 @@ datasource db {
 model User {
   id            String    @id @default(cuid())
   name          String?
-  nickname      String?   // Apodo del socio
   email         String?   @unique
   emailVerified DateTime?
   image         String?
   role          Role      @default(USER)
   xp            Int       @default(0)     // Experiencia acumulada
   streak        Int       @default(0)     // Racha de días activos
-  createdAt     DateTime  @default(now()) // Fecha de registro
   subscription  Subscription?
   accounts      Account[]
   sessions      Session[]
@@ -63,7 +61,6 @@ model News {
   excerpt     String?
   category    String
   image       String?
-  url         String?  // Enlace a la fuente original
   isUrgent    Boolean  @default(false)
   isLocked    Boolean  @default(true)
   published   Boolean  @default(false)
