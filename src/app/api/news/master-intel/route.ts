@@ -10,7 +10,11 @@ const parser = new Parser();
 // Caching layer to avoid hitting API limits
 let cachedIntel: any = null;
 let lastUpdate = 0;
-const CACHE_DURATION = 1000 * 60 * 60; // 1 hora
+const CACHE_DURATION = 1000 * 60 * 30; // 30 min para mayor frescura
+
+function generateId(title: string) {
+  return title.toLowerCase().replace(/[^a-z0-9]+/g, '-').replace(/(^-|-$)/g, '').substring(0, 50);
+}
 
 export async function GET() {
   try {
@@ -36,7 +40,8 @@ export async function GET() {
     const rawItems = results.flatMap(res => res.items).slice(0, 15).map(item => ({
       title: item.title,
       content: item.contentSnippet,
-      date: item.pubDate
+      date: item.pubDate,
+      link: item.link
     }));
 
     // 2. PROCESAMIENTO CON MASTER PROMPT (MOTOR ALPHA)
@@ -52,7 +57,7 @@ export async function GET() {
       FORMATO DE SALIDA (JSON ESTRICTO):
       {
         "topNews": [
-          { "title": "TITULO", "summary": "RESUMEN", "impact": 1-10, "companies": [], "people": [], "consequence": "POSIBLE CONSECUENCIA", "importance": "ALTO/CRITICO" }
+          { "id": "crear-slug-unico", "title": "TITULO", "summary": "RESUMEN", "impact": 1-10, "companies": [], "people": [], "consequence": "POSIBLE CONSECUENCIA", "importance": "ALTO/CRITICO", "url": "URL_ORIGINAL" }
         ],
         "rumors": [
           { "text": "RUMOR", "source": "FUENTE", "credibility": "ALTO/MEDIO", "probability": "0-100%" }
@@ -72,7 +77,7 @@ export async function GET() {
 
     const chatCompletion = await groq.chat.completions.create({
       messages: [
-        { role: "system", content: "Eres el Command Center de HAWKIN. Responde siempre en JSON puro." },
+        { role: "system", content: "Eres el Command Center de HAWKIN. Responde siempre en JSON puro. Asegúrate de incluir los campos 'id' (slug) y 'url' para cada noticia." },
         { role: "user", content: MASTER_PROMPT }
       ],
       model: "llama-3.3-70b-versatile",
@@ -84,6 +89,16 @@ export async function GET() {
     let intelReport;
     try {
       intelReport = JSON.parse(content);
+      // Post-procesamiento para asegurar IDs
+      if (intelReport.topNews) {
+        intelReport.topNews = intelReport.topNews.map((n: any) => ({
+          ...n,
+          id: n.id || generateId(n.title),
+          category: "CENTRO DE MANDO",
+          date: new Date().toLocaleTimeString('es-PE', { hour: '2-digit', minute: '2-digit' }),
+          author: "HAWKIN Engine"
+        }));
+      }
     } catch (e) {
       console.error("Failed to parse AI JSON:", content);
       return NextResponse.json({ error: "Error en el formato de inteligencia" }, { status: 500 });

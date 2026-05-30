@@ -2,9 +2,11 @@
 
 import { useState, useEffect } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
+import Link from 'next/link';
 import { 
   Zap, TrendingUp, TriangleAlert, Users, Target, 
-  Cpu, Rocket, Loader2, Sparkles, Swords, Info
+  Cpu, Rocket, Loader2, Sparkles, Swords, Info, 
+  ArrowUpRight, Globe, ShieldCheck, Flame
 } from 'lucide-react';
 
 export default function MasterIntel() {
@@ -28,164 +30,225 @@ export default function MasterIntel() {
 
   if (loading) {
     return (
-      <div className="p-12 bg-white/[0.02] border border-white/5 rounded-[50px] text-center space-y-6">
-        <Loader2 className="animate-spin text-cyan-500 mx-auto" size={40} />
-        <p className="text-[10px] font-black uppercase tracking-[0.5em] text-cyan-400 animate-pulse">Sincronizando Centro de Mando Mundial...</p>
+      <div className="p-20 bg-[#050505] border border-white/5 rounded-[60px] text-center space-y-8 shadow-2xl relative overflow-hidden">
+        <div className="absolute inset-0 bg-gradient-to-br from-cyan-500/5 to-transparent opacity-30" />
+        <Loader2 className="animate-spin text-cyan-500 mx-auto" size={50} />
+        <div className="space-y-2">
+           <p className="text-[11px] font-black uppercase tracking-[0.6em] text-cyan-400 animate-pulse">Sincronizando Núcleo de Inteligencia Alpha</p>
+           <p className="text-gray-600 text-[10px] font-bold uppercase tracking-widest">Analizando satélites y cables de fibra óptica...</p>
+        </div>
       </div>
     );
   }
 
   if (!intel || intel.error) {
     return intel?.error ? (
-      <div className="p-8 bg-red-500/10 border border-red-500/20 rounded-3xl text-red-500 text-xs font-black uppercase text-center">
+      <div className="p-8 bg-red-500/10 border border-red-500/20 rounded-3xl text-red-500 text-xs font-black uppercase text-center backdrop-blur-xl">
         {intel.error}
       </div>
     ) : null;
   }
 
   return (
-    <div className="space-y-16">
-      {/* SECCIÓN 1: TOP NOTICIAS */}
-      {Array.isArray(intel.topNews) && intel.topNews.length > 0 && (
-        <section>
-          <div className="flex items-center gap-4 mb-10">
-             <Zap className="text-yellow-500 fill-yellow-500" size={24} />
-             <h2 className="text-3xl font-black uppercase italic tracking-tighter text-white">Top 10 Noticias del Día</h2>
-          </div>
-          <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-            {intel.topNews.slice(0, 10).map((news: any, i: number) => (
-              <motion.div 
-                key={i}
-                initial={{ opacity: 0, x: -20 }}
-                animate={{ opacity: 1, x: 0 }}
-                transition={{ delay: i * 0.1 }}
-                className="p-8 rounded-[40px] bg-white/[0.02] border border-white/5 hover:border-cyan-500/30 transition-all group"
-              >
-                <div className="flex justify-between items-start mb-6">
-                  <span className={`text-[8px] font-black px-3 py-1 rounded-full ${news.importance === 'CRITICO' ? 'bg-red-500 text-white' : 'bg-cyan-500 text-black'}`}>
-                    {news.importance || 'ALTO'}
-                  </span>
-                  <span className="text-xs font-black text-cyan-400 italic">Impacto: {news.impact || '?'}/10</span>
-                </div>
-                <h3 className="text-xl font-bold uppercase italic leading-tight text-white group-hover:text-cyan-400 transition-colors mb-4">{news.title}</h3>
-                <p className="text-gray-500 text-sm font-light mb-6 leading-relaxed">{news.summary}</p>
-                <div className="pt-6 border-t border-white/5 space-y-4">
-                   <div className="flex flex-wrap gap-2">
-                      {Array.isArray(news.companies) && news.companies.map((c: string, idx: number) => (
-                        <span key={idx} className="text-[8px] bg-white/5 px-2 py-1 rounded-md text-gray-400 font-bold uppercase">{c}</span>
-                      ))}
-                   </div>
-                   <p className="text-[10px] text-purple-400 font-bold italic uppercase leading-none">
-                      <Sparkles className="inline mr-2" size={10} /> Consecuencia: {news.consequence}
-                   </p>
-                </div>
-              </motion.div>
-            ))}
-          </div>
-        </section>
-      )}
-
-      {/* SECCIÓN 2: RUMORES Y CONFLICTOS */}
-      <div className="grid grid-cols-1 lg:grid-cols-2 gap-12">
-         {/* Rumores */}
-         {Array.isArray(intel.rumors) && intel.rumors.length > 0 && (
-           <section className="p-10 rounded-[60px] bg-gradient-to-br from-purple-500/5 to-transparent border border-purple-500/20">
-              <h3 className="text-xl font-black uppercase italic tracking-tighter text-purple-400 mb-10 flex items-center gap-3">
-                 <TriangleAlert size={20} /> Rumores más Fuertes
-              </h3>
-              <div className="space-y-6">
-                 {intel.rumors.map((r: any, i: number) => (
-                   <div key={i} className="p-6 bg-black/40 rounded-3xl border border-white/5">
-                      <p className="text-sm text-white font-medium mb-3 italic leading-relaxed">"{r.text}"</p>
-                      <div className="flex justify-between items-center text-[8px] font-black uppercase tracking-widest">
-                         <span className="text-purple-400">Fuente: {r.source}</span>
-                         <span className="text-gray-500">Probabilidad: {r.probability}</span>
-                      </div>
-                   </div>
-                 ))}
+    <div className="space-y-24">
+      {/* SECCIÓN 1: TOP NOTICIAS - ESTILO CYBER CARD */}
+      <section>
+        <div className="flex flex-col md:flex-row md:items-end justify-between gap-6 mb-12 border-b border-white/10 pb-8">
+           <div className="space-y-4">
+              <div className="flex items-center gap-3">
+                 <div className="w-2 h-2 bg-cyan-500 rounded-full animate-ping" />
+                 <span className="text-[10px] font-black text-cyan-500 uppercase tracking-[0.4em]">Inyección de Datos Real-Time</span>
               </div>
-           </section>
-         )}
+              <h2 className="text-4xl md:text-6xl font-black uppercase italic tracking-tighter text-white leading-none">
+                Top 10 <span className="text-gray-500">Noticias.</span>
+              </h2>
+           </div>
+           <div className="hidden md:flex gap-4">
+              <div className="px-5 py-2 bg-white/5 rounded-full border border-white/10 text-[9px] font-black uppercase tracking-widest text-gray-400">
+                 Status: Operativo
+              </div>
+           </div>
+        </div>
+
+        <div className="grid grid-cols-1 md:grid-cols-2 gap-8">
+          {intel.topNews?.slice(0, 10).map((news: any, i: number) => (
+            <motion.div 
+              key={i}
+              initial={{ opacity: 0, y: 20 }}
+              animate={{ opacity: 1, y: 0 }}
+              transition={{ delay: i * 0.05 }}
+              className="group relative"
+            >
+              {/* Contenedor del Link para que toda la card sea clickable */}
+              <Link href={`/news/${news.id}`} className="block">
+                <div className="p-10 rounded-[50px] bg-[#080808] border border-white/5 hover:border-cyan-500/40 transition-all duration-500 group-hover:shadow-[0_20px_80px_rgba(34,211,238,0.1)] relative overflow-hidden h-full">
+                  
+                  {/* Efecto de fondo al hacer hover */}
+                  <div className="absolute inset-0 bg-gradient-to-br from-cyan-500/[0.02] to-transparent opacity-0 group-hover:opacity-100 transition-opacity" />
+                  
+                  <div className="flex justify-between items-center mb-8 relative z-10">
+                    <div className="flex gap-3">
+                       <span className={`text-[8px] font-black px-4 py-1.5 rounded-full ${news.importance === 'CRITICO' ? 'bg-red-500 text-white shadow-[0_0_15px_rgba(239,68,68,0.4)]' : 'bg-cyan-500 text-black shadow-[0_0_15px_rgba(34,211,238,0.3)]'}`}>
+                        {news.importance || 'ALTO'}
+                      </span>
+                    </div>
+                    <div className="flex items-center gap-2">
+                       <div className="w-1.5 h-1.5 bg-yellow-500 rounded-full" />
+                       <span className="text-[10px] font-black text-yellow-500 italic tracking-widest">IMPACTO {news.impact}/10</span>
+                    </div>
+                  </div>
+
+                  <h3 className="text-2xl font-black uppercase italic leading-[1.1] text-white group-hover:text-cyan-400 transition-colors mb-6 tracking-tighter">
+                    {news.title}
+                  </h3>
+                  
+                  <p className="text-gray-500 text-sm font-light mb-8 leading-relaxed line-clamp-3">
+                    {news.summary}
+                  </p>
+
+                  <div className="pt-8 border-t border-white/5 flex flex-col sm:flex-row justify-between items-start sm:items-center gap-6 relative z-10">
+                     <div className="flex flex-wrap gap-2">
+                        {Array.isArray(news.companies) && news.companies.slice(0, 3).map((c: string, idx: number) => (
+                          <span key={idx} className="text-[7px] bg-white/[0.03] px-3 py-1 rounded-md text-gray-500 font-black uppercase border border-white/5">{c}</span>
+                        ))}
+                     </div>
+                     <div className="flex items-center gap-3 text-[9px] font-black uppercase tracking-widest text-cyan-500 group-hover:translate-x-2 transition-transform">
+                        Analizar Reporte <ArrowUpRight size={14} />
+                     </div>
+                  </div>
+                </div>
+              </Link>
+            </motion.div>
+          ))}
+        </div>
+      </section>
+
+      {/* SECCIÓN 2: RUMORES Y CONFLICTOS - ESTILO DARK TACTICAL */}
+      <div className="grid grid-cols-1 lg:grid-cols-2 gap-16">
+         {/* Rumores */}
+         <section className="space-y-10">
+            <div className="flex items-center gap-4 border-l-4 border-purple-500 pl-6">
+               <div className="p-3 bg-purple-500/10 rounded-2xl text-purple-400">
+                  <TriangleAlert size={24} />
+               </div>
+               <h3 className="text-3xl font-black uppercase italic tracking-tighter text-white">
+                 Dark <span className="text-purple-400">Rumors.</span>
+               </h3>
+            </div>
+            <div className="space-y-6">
+               {intel.rumors?.map((r: any, i: number) => (
+                 <motion.div 
+                    key={i} 
+                    whileHover={{ scale: 1.02 }}
+                    className="p-8 bg-[#0A0A0A] rounded-[40px] border border-white/5 shadow-xl relative group overflow-hidden"
+                 >
+                    <div className="absolute top-0 right-0 p-6 opacity-5 group-hover:rotate-12 transition-transform"><Flame size={40} className="text-purple-500" /></div>
+                    <p className="text-base text-gray-300 font-medium mb-6 italic leading-relaxed relative z-10">"{r.text}"</p>
+                    <div className="flex justify-between items-center text-[8px] font-black uppercase tracking-[0.2em] relative z-10">
+                       <span className="text-purple-500 flex items-center gap-2"><Globe size={10} /> Fuente: {r.source}</span>
+                       <span className="bg-purple-500/10 text-purple-400 px-3 py-1 rounded-full border border-purple-500/20">Probabilidad: {r.probability}</span>
+                    </div>
+                 </motion.div>
+               ))}
+            </div>
+         </section>
 
          {/* Batallas */}
-         {Array.isArray(intel.battles) && intel.battles.length > 0 && (
-           <section className="p-10 rounded-[60px] bg-gradient-to-br from-red-500/5 to-transparent border border-red-500/20">
-              <h3 className="text-xl font-black uppercase italic tracking-tighter text-red-500 mb-10 flex items-center gap-3">
-                 <Swords size={20} /> Batallas y Conflictos
-              </h3>
-              <div className="space-y-6">
-                 {intel.battles.map((b: any, i: number) => (
-                   <div key={i} className="p-6 bg-black/40 rounded-3xl border border-white/5">
-                      <h4 className="text-sm font-black text-white uppercase italic mb-2">{b.competitors}</h4>
-                      <p className="text-xs text-gray-500 font-light mb-4">{b.motive}</p>
-                      <div className="flex justify-between items-center text-[8px] font-black uppercase">
-                         <span className="text-red-400">Situación: {b.status}</span>
-                         <span className="text-green-500">Líder: {b.winners}</span>
-                      </div>
-                   </div>
-                 ))}
-              </div>
-           </section>
-         )}
-      </div>
-
-      {/* SECCIÓN 3: CEOs Y TECNOLOGÍA */}
-      <div className="grid grid-cols-1 lg:grid-cols-3 gap-8">
-         {Array.isArray(intel.trendingCEOs) && (
-           <section className="p-8 rounded-[40px] bg-white/[0.01] border border-white/5">
-              <h4 className="text-xs font-black uppercase tracking-widest text-cyan-400 mb-8 flex items-center gap-2">
-                 <Users size={16} /> CEOs del Día
-              </h4>
-              <div className="space-y-4">
-                 {intel.trendingCEOs.map((ceo: any, i: number) => (
-                   <div key={i} className="flex justify-between items-center border-b border-white/5 pb-3">
-                      <div className="text-left">
-                         <p className="text-xs font-black text-white uppercase">{ceo.name}</p>
-                         <p className="text-[8px] text-gray-500 font-bold uppercase">{ceo.company}</p>
-                      </div>
-                      <span className="text-[7px] bg-white/5 px-2 py-1 rounded text-cyan-500 font-black">{ceo.reason}</span>
-                   </div>
-                 ))}
-              </div>
-           </section>
-         )}
-
-         {Array.isArray(intel.emergingTech) && (
-           <section className="p-8 rounded-[40px] bg-white/[0.01] border border-white/5">
-              <h4 className="text-xs font-black uppercase tracking-widest text-blue-400 mb-8 flex items-center gap-2">
-                 <Cpu size={16} /> Tech Emergente
-              </h4>
-              <div className="flex flex-wrap gap-3">
-                 {intel.emergingTech.map((t: string, i: number) => (
-                   <span key={i} className="px-4 py-2 bg-blue-500/10 border border-blue-500/20 rounded-xl text-[9px] font-bold text-blue-400 uppercase tracking-widest">
-                      {t}
-                   </span>
-                 ))}
-              </div>
-           </section>
-         )}
-
-         <section className="p-8 rounded-[40px] bg-gradient-to-br from-cyan-500/10 to-transparent border border-cyan-500/30 relative overflow-hidden">
-            <div className="absolute top-0 right-0 p-4 opacity-10 rotate-12"><Rocket size={100} /></div>
-            <h4 className="text-xs font-black uppercase tracking-widest text-white mb-8 flex items-center gap-2">
-               <Info size={16} className="text-cyan-400" /> Predicción Alpha
-            </h4>
-            <div className="space-y-4 relative z-10">
-               <p className="text-[10px] text-gray-400 leading-relaxed italic">
-                  Dominancia: <span className="text-white font-bold">{intel.prediction?.dominance || 'En análisis'}</span>
-               </p>
-               <p className="text-[10px] text-gray-400 leading-relaxed italic">
-                  Influencia: <span className="text-white font-bold">{intel.prediction?.ceo || 'Calculando...'}</span>
-               </p>
-               <p className="text-[10px] text-red-400 leading-relaxed font-black uppercase tracking-widest">
-                  Riesgo: {intel.prediction?.risk || 'Bajo'}
-               </p>
+         <section className="space-y-10">
+            <div className="flex items-center gap-4 border-l-4 border-red-500 pl-6">
+               <div className="p-3 bg-red-500/10 rounded-2xl text-red-400">
+                  <Swords size={24} />
+               </div>
+               <h3 className="text-3xl font-black uppercase italic tracking-tighter text-white">
+                 War <span className="text-red-400">Zone.</span>
+               </h3>
+            </div>
+            <div className="space-y-6">
+               {intel.battles?.map((b: any, i: number) => (
+                 <motion.div 
+                    key={i} 
+                    whileHover={{ scale: 1.02 }}
+                    className="p-8 bg-[#0A0A0A] rounded-[40px] border border-white/5 shadow-xl relative overflow-hidden group"
+                 >
+                    <div className="flex items-center gap-4 mb-4">
+                       <div className="w-8 h-[2px] bg-red-500/50" />
+                       <h4 className="text-lg font-black text-white uppercase italic tracking-tighter">{b.competitors}</h4>
+                    </div>
+                    <p className="text-sm text-gray-500 font-light mb-8 leading-relaxed">{b.motive}</p>
+                    <div className="grid grid-cols-2 gap-4 border-t border-white/5 pt-6">
+                       <div>
+                          <p className="text-[7px] font-black text-gray-700 uppercase tracking-widest mb-1">Estatus Actual</p>
+                          <p className="text-[10px] font-bold text-red-400 uppercase italic">{b.status}</p>
+                       </div>
+                       <div className="text-right">
+                          <p className="text-[7px] font-black text-gray-700 uppercase tracking-widest mb-1">Líder del Campo</p>
+                          <p className="text-[10px] font-bold text-green-500 uppercase italic">{b.winners}</p>
+                       </div>
+                    </div>
+                 </motion.div>
+               ))}
             </div>
          </section>
       </div>
 
-      <div className="pt-10 text-center">
-         <p className="text-[8px] font-black text-gray-700 uppercase tracking-[0.8em]">HAWKIN COMMAND CENTER • LIVE INTELLIGENCE FEED</p>
+      {/* SECCIÓN 3: CEOs Y TECNOLOGÍA - ESTILO DATA GRID */}
+      <div className="grid grid-cols-1 lg:grid-cols-3 gap-8">
+         <section className="p-10 rounded-[50px] bg-[#050505] border border-white/5 relative overflow-hidden group">
+            <div className="absolute top-0 right-0 w-32 h-32 bg-cyan-500/5 blur-[50px] rounded-full" />
+            <h4 className="text-[10px] font-black uppercase tracking-[0.5em] text-cyan-500 mb-10 flex items-center gap-3">
+               <Users size={16} /> CEOs Watch
+            </h4>
+            <div className="space-y-6 relative z-10">
+               {intel.trendingCEOs?.map((ceo: any, i: number) => (
+                 <div key={i} className="flex justify-between items-center gap-4 pb-4 border-b border-white/[0.03] last:border-0 group/ceo">
+                    <div>
+                       <p className="text-sm font-black text-white uppercase group-hover/ceo:text-cyan-400 transition-colors">{ceo.name}</p>
+                       <p className="text-[8px] text-gray-600 font-bold uppercase tracking-widest">{ceo.company}</p>
+                    </div>
+                    <span className="text-[7px] bg-cyan-500/5 px-2 py-1 rounded text-cyan-500 font-black border border-cyan-500/10">{ceo.reason}</span>
+                 </div>
+               ))}
+            </div>
+         </section>
+
+         <section className="p-10 rounded-[50px] bg-[#050505] border border-white/5 relative overflow-hidden group">
+            <div className="absolute top-0 right-0 w-32 h-32 bg-blue-500/5 blur-[50px] rounded-full" />
+            <h4 className="text-[10px] font-black uppercase tracking-[0.5em] text-blue-400 mb-10 flex items-center gap-3">
+               <Cpu size={16} /> Alpha Tech
+            </h4>
+            <div className="flex flex-wrap gap-3 relative z-10">
+               {intel.emergingTech?.map((t: string, i: number) => (
+                 <span key={i} className="px-4 py-2 bg-blue-500/5 border border-blue-500/10 rounded-2xl text-[9px] font-black text-blue-400 uppercase tracking-widest hover:bg-blue-500 hover:text-black transition-all cursor-crosshair">
+                    {t}
+                 </span>
+               ))}
+            </div>
+         </section>
+
+         <section className="p-10 rounded-[50px] bg-gradient-to-br from-cyan-500/10 to-transparent border border-cyan-500/20 relative overflow-hidden group">
+            <div className="absolute -top-10 -right-10 p-4 opacity-5 group-hover:scale-110 transition-transform duration-[3s]"><Rocket size={200} /></div>
+            <h4 className="text-[10px] font-black uppercase tracking-[0.5em] text-white mb-10 flex items-center gap-3">
+               <Info size={16} className="text-cyan-400" /> Prediction
+            </h4>
+            <div className="space-y-6 relative z-10">
+               <div className="space-y-1">
+                  <p className="text-[7px] font-black text-gray-600 uppercase tracking-widest">Dominancia de Mercado</p>
+                  <p className="text-sm text-white font-bold italic">{intel.prediction?.dominance || 'En análisis'}</p>
+               </div>
+               <div className="space-y-1">
+                  <p className="text-[7px] font-black text-gray-600 uppercase tracking-widest">Poder en Ascenso</p>
+                  <p className="text-sm text-white font-bold italic">{intel.prediction?.ceo || 'Calculando...'}</p>
+               </div>
+               <div className="p-4 bg-red-500/5 border border-red-500/10 rounded-2xl">
+                  <p className="text-[7px] font-black text-red-500 uppercase tracking-widest mb-1">Riesgo Sistémico</p>
+                  <p className="text-[10px] text-red-400 font-bold uppercase">{intel.prediction?.risk || 'Bajo'}</p>
+               </div>
+            </div>
+         </section>
+      </div>
+
+      <div className="pt-10 text-center border-t border-white/5 opacity-30">
+         <p className="text-[8px] font-black text-gray-500 uppercase tracking-[1em]">HAWKIN COMMAND CENTER • DECRYPTING THE FUTURE • REAL-TIME FEED</p>
       </div>
     </div>
   );
