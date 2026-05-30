@@ -48,12 +48,9 @@ export async function GET() {
       Actúa como un sistema de inteligencia periodística mundial especializado exclusivamente en Inteligencia Artificial.
       Analiza los siguientes datos y genera un reporte estructurado en JSON.
 
-      OBJETIVOS:
-      1. Detectar noticias bomba, rumores y filtraciones.
-      2. Analizar conflictos entre empresas y CEOs (OpenAI vs Google, etc).
-      3. Identificar tecnologías disruptivas y startups a vigilar.
+      OBJETIVO CRÍTICO: Debes identificar y reportar exactamente las 10 noticias más impactantes de los datos proporcionados. No te limites a una.
 
-      FORMATO JSON REQUERIDO:
+      FORMATO JSON REQUERIDO (ESTRICTO):
       {
         "topNews": [
           { "title": "TITULO", "summary": "RESUMEN", "impact": 1-10, "companies": ["EMPRESA"], "people": ["PERSONA"], "consequence": "POSIBLE CONSECUENCIA", "importance": "CRITICO/ALTO/MEDIO", "url": "URL" }
@@ -68,11 +65,11 @@ export async function GET() {
           { "name": "Nombre", "company": "Empresa", "reason": "Motivo de tendencia" }
         ],
         "emergingTech": ["Tecnología A", "Tech B"],
-        "startups": ["Startup A (Crecimiento X%)"],
+        "startups": ["Startup A", "Startup B"],
         "prediction": { "dominance": "EMPRESA DOMINANTE", "ceo": "CEO INFLUYENTE", "tech": "TECNOLOGIA CLAVE", "risk": "RIESGO MAYOR" }
       }
 
-      NOTICIAS PARA PROCESAR: ${JSON.stringify(rawItems)}
+      NOTICIAS PARA PROCESAR (EXTRAE LAS 10 MEJORES): ${JSON.stringify(rawItems)}
     `;
 
     const chatCompletion = await groq.chat.completions.create({
