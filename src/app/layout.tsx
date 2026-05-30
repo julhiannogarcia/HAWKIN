@@ -17,6 +17,9 @@ export const metadata: Metadata = {
     url: "https://aihawkin.com",
     siteName: "AI HAWKIN",
   },
+  verification: {
+    google: "mNoEg1VurMz0gj5grgyPY19ww0WLd9Dj6_xuTWOzKgQ",
+  }
 };
 
 export default function RootLayout({ children }: { children: React.ReactNode }) {
