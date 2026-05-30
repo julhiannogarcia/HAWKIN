@@ -18,7 +18,7 @@ export async function POST(req: Request) {
         isUrgent: !!isUrgent,
         isLocked: !!isLocked,
         image: image || "https://images.unsplash.com/photo-1451187580459-43490279c0fa?auto=format&fit=crop&q=80&w=800",
-        url: url || null,
+        // url: url || null, // Desactivado temporalmente por falta de sync en DB
         published: true, 
       }
     });
