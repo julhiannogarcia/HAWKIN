@@ -1,5 +1,6 @@
 import { NextResponse } from "next/server";
 import Parser from 'rss-parser';
+import { prisma } from "@/lib/prisma";
 
 export const dynamic = 'force-dynamic'; // FORZAR DATOS EN VIVO AL SEGUNDO
 export const revalidate = 0;
@@ -18,14 +19,29 @@ function generateShortId(text: string) {
 
 export async function GET() {
   try {
-    // RADAR GLOBAL: EXCLUSIVO IA, CEOS Y FUNDADORES (SILICON VALLEY SCOOPS)
-    // Filtros de búsqueda para obtener solo noticias de primera hora y rumores de élite
+    // 1. OBTENER NOTICIAS MANUALES DE LA BASE DE DATOS
+    const dbNews = await prisma.news.findMany({
+      where: { published: true },
+      orderBy: { createdAt: 'desc' },
+      take: 10
+    });
+
+    const formattedDbNews = dbNews.map(n => ({
+      id: n.id,
+      title: n.title,
+      category: n.category,
+      excerpt: n.excerpt || n.content.substring(0, 250) + "...",
+      author: "Julhianno Garcia",
+      date: `Hace un momento (${new Date(n.createdAt).toLocaleTimeString('es-PE', { hour: '2-digit', minute: '2-digit' })})`,
+      timestamp: new Date(n.createdAt).getTime(),
+      image: n.image,
+      url: n.url,
+      source: "HAWKIN Elite"
+    }));
+
+    // 2. RADAR GLOBAL RSS
     const AI_MASTER_FEED = 'https://news.google.com/rss/search?q=OpenAI+GPT-5+Sam+Altman+rumor+Elon+Musk+xAI+Jensen+Huang+NVIDIA+Blackwell+DeepMind+Anthropic+Claude+scoop+breaking&hl=es-419&gl=US&ceid=US:es-419';
-    
-    // Shield: Enfocado en Zero-Day exploits y ciberdefensa de IA
     const SHIELD_INTEL_FEED = 'https://news.google.com/rss/search?q=cybersecurity+zero-day+exploit+AI+vulnerability+threat+intelligence+breaking&hl=es-419&gl=US&ceid=US:es-419';
-    
-    // Novedades de Fundadores y Creaciones de IA
     const CREATIONS_FEED = 'https://news.google.com/rss/search?q=new+AI+startup+founder+exit+investment+funding+round+Silicon+Valley+latest&hl=es-419&gl=US&ceid=US:es-419';
 
     const [aiFeed, shieldFeed, creationsFeed] = await Promise.all([
@@ -51,13 +67,11 @@ export async function GET() {
       const getRealImage = (title: string, cat: string) => {
         const t = title.toLowerCase();
         const base = "https://images.unsplash.com/";
-        
         if (cat === "SHIELD") return `${base}photo-1633265486232-442b85c74e5f?auto=format&fit=crop&q=80&w=1000&sig=${uniqueId}`;
         if (t.includes("musk") || t.includes("tesla") || t.includes("xai")) return `${base}photo-1541562232579-512a21360020?auto=format&fit=crop&q=80&w=1000&sig=${uniqueId}`;
         if (t.includes("altman") || t.includes("openai") || t.includes("gpt")) return `${base}photo-1677442136019-21780ecad995?auto=format&fit=crop&q=80&w=1000&sig=${uniqueId}`;
         if (t.includes("nvidia") || t.includes("chip") || t.includes("gpu")) return `${base}photo-1591405351990-4726e331f141?auto=format&fit=crop&q=80&w=1000&sig=${uniqueId}`;
         if (t.includes("google") || t.includes("deepmind")) return `${base}photo-1573804633927-bfcbcd909acd?auto=format&fit=crop&q=80&w=1000&sig=${uniqueId}`;
-        
         return `${base}photo-1451187580459-43490279c0fa?auto=format&fit=crop&q=80&w=1000&sig=${uniqueId}`;
       };
 
@@ -68,19 +82,23 @@ export async function GET() {
         excerpt: (item.contentSnippet || "Analizando el impacto de esta creación en el ecosistema global...").substring(0, 250) + "...",
         author: item.source?.name || "HAWKIN Intelligence",
         date: item.pubDate ? `${getTimeAgo(item.pubDate)} (${specificTime})` : "En Vivo",
-        timestamp: item.pubDate ? pubDate.getTime() : Date.now(), // Campo para ordenamiento
+        timestamp: item.pubDate ? pubDate.getTime() : Date.now(),
         image: getRealImage(item.title, category),
         url: item.link,
         source: item.source?.name || "Fuente Global"
       };
     });
 
+    // Combinar noticias de DB con las de RSS en la categoría principal
+    const allNews = [...formattedDbNews, ...formatItems(aiFeed.items, "RUMORES & CEOS")];
+
     return NextResponse.json({
-      news: formatItems(aiFeed.items, "RUMORES & CEOS"),
+      news: allNews,
       shield: formatItems(shieldFeed.items, "SHIELD INTEL"),
       hardware: formatItems(creationsFeed.items, "CREACIONES IA")
     });
   } catch (error) {
+    console.error("Radar Motor Error:", error);
     return new NextResponse("Error en el Motor HAWKIN", { status: 500 });
   }
 }

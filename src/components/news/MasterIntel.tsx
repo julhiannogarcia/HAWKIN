@@ -57,7 +57,7 @@ export default function MasterIntel() {
 
   useEffect(() => {
     fetchIntel();
-    const interval = setInterval(fetchIntel, 600000); // Cada 10 minutos para coincidir con el cache del servidor
+    const interval = setInterval(fetchIntel, 60000); // Sincronización cada 60 segundos
     return () => clearInterval(interval);
   }, []);
 
@@ -139,58 +139,68 @@ export default function MasterIntel() {
               className="group relative"
             >
               <Link href={`/news/${news.id}`} className="block h-full">
-                <div className="p-12 rounded-[60px] bg-[#050505] border border-white/[0.03] hover:border-cyan-500/40 transition-all duration-700 group-hover:shadow-[0_40px_100px_rgba(0,0,0,0.8)] relative overflow-hidden flex flex-col h-full">
+                <div className="p-0 rounded-[60px] bg-[#050505] border border-white/[0.03] hover:border-cyan-500/40 transition-all duration-700 group-hover:shadow-[0_40px_100px_rgba(0,0,0,0.8)] relative overflow-hidden flex flex-col h-full">
                   
+                  {/* Imagen de Impacto */}
+                  {news.image && (
+                    <div className="h-48 w-full overflow-hidden relative">
+                       <img src={news.image} className="w-full h-full object-cover opacity-60 group-hover:opacity-100 group-hover:scale-110 transition-all duration-1000" alt="Intel" />
+                       <div className="absolute inset-0 bg-gradient-to-t from-[#050505] via-transparent to-transparent" />
+                    </div>
+                  )}
+
                   {/* Neón lateral dinámico por importancia */}
                   <div className={`absolute top-0 left-0 w-1 h-full ${news.importance === 'CRITICO' ? 'bg-red-600 shadow-[5px_0_20px_rgba(220,38,38,0.5)]' : 'bg-cyan-500 shadow-[5px_0_20px_rgba(34,211,238,0.5)]'}`} />
                   
-                  <div className="flex justify-between items-center mb-10 relative z-10">
-                    <span className={`text-[9px] font-black px-5 py-2 rounded-full tracking-widest ${news.importance === 'CRITICO' ? 'bg-red-600 text-white' : 'bg-cyan-500 text-black'}`}>
-                      {news.importance || 'ALTO'}
-                    </span>
-                    <div className="flex items-center gap-3">
-                       <span className="text-xs font-black text-white italic">IMPACTO {news.impact}/10</span>
-                       <div className="w-10 h-10 rounded-full bg-white/5 flex items-center justify-center text-gray-500 group-hover:text-cyan-400 group-hover:rotate-45 transition-all">
-                          <ArrowUpRight size={20} />
+                  <div className="p-10 flex-1 flex flex-col">
+                    <div className="flex justify-between items-center mb-10 relative z-10">
+                      <span className={`text-[9px] font-black px-5 py-2 rounded-full tracking-widest ${news.importance === 'CRITICO' ? 'bg-red-600 text-white' : 'bg-cyan-500 text-black'}`}>
+                        {news.importance || 'ALTO'}
+                      </span>
+                      <div className="flex items-center gap-3">
+                         <span className="text-xs font-black text-white italic">IMPACTO {news.impact}/10</span>
+                         <div className="w-10 h-10 rounded-full bg-white/5 flex items-center justify-center text-gray-500 group-hover:text-cyan-400 group-hover:rotate-45 transition-all">
+                            <ArrowUpRight size={20} />
+                         </div>
+                      </div>
+                    </div>
+
+                    <h3 className="text-3xl font-black uppercase italic leading-[0.95] text-white group-hover:text-cyan-400 transition-colors mb-8 tracking-tighter">
+                      {news.title}
+                    </h3>
+                    
+                    <p className="text-gray-400 text-base font-light mb-10 leading-relaxed line-clamp-3">
+                      {news.summary}
+                    </p>
+
+                    <div className="mt-auto space-y-8 relative z-10">
+                       <div className="grid grid-cols-2 gap-6 border-y border-white/5 py-8">
+                          <div>
+                             <p className="text-[8px] font-black text-gray-600 uppercase tracking-widest mb-2">Empresas Foco</p>
+                             <div className="flex flex-wrap gap-2">
+                                {news.companies?.map((c: string, idx: number) => (
+                                  <span key={idx} className="text-[8px] bg-white/5 px-3 py-1 rounded text-white font-bold">{c}</span>
+                                ))}
+                             </div>
+                          </div>
+                          <div>
+                             <p className="text-[8px] font-black text-gray-600 uppercase tracking-widest mb-2">Líderes Activos</p>
+                             <div className="flex flex-wrap gap-2">
+                                {news.people?.map((p: string, idx: number) => (
+                                  <span key={idx} className="text-[8px] bg-cyan-500/10 px-3 py-1 rounded text-cyan-400 font-bold">{p}</span>
+                                ))}
+                             </div>
+                          </div>
+                       </div>
+                       <div className="p-6 bg-purple-500/5 rounded-3xl border border-purple-500/10">
+                          <p className="text-[10px] text-purple-400 font-black uppercase italic leading-tight">
+                             <Sparkles className="inline mr-3" size={14} /> Consecuencia: {news.consequence}
+                          </p>
+                       </div>
+                       <div className="flex items-center gap-3 text-[10px] font-black text-gray-600 uppercase">
+                          <Clock size={12} className="text-cyan-500" /> Inyectado: {new Date(news.timestamp).toLocaleTimeString('es-PE')}
                        </div>
                     </div>
-                  </div>
-
-                  <h3 className="text-3xl font-black uppercase italic leading-[0.95] text-white group-hover:text-cyan-400 transition-colors mb-8 tracking-tighter">
-                    {news.title}
-                  </h3>
-                  
-                  <p className="text-gray-400 text-base font-light mb-10 leading-relaxed line-clamp-3">
-                    {news.summary}
-                  </p>
-
-                  <div className="mt-auto space-y-8 relative z-10">
-                     <div className="grid grid-cols-2 gap-6 border-y border-white/5 py-8">
-                        <div>
-                           <p className="text-[8px] font-black text-gray-600 uppercase tracking-widest mb-2">Empresas Foco</p>
-                           <div className="flex flex-wrap gap-2">
-                              {news.companies?.map((c: string, idx: number) => (
-                                <span key={idx} className="text-[8px] bg-white/5 px-3 py-1 rounded text-white font-bold">{c}</span>
-                              ))}
-                           </div>
-                        </div>
-                        <div>
-                           <p className="text-[8px] font-black text-gray-600 uppercase tracking-widest mb-2">Líderes Activos</p>
-                           <div className="flex flex-wrap gap-2">
-                              {news.people?.map((p: string, idx: number) => (
-                                <span key={idx} className="text-[8px] bg-cyan-500/10 px-3 py-1 rounded text-cyan-400 font-bold">{p}</span>
-                              ))}
-                           </div>
-                        </div>
-                     </div>
-                     <div className="p-6 bg-purple-500/5 rounded-3xl border border-purple-500/10">
-                        <p className="text-[10px] text-purple-400 font-black uppercase italic leading-tight">
-                           <Sparkles className="inline mr-3" size={14} /> Consecuencia: {news.consequence}
-                        </p>
-                     </div>
-                     <div className="flex items-center gap-3 text-[10px] font-black text-gray-600 uppercase">
-                        <Clock size={12} className="text-cyan-500" /> Inyectado: {intel.lastUpdate || new Date().toLocaleTimeString('es-PE')}
-                     </div>
                   </div>
                 </div>
               </Link>

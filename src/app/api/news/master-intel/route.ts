@@ -28,27 +28,46 @@ export async function GET() {
 
     const groq = new Groq({ apiKey });
 
-    // 1. RECOPILAR INTELIGENCIA BRUTA (FUENTES DE ALTA CREDIBILIDAD)
+    // 1. OBTENER INTELIGENCIA MANUAL (DB)
+    const dbNews = await prisma.news.findMany({
+      where: { published: true },
+      orderBy: { createdAt: 'desc' },
+      take: 5
+    });
+
+    const manualIntel = dbNews.map(n => ({
+      id: n.id,
+      title: n.title,
+      summary: n.excerpt || n.content.substring(0, 250) + "...",
+      impact: n.isUrgent ? 10 : 8,
+      companies: [n.category],
+      people: ["Julhianno Garcia"],
+      consequence: "Análisis exclusivo inyectado por el Fundador.",
+      importance: n.isUrgent ? "CRITICO" : "ALTO",
+      url: n.url,
+      timestamp: n.createdAt.toISOString()
+    }));
+
+    // 2. RECOPILAR INTELIGENCIA BRUTA (RSS)
     const FEEDS = [
       'https://news.google.com/rss/search?q=OpenAI+NVIDIA+Tesla+Anthropic+startups+AI+AGI+breaking&hl=en-US&gl=US&ceid=US:en',
-      'https://news.google.com/rss/search?q=Sam+Altman+Elon+Musk+Jensen+Huang+tech+CEO+leak+rumor&hl=en-US&gl=US&ceid=US:en',
-      'https://hnrss.org/frontpage?q=AI'
+      'https://news.google.com/rss/search?q=Sam+Altman+Elon+Musk+Jensen+Huang+tech+CEO+leak+rumor&hl=en-US&gl=US&ceid=US:en'
     ];
 
     const results = await Promise.all(FEEDS.map(url => parser.parseURL(url)));
-    const rawItems = results.flatMap(res => res.items).slice(0, 20).map(item => ({
+    const rawItems = results.flatMap(res => res.items).slice(0, 15).map(item => ({
       title: item.title,
       snippet: item.contentSnippet?.substring(0, 300),
       source: item.source?.name || "Global Intel",
       link: item.link
     }));
 
-    // 2. MOTOR DE INTELIGENCIA DE GRADO MILITAR (MASTER PROMPT)
+    // 3. MOTOR DE INTELIGENCIA DE GRADO MILITAR (MASTER PROMPT)
     const MASTER_PROMPT = `
       Actúa como un sistema de inteligencia periodística mundial especializado exclusivamente en Inteligencia Artificial.
       Analiza los siguientes datos y genera un reporte estructurado en JSON.
 
-      OBJETIVO CRÍTICO: Debes identificar y reportar exactamente las 10 noticias más impactantes de los datos proporcionados. No te limites a una.
+      OBJETIVO CRÍTICO: Debes identificar y reportar exactamente las 10 noticias más impactantes de los datos proporcionados.
 
       FORMATO JSON REQUERIDO (ESTRICTO):
       {
@@ -64,12 +83,12 @@ export async function GET() {
         "trendingCEOs": [
           { "name": "Nombre", "company": "Empresa", "reason": "Motivo de tendencia" }
         ],
-        "emergingTech": ["Tecnología A", "Tech B"],
-        "startups": ["Startup A", "Startup B"],
+        "emergingTech": ["Tecnología A"],
+        "startups": ["Startup A"],
         "prediction": { "dominance": "EMPRESA DOMINANTE", "ceo": "CEO INFLUYENTE", "tech": "TECNOLOGIA CLAVE", "risk": "RIESGO MAYOR" }
       }
 
-      NOTICIAS PARA PROCESAR (EXTRAE LAS 10 MEJORES): ${JSON.stringify(rawItems)}
+      NOTICIAS PARA PROCESAR (EXTRAE LAS MEJORES): ${JSON.stringify(rawItems)}
     `;
 
     const chatCompletion = await groq.chat.completions.create({
@@ -78,7 +97,7 @@ export async function GET() {
         { role: "user", content: MASTER_PROMPT }
       ],
       model: "llama-3.3-70b-versatile",
-      temperature: 0.3, // Menos creatividad, más precisión
+      temperature: 0.3,
       response_format: { type: "json_object" }
     });
 
@@ -90,11 +109,14 @@ export async function GET() {
       
       // Enriquecimiento de datos para el UI
       if (intelReport.topNews) {
-        intelReport.topNews = intelReport.topNews.map((n: any) => ({
+        const aiNews = intelReport.topNews.map((n: any) => ({
           ...n,
           id: generateId(n.title),
           timestamp: new Date().toISOString()
         }));
+
+        // MEZCLAR Y PRIORIZAR MANUALES
+        intelReport.topNews = [...manualIntel, ...aiNews].slice(0, 10);
       }
     } catch (e) {
       console.error("Failed to parse AI JSON:", content);
