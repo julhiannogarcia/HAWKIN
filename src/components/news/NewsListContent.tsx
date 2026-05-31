@@ -7,6 +7,7 @@ import GlobalTicker from '@/components/Ticker';
 import LiveFeed from '@/components/LiveFeed';
 import NewsCard from '@/components/NewsCard';
 import MasterIntel from '@/components/news/MasterIntel';
+import AdSpace from '@/components/AdSpace';
 import { Loader2, Radio } from 'lucide-react';
 
 export default function NewsPage() {
