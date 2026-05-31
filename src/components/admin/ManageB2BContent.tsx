@@ -229,14 +229,15 @@ export default function ManageAds() {
                          <Globe size={16} /> Activos Digitales (Soporta Video 4K)
                       </h3>
                       <div>
-                         <label className="text-[8px] font-black text-gray-600 uppercase tracking-widest mb-2 block">URL del Banner (JPG/PNG o MP4)</label>
+                         <label className="text-[8px] font-black text-gray-600 uppercase tracking-widest mb-2 block">URL del Banner (JPG/PNG o MP4/YouTube)</label>
                          <input 
                             type="text" 
                             value={bannerUrl}
                             onChange={(e) => setBannerUrl(e.target.value)}
-                            placeholder="https://... (Soporta .mp4)"
+                            placeholder="https://... (.mp4 o youtube.com/watch?v=...)"
                             className="w-full bg-black border border-white/10 rounded-2xl p-4 text-[10px] font-bold text-white outline-none focus:border-cyan-500 transition-all"
                          />
+                         <p className="text-[7px] text-gray-500 mt-2 font-bold uppercase tracking-widest italic">* Usa enlaces directos a .mp4 o links de YouTube para activar el modo video.</p>
                       </div>
                       <div>
                          <label className="text-[8px] font-black text-gray-600 uppercase tracking-widest mb-2 block">URL de Destino (Clic del Usuario)</label>
