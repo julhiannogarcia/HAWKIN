@@ -18,15 +18,18 @@ export async function POST(req: Request) {
         isUrgent: !!isUrgent,
         isLocked: !!isLocked,
         image: image || "https://images.unsplash.com/photo-1451187580459-43490279c0fa?auto=format&fit=crop&q=80&w=800",
-        // url: url || null, // Desactivado temporalmente por falta de sync en DB
+        url: url || null,
         published: true, 
       }
     });
 
     return NextResponse.json(news);
-  } catch (error) {
+  } catch (error: any) {
     console.error("Error creating news:", error);
-    return NextResponse.json({ error: "Error al crear la noticia" }, { status: 500 });
+    return NextResponse.json({ 
+      error: "Error de Base de Datos", 
+      message: error.message || "Fallo técnico en el núcleo." 
+    }, { status: 500 });
   }
 }
 
