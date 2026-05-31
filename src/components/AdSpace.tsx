@@ -1,7 +1,7 @@
 'use client';
 
 import { motion } from 'framer-motion';
-import { ShoppingBag, Laptop, Shirt, ExternalLink, Zap } from 'lucide-react';
+import { ShoppingBag, Laptop, Shirt, ExternalLink, Zap, Building2 } from 'lucide-react';
 import { useState, useEffect } from 'react';
 
 interface AdSpaceProps {
@@ -30,16 +30,11 @@ export default function AdSpace({ isPremium, type = 'banner' }: AdSpaceProps) {
         const data = await res.json();
         
         if (Array.isArray(data) && data.length > 0) {
+          // Seleccionar uno al azar
           setAd(data[Math.floor(Math.random() * data.length)]);
-          console.log(`[HAWKIN ADS] Pauta cargada: ${data[0].companyName}`);
         } else {
-          console.log(`[HAWKIN ADS] No hay pautas activas para ${placement}. Buscando pauta global...`);
-          // Si no hay en esa posición, intentar traer cualquiera activa
-          const resGlobal = await fetch(`/api/ads`);
-          const dataGlobal = await resGlobal.json();
-          if (dataGlobal.length > 0) {
-             setAd(dataGlobal[Math.floor(Math.random() * dataGlobal.length)]);
-          }
+          console.log(`[HAWKIN ADS] No hay pautas activas para ${placement}.`);
+          setAd(null);
         }
       } catch (e) {
         console.error("[HAWKIN ADS] Error al sincronizar publicidad:", e);
@@ -53,11 +48,7 @@ export default function AdSpace({ isPremium, type = 'banner' }: AdSpaceProps) {
 
   const handleAdClick = async () => {
     if (!ad?.id) return;
-    
-    // Abrir URL en nueva pestaña
     if (ad.targetUrl) window.open(ad.targetUrl, '_blank');
-
-    // Registrar clic en DB (sin esperar para no bloquear)
     fetch('/api/ads', {
       method: 'POST',
       headers: { 'Content-Type': 'application/json' },
@@ -65,8 +56,24 @@ export default function AdSpace({ isPremium, type = 'banner' }: AdSpaceProps) {
     }).catch(console.error);
   };
 
-  // REGLA DE ORO: Si es premium o no hay ad, no mostramos nada
-  if (isPremium || !ad) return null;
+  // REGLA DE ORO: Si es premium, no mostramos nada.
+  if (isPremium) return null;
+
+  // Si no hay anuncio, mostrar un placeholder elegante de reserva
+  if (!ad && !loading) {
+    return (
+      <div className={`w-full ${type === 'inline' ? 'my-12 p-8 h-40' : 'h-24'} bg-white/[0.02] border border-dashed border-white/10 rounded-[30px] flex items-center justify-center group hover:border-blue-500/30 transition-all cursor-pointer relative overflow-hidden`}>
+         <div className="absolute top-2 right-4 text-[7px] uppercase tracking-[0.4em] text-gray-700 font-black">HAWKIN AD NETWORK</div>
+         <a href="/b2b" className="flex items-center gap-4 text-gray-700 group-hover:text-blue-500 transition-colors">
+            <Building2 size={20} />
+            <span className="text-[10px] font-black uppercase tracking-widest">Reserva este espacio B2B</span>
+            <ExternalLink size={12} />
+         </a>
+      </div>
+    );
+  }
+
+  if (loading) return null;
 
   if (type === 'inline') {
     return (
@@ -100,7 +107,6 @@ export default function AdSpace({ isPremium, type = 'banner' }: AdSpaceProps) {
     );
   }
 
-  // Estilo Banner o Sidebar simplificado
   return (
     <div 
       onClick={handleAdClick}

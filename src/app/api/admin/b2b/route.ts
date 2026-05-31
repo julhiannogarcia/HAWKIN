@@ -9,6 +9,10 @@ export async function POST(req: Request) {
       return NextResponse.json({ error: "Faltan datos obligatorios para la campaña" }, { status: 400 });
     }
 
+    // Ajustar endDate al final del día (23:59:59)
+    const finalEndDate = endDate ? new Date(endDate) : new Date(Date.now() + 30 * 24 * 60 * 60 * 1000);
+    finalEndDate.setHours(23, 59, 59, 999);
+
     const campaign = await prisma.adCampaign.create({
       data: {
         companyName,
@@ -16,7 +20,7 @@ export async function POST(req: Request) {
         targetUrl: targetUrl || null,
         placement,
         startDate: startDate ? new Date(startDate) : new Date(),
-        endDate: endDate ? new Date(endDate) : new Date(Date.now() + 30 * 24 * 60 * 60 * 1000), // +30 días por defecto
+        endDate: finalEndDate,
         status: status || "ACTIVE",
       }
     });

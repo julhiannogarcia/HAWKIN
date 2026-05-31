@@ -6,13 +6,28 @@ export async function GET(req: Request) {
   const placement = searchParams.get('placement');
 
   try {
+    const now = new Date();
     const ads = await prisma.adCampaign.findMany({
       where: {
         status: 'ACTIVE',
         placement: placement || undefined,
-        endDate: { gte: new Date() }, // Solo campañas no vencidas
+        startDate: { lte: now },
+        endDate: { gte: now },
       },
     });
+
+    // Si no hay anuncios para esa ubicación, traer cualquiera que sea global
+    if (ads.length === 0 && placement) {
+      const globalAds = await prisma.adCampaign.findMany({
+        where: {
+          status: 'ACTIVE',
+          startDate: { lte: now },
+          endDate: { gte: now },
+        },
+        take: 5
+      });
+      return NextResponse.json(globalAds);
+    }
 
     return NextResponse.json(ads);
   } catch (error) {
