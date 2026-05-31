@@ -188,28 +188,34 @@ export default function MasterIntel() {
 
                         <div className="mt-auto space-y-8 relative z-10">
                            <div className="grid grid-cols-2 gap-6 border-y border-white/5 py-8">
-                              <div>
-                                 <p className="text-[8px] font-black text-gray-600 uppercase tracking-widest mb-2">Empresas Foco</p>
-                                 <div className="flex flex-wrap gap-2">
-                                    {news.companies?.map((c: string, idx: number) => (
-                                      <span key={idx} className="text-[8px] bg-white/5 px-3 py-1 rounded text-white font-bold">{c}</span>
-                                    ))}
-                                 </div>
-                              </div>
-                              <div>
-                                 <p className="text-[8px] font-black text-gray-600 uppercase tracking-widest mb-2">Líderes Activos</p>
-                                 <div className="flex flex-wrap gap-2">
-                                    {news.people?.map((p: string, idx: number) => (
-                                      <span key={idx} className="text-[8px] bg-cyan-500/10 px-3 py-1 rounded text-cyan-400 font-bold">{p}</span>
-                                    ))}
-                                 </div>
-                              </div>
+                              {news.companies && news.companies.length > 0 && (
+                                <div>
+                                   <p className="text-[8px] font-black text-gray-600 uppercase tracking-widest mb-2">Empresas Foco</p>
+                                   <div className="flex flex-wrap gap-2">
+                                      {news.companies.map((c: string, idx: number) => (
+                                        <span key={idx} className="text-[8px] bg-white/5 px-3 py-1 rounded text-white font-bold">{c}</span>
+                                      ))}
+                                   </div>
+                                </div>
+                              )}
+                              {news.people && news.people.length > 0 && (
+                                <div>
+                                   <p className="text-[8px] font-black text-gray-600 uppercase tracking-widest mb-2">Líderes Activos</p>
+                                   <div className="flex flex-wrap gap-2">
+                                      {news.people.map((p: string, idx: number) => (
+                                        <span key={idx} className="text-[8px] bg-cyan-500/10 px-3 py-1 rounded text-cyan-400 font-bold">{p}</span>
+                                      ))}
+                                   </div>
+                                </div>
+                              )}
                            </div>
-                           <div className="p-6 bg-purple-500/5 rounded-3xl border border-purple-500/10">
-                              <p className="text-[10px] text-purple-400 font-black uppercase italic leading-tight">
-                                 <Sparkles className="inline mr-3" size={14} /> Consecuencia: {news.consequence}
-                              </p>
-                           </div>
+                           {news.consequence && (
+                             <div className="p-6 bg-purple-500/5 rounded-3xl border border-purple-500/10">
+                                <p className="text-[10px] text-purple-400 font-black uppercase italic leading-tight">
+                                   <Sparkles className="inline mr-3" size={14} /> Consecuencia: {news.consequence}
+                                </p>
+                             </div>
+                           )}
                            <div className="flex items-center gap-3 text-[10px] font-black text-gray-600 uppercase">
                               <Clock size={12} className="text-cyan-500" /> Inyectado: {new Date(news.timestamp).toLocaleTimeString('es-PE', {hour: '2-digit', minute:'2-digit'})}
                            </div>

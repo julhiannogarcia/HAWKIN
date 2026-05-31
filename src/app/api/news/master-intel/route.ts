@@ -22,7 +22,7 @@ export async function GET() {
   let manualIntel: any[] = [];
 
   try {
-    // 1. OBTENER NOTICIAS MANUALES (PRIORIDAD ALPHA - SIEMPRE DEBE FUNCIONAR)
+    // 1. OBTENER NOTICIAS MANUALES (MÁXIMA PRIORIDAD)
     try {
       const dbNews = await prisma.news.findMany({
         where: { published: true },
@@ -30,19 +30,21 @@ export async function GET() {
         take: 10
       });
 
-      manualIntel = dbNews.map(n => ({
-        id: n.id,
-        title: n.title,
-        summary: n.excerpt || n.content.substring(0, 250) + "...",
-        impact: n.isUrgent ? 10 : 9,
-        companies: [n.category || "ALPHA"],
-        people: ["Fundador HAWKIN"],
-        consequence: "Análisis estratégico prioritario.",
-        importance: n.isUrgent ? "CRITICO" : "ALTO",
-        url: n.url || `/news/${n.id}`,
-        image: n.imageUrl,
-        timestamp: n.createdAt.toISOString()
-      }));
+      manualIntel = dbNews
+        .filter(n => n.title && (n.excerpt || n.content)) // Solo si tienen contenido
+        .map(n => ({
+          id: n.id,
+          title: n.title,
+          summary: n.excerpt || n.content.substring(0, 250) + "...",
+          impact: n.isUrgent ? 10 : 9,
+          companies: [n.category || "ALPHA"],
+          people: ["Fundador HAWKIN"],
+          consequence: "Análisis estratégico prioritario.",
+          importance: n.isUrgent ? "CRITICO" : "ALTO",
+          url: n.url || `/news/${n.id}`,
+          image: n.imageUrl || null,
+          timestamp: n.createdAt.toISOString()
+        }));
     } catch (dbErr) {
       console.error("DB Error in Master Intel:", dbErr);
     }
@@ -59,7 +61,6 @@ export async function GET() {
 
     const apiKey = process.env.GROQ_API_KEY;
     if (!apiKey) {
-       console.error("Missing GROQ_API_KEY");
        return NextResponse.json({ 
          topNews: manualIntel, 
          rumors: [], battles: [], trendingCEOs: [], 
@@ -70,54 +71,66 @@ export async function GET() {
 
     const groq = new Groq({ apiKey });
 
-    // 3. RECOPILAR RSS CON FALLBACK
+    // 3. RECOPILAR RSS CON TIMEOUT ESTRICTO
     let rawItems: any[] = [];
     try {
-      const FEEDS = ['https://news.google.com/rss/search?q=AI+breaking+news&hl=en-US&gl=US&ceid=US:en'];
+      const FEEDS = ['https://news.google.com/rss/search?q=AI+breaking+news+OpenAI+NVIDIA+Tesla&hl=en-US&gl=US&ceid=US:en'];
       const results = await Promise.all(FEEDS.map(url => 
         Promise.race([
           parser.parseURL(url),
-          new Promise((_, reject) => setTimeout(() => reject(new Error('Timeout')), 3000))
+          new Promise((_, reject) => setTimeout(() => reject(new Error('Timeout')), 3500))
         ]).catch(() => ({ items: [] }))
       ));
       // @ts-ignore
-      rawItems = results.flatMap(res => res.items || []).slice(0, 5).map(item => ({
+      rawItems = results.flatMap(res => res.items || []).slice(0, 10).map(item => ({
         title: item.title,
-        snippet: item.contentSnippet?.substring(0, 100),
-        source: item.source?.name || "Global"
+        content: item.contentSnippet || item.title,
+        source: item.source?.name || "Global Intel"
       }));
     } catch (e) { console.error("RSS Error:", e); }
 
-    // 4. MOTOR DE IA (LLAMA-3-8B - ULTRA RÁPIDO)
+    // 4. MOTOR DE IA (LLAMA-3-70B PARA MEJOR CALIDAD JSON)
     let aiItems: any[] = [];
     let intelReport: any = { rumors: [], battles: [], trendingCEOs: [], prediction: {} };
 
-    try {
-      const chatCompletion = await groq.chat.completions.create({
-        messages: [
-          { role: "system", content: "Eres el HAWKIN WAR ROOM. Responde SOLO en JSON." },
-          { role: "user", content: `Analiza: ${JSON.stringify(rawItems)}. Formato JSON: { "topNews": [{"title":"", "summary":"", "impact":10, "companies":[], "people":[], "consequence":"", "importance":"ALTO"}], "rumors":[], "battles":[], "trendingCEOs":[], "prediction":{} }` }
-        ],
-        model: "llama3-8b-8192",
-        temperature: 0.1,
-        response_format: { type: "json_object" }
-      });
+    if (rawItems.length > 0) {
+      try {
+        const chatCompletion = await groq.chat.completions.create({
+          messages: [
+            { 
+              role: "system", 
+              content: "Eres el HAWKIN WAR ROOM. Analiza noticias de IA y devuelve SIEMPRE un JSON válido con campos: title, summary, impact (1-10), companies (array), people (array), consequence, importance (CRITICO/ALTO)." 
+            },
+            { 
+              role: "user", 
+              content: `Analiza estos datos y genera el reporte JSON: ${JSON.stringify(rawItems)}. Asegúrate de que CADA noticia tenga título y resumen.` 
+            }
+          ],
+          model: "llama-3.3-70b-versatile", // Volvemos al 70B para asegurar que el JSON no venga vacío
+          temperature: 0.1,
+          response_format: { type: "json_object" }
+        });
 
-      const content = chatCompletion.choices[0]?.message?.content || "{}";
-      const parsed = JSON.parse(content);
-      
-      intelReport = parsed;
-      aiItems = (parsed.topNews || []).map((n: any) => ({
-        ...n,
-        id: generateId(n.title),
-        timestamp: new Date().toISOString()
-      }));
+        const content = chatCompletion.choices[0]?.message?.content || "{}";
+        const parsed = JSON.parse(content);
+        
+        intelReport = parsed;
+        aiItems = (parsed.topNews || [])
+          .filter((n: any) => n.title && n.summary) // FILTRO CRÍTICO: No permitir items vacíos
+          .map((n: any) => ({
+            ...n,
+            id: generateId(n.title),
+            timestamp: new Date().toISOString()
+          }));
 
-      // Actualizar Caché
-      cachedIntel = { ...intelReport, aiItems };
-      lastUpdate = now;
-    } catch (aiErr) {
-      console.error("AI Error:", aiErr);
+        // Actualizar Caché solo si hay datos reales
+        if (aiItems.length > 0) {
+          cachedIntel = { ...intelReport, aiItems };
+          lastUpdate = now;
+        }
+      } catch (aiErr) {
+        console.error("AI Error:", aiErr);
+      }
     }
 
     // MEZCLAR Y RESPONDER (SIEMPRE MUESTRA ALGO)
@@ -131,7 +144,6 @@ export async function GET() {
 
   } catch (error: any) {
     console.error("Critical War Room API Failure:", error);
-    // FALLBACK DE EMERGENCIA: SOLO MANUALES
     return NextResponse.json({ 
        topNews: manualIntel, 
        rumors: [], battles: [], trendingCEOs: [],
