@@ -1,17 +1,20 @@
 'use client';
 
 import React, { useState, useEffect } from 'react';
-import Intro from '@/components/Intro';
-import Hero from '@/components/Hero';
-import GlobalTicker from '@/components/Ticker';
-import FounderZone from '@/components/FounderZone';
-import Header from '@/components/Header';
-import Footer from '@/components/Footer';
-import Pricing from '@/components/Pricing';
-import LiveFeed from '@/components/LiveFeed';
-import VisionSection from '@/components/VisionSection';
-import AdSpace from '@/components/AdSpace';
+import dynamic from 'next/dynamic';
 import { Loader2 } from 'lucide-react';
+
+// CARGA DINÁMICA CON SSR: FALSE PARA BLINDAR LA ESTABILIDAD
+const Header = dynamic(() => import('@/components/Header'), { ssr: false });
+const Footer = dynamic(() => import('@/components/Footer'), { ssr: false });
+const Intro = dynamic(() => import('@/components/Intro'), { ssr: false });
+const Hero = dynamic(() => import('@/components/Hero'), { ssr: false });
+const GlobalTicker = dynamic(() => import('@/components/Ticker'), { ssr: false });
+const FounderZone = dynamic(() => import('@/components/FounderZone'), { ssr: false });
+const Pricing = dynamic(() => import('@/components/Pricing'), { ssr: false });
+const LiveFeed = dynamic(() => import('@/components/LiveFeed'), { ssr: false });
+const VisionSection = dynamic(() => import('@/components/VisionSection'), { ssr: false });
+const AdSpace = dynamic(() => import('@/components/AdSpace'), { ssr: false });
 
 export default function Home() {
   const [isMounted, setIsMounted] = useState(false);
