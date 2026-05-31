@@ -29,13 +29,6 @@ export default function ShieldPage() {
     loadShieldData();
   }, []);
 
-  const manuals = [
-    { title: 'Defensa Windows 11', desc: 'Protección contra Malware', icon: <Monitor className="text-blue-500" />, href: '/academy/windows-defense' },
-    { title: 'Privacidad Mac M5', desc: 'Blindaje de Archivos', icon: <Laptop className="text-cyan-400" />, href: '/academy/mac-shield' },
-    { title: 'Seguridad Móvil', desc: 'Cifrado de Mensajería', icon: <Smartphone className="text-purple-500" />, href: '/academy/mobile-privacy' },
-    { title: 'Linux Hardening', desc: 'Comandos de Seguridad', icon: <Terminal className="text-green-500" />, href: '/academy/linux-secure' },
-  ];
-
   return (
     <main className="min-h-screen bg-[#020202] text-white selection:bg-red-500 selection:text-white">
       <Header />
@@ -142,38 +135,12 @@ export default function ShieldPage() {
             )}
           </div>
 
-          {/* 2. MANUALES DE DEFENSA (OPERATIVOS) */}
+          {/* 2. PROTOCOLOS DE SEGURIDAD */}
           <div className="lg:col-span-4 space-y-12">
             <h2 className="text-2xl font-black uppercase italic tracking-widest flex items-center gap-4 border-b border-white/5 pb-8">
-              <Zap className="text-yellow-500" /> Defensa v2.0
+              <Zap className="text-yellow-500" /> Seguridad v2.0
             </h2>
             
-            <div className="space-y-6">
-               {manuals.map((manual, i) => (
-                 <Link key={i} href={manual.href}>
-                   <div className="p-8 glass-card bg-white/[0.01] border-white/5 rounded-[40px] flex items-center justify-between group hover:border-cyan-400/30 transition-all mb-4 cursor-pointer">
-                      <div className="flex items-center gap-6">
-                         <div className="w-14 h-14 bg-white/5 rounded-2xl flex items-center justify-center group-hover:scale-110 transition-transform">
-                            {manual.icon}
-                         </div>
-                         <div>
-                            <h4 className="text-lg font-black uppercase tracking-tighter group-hover:text-white transition-colors">{manual.title}</h4>
-                            <p className="text-[10px] font-bold text-gray-600 uppercase tracking-widest">{manual.desc}</p>
-                         </div>
-                      </div>
-                      <ChevronRight className="text-gray-700 group-hover:text-cyan-400 group-hover:translate-x-2 transition-all" />
-                   </div>
-                 </Link>
-               ))}
-            </div>
-
-            {/* BOTÓN VER TODOS LOS TUTORIALES REALES */}
-            <Link href="/academy">
-               <button className="w-full py-6 mt-6 bg-white text-black font-black uppercase tracking-[0.4em] text-[10px] rounded-[30px] hover:bg-red-600 hover:text-white transition-all shadow-[0_20px_50px_rgba(0,0,0,0.5)]">
-                 Entrar a la Academia HAWKIN
-               </button>
-            </Link>
-
             {/* ALERTA DE FRAUDE DINÁMICA */}
             <div className="p-10 bg-gradient-to-br from-yellow-500/20 to-transparent border border-yellow-500/20 rounded-[50px] space-y-6 relative overflow-hidden">
                <div className="absolute -top-4 -right-4 opacity-10">
