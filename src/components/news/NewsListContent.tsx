@@ -49,13 +49,36 @@ export default function NewsPage() {
         {/* MOTOR DE INTELIGENCIA MAESTRO */}
         <MasterIntel />
 
-        {/* FEED DE NOTICIAS TRADICIONAL (ELIMINADO MOCK HARDCODED PARA USAR LIVEFEED) */}
-        <div className="mt-40 space-y-16">
-           <div className="flex items-center gap-4">
-              <div className="w-4 h-4 bg-cyan-500 rounded-full" />
-              <h2 className="text-4xl font-black uppercase italic tracking-tighter">Archivo de <span className="text-gray-600">Inteligencia</span></h2>
+        {/* FEED DE NOTICIAS CON SIDEBAR TÁCTICO */}
+        <div className="mt-40 grid grid-cols-1 lg:grid-cols-12 gap-16">
+           <div className="lg:col-span-8 space-y-16">
+              <div className="flex items-center gap-4">
+                 <div className="w-4 h-4 bg-cyan-500 rounded-full" />
+                 <h2 className="text-4xl font-black uppercase italic tracking-tighter">Archivo de <span className="text-gray-600">Inteligencia</span></h2>
+              </div>
+              <LiveFeed />
            </div>
-           <LiveFeed />
+
+           {/* SIDEBAR PUBLICITARIO Y TÁCTICO */}
+           <aside className="lg:col-span-4 space-y-12">
+              <div className="sticky top-40 space-y-12">
+                 <div className="space-y-6">
+                    <h3 className="text-[10px] font-black uppercase tracking-[0.4em] text-gray-500 border-b border-white/5 pb-4">Patrocinador Alpha</h3>
+                    <AdSpace isPremium={false} type="sidebar" />
+                 </div>
+
+                 <div className="p-10 rounded-[50px] bg-white/[0.02] border border-white/5 space-y-8">
+                    <h3 className="text-xs font-black uppercase tracking-widest text-cyan-400">Canal Seguro</h3>
+                    <p className="text-gray-500 text-xs font-light leading-relaxed italic">
+                       Estás conectado al nodo de inteligencia HAWKIN. Todas las transmisiones están encriptadas bajo protocolo SHIELD Nivel 10.
+                    </p>
+                    <div className="flex items-center gap-4">
+                       <div className="w-2 h-2 bg-green-500 rounded-full animate-pulse" />
+                       <span className="text-[8px] font-black text-white uppercase tracking-widest">Conexión Estable</span>
+                    </div>
+                 </div>
+              </div>
+           </aside>
         </div>
       </div>
 

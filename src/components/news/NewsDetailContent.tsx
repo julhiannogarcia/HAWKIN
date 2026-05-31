@@ -358,6 +358,9 @@ export default function NewsDetailContent() {
              </div>
 
              <aside className="lg:col-span-4 space-y-8">
+                {/* PUBLICIDAD DE IMPACTO SIDEBAR */}
+                <AdSpace isPremium={!!session} type="sidebar" />
+
                 <div className="p-8 rounded-[40px] bg-white/[0.02] border border-white/5 space-y-6 shadow-xl">
                    <h4 className="text-xs font-black uppercase tracking-widest text-cyan-400 flex items-center gap-2">
                       <TrendingUp size={14} /> Datos Críticos

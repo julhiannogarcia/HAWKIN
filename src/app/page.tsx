@@ -35,8 +35,8 @@ export default function Home() {
       <div className="flex flex-col">
         <Intro />
         
-        {/* Espacio Publicitario Premium */}
-        <div className="mt-40 max-w-5xl mx-auto w-full px-4">
+        {/* Espacio Publicitario Premium - FORMATO GIGANTE */}
+        <div className="w-full">
           <AdSpace isPremium={false} type="banner" />
         </div>
 
@@ -60,6 +60,12 @@ export default function Home() {
         </section>
 
         <VisionSection />
+
+        {/* Espacio Publicitario de Cierre */}
+        <div className="max-w-6xl mx-auto w-full px-4 py-20">
+           <AdSpace isPremium={false} type="inline" />
+        </div>
+
         <FounderZone />
         <Pricing />
         <Footer />

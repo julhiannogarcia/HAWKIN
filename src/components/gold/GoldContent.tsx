@@ -206,6 +206,11 @@ export default function GoldPage() {
                  <Globe className="text-blue-500" size={20} />
                  <h3 className="text-sm font-black uppercase tracking-[0.3em]">Índices Globales y Metales</h3>
               </div>
+              <div className="space-y-6">
+                 <h4 className="text-[10px] font-black uppercase tracking-[0.4em] text-gray-500 border-b border-white/5 pb-4">Gold Sponsor</h4>
+                 <AdSpace isPremium={false} type="sidebar" />
+              </div>
+
               <div className="h-full p-4">
                  <MarketOverviewWidget />
               </div>

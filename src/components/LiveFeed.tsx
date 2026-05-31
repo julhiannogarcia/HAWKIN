@@ -85,20 +85,21 @@ export default function LiveFeed() {
       <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
         <AnimatePresence>
           {currentItems.slice(0, visibleCount).map((item, idx) => (
-            <motion.div
-              key={item.id}
-              initial={{ opacity: 0, y: 20 }}
-              animate={{ opacity: 1, y: 0 }}
-              exit={{ opacity: 0, y: -20 }}
-            >
-              {/* Insertar un Ad después de la 3ra noticia para máxima visibilidad */}
+            <React.Fragment key={item.id}>
+              {/* Insertar un Ad Gigante después de la 3ra noticia */}
               {idx === 3 && (
-                <div className="mb-8">
+                <div className="col-span-full py-12">
                    <AdSpace isPremium={!!session} type="inline" />
                 </div>
               )}
-              <NewsCard {...item} />
-            </motion.div>
+              <motion.div
+                initial={{ opacity: 0, y: 20 }}
+                animate={{ opacity: 1, y: 0 }}
+                exit={{ opacity: 0, y: -20 }}
+              >
+                <NewsCard {...item} />
+              </motion.div>
+            </React.Fragment>
           ))}
         </AnimatePresence>
       </div>

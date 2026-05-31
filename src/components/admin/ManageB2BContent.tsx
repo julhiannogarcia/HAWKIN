@@ -193,9 +193,9 @@ export default function ManageAds() {
                             onChange={(e) => setPlacement(e.target.value)}
                             className="w-full bg-black border border-white/10 rounded-2xl p-4 text-[10px] font-black uppercase tracking-widest outline-none focus:border-blue-500 transition-all text-white appearance-none"
                          >
-                            <option value="TOP_BANNER">Top Banner (Cabecera Global)</option>
-                            <option value="NEWS_FEED">News Feed (Pauta Nativa)</option>
-                            <option value="SIDEBAR">Sidebar de Impacto (Lateral)</option>
+                            <option value="TOP_BANNER">Plus Streaming & Hero (Banner Gigante)</option>
+                            <option value="NEWS_FEED">Native Radar (Entre Noticias)</option>
+                            <option value="SIDEBAR">Impact Sidebar (Lateral Táctico)</option>
                          </select>
                       </div>
                    </div>
@@ -226,15 +226,15 @@ export default function ManageAds() {
                 <div className="space-y-10">
                    <div className="space-y-6">
                       <h3 className="text-xs font-black uppercase tracking-[0.4em] text-cyan-400 flex items-center gap-3">
-                         <Globe size={16} /> Activos Digitales
+                         <Globe size={16} /> Activos Digitales (Soporta Video 4K)
                       </h3>
                       <div>
-                         <label className="text-[8px] font-black text-gray-600 uppercase tracking-widest mb-2 block">URL del Banner (Imagen 16:9)</label>
+                         <label className="text-[8px] font-black text-gray-600 uppercase tracking-widest mb-2 block">URL del Banner (JPG/PNG o MP4)</label>
                          <input 
                             type="text" 
                             value={bannerUrl}
                             onChange={(e) => setBannerUrl(e.target.value)}
-                            placeholder="https://..."
+                            placeholder="https://... (Soporta .mp4)"
                             className="w-full bg-black border border-white/10 rounded-2xl p-4 text-[10px] font-bold text-white outline-none focus:border-cyan-500 transition-all"
                          />
                       </div>
@@ -313,10 +313,10 @@ export default function ManageAds() {
       {/* ESTADÍSTICAS RÁPIDAS B2B */}
       <div className="grid grid-cols-1 md:grid-cols-4 gap-6">
          {[
-           { label: 'Revenue Proyectado', value: 'S/ 24,900', icon: <DollarSign className="text-green-500" /> },
+           { label: 'Revenue Proyectado', value: 'S/ 48,250', icon: <DollarSign className="text-green-500" /> },
            { label: 'Campañas Activas', value: campaigns.filter(c => c.status === 'ACTIVE').length.toString(), icon: <Target className="text-blue-500" /> },
-           { label: 'Impacto Global', value: '12.8M', icon: <Activity className="text-cyan-500" /> },
-           { label: 'CTR Promedio', value: '4.8%', icon: <Sparkles className="text-purple-500" /> },
+           { label: 'Alcance Global', value: '18.5M', icon: <Activity className="text-cyan-500" /> },
+           { label: 'CTR Plus+', value: '6.2%', icon: <Sparkles className="text-purple-500" /> },
          ].map((stat, i) => (
            <div key={i} className="p-8 rounded-[40px] bg-[#080808] border border-white/5 flex items-center gap-6 hover:border-blue-500/20 transition-all group">
               <div className="p-4 bg-black/40 rounded-2xl border border-white/5 group-hover:rotate-12 transition-transform">{stat.icon}</div>
