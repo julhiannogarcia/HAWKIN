@@ -132,6 +132,8 @@ model AdCampaign {
   bannerUrl        String
   targetUrl        String?  // Enlace a donde lleva el anuncio
   placement        String   // TOP_BANNER, NEWS_FEED, SIDEBAR
+  targetCountry    String?  // Código de país (ISO) para segmentación local
+  isGlobal         Boolean  @default(false) // Si es true, se ignora targetCountry y sale en todo el mundo
   startDate        DateTime
   endDate          DateTime
   status           String   @default("PENDING") // PENDING, ACTIVE, COMPLETED

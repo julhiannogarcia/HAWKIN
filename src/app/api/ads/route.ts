@@ -4,38 +4,51 @@ import { prisma } from "@/lib/prisma";
 export async function GET(req: Request) {
   const { searchParams } = new URL(req.url);
   const placement = searchParams.get('placement');
+  const countryCode = searchParams.get('country') || 'US';
 
   try {
     const now = new Date();
+    
+    // Buscar anuncios que:
+    // 1. Estén activos
+    // 2. Coincidan con la ubicación (si se pide)
+    // 3. Estén dentro del rango de fechas
+    // 4. Sean GLOBALES o coincidan con el PAÍS del usuario
     const ads = await prisma.adCampaign.findMany({
       where: {
         status: 'ACTIVE',
         placement: placement || undefined,
         startDate: { lte: now },
         endDate: { gte: now },
+        OR: [
+          { isGlobal: true },
+          { targetCountry: countryCode }
+        ]
       },
     });
 
-    // Si no hay anuncios para esa ubicación, traer cualquiera que sea global
-    if (ads.length === 0 && placement) {
-      const globalAds = await prisma.adCampaign.findMany({
+    // Fallback: Si no hay anuncios locales, traer globales para no dejar el espacio vacío
+    if (ads.length === 0) {
+      const globalFallback = await prisma.adCampaign.findMany({
         where: {
           status: 'ACTIVE',
           startDate: { lte: now },
           endDate: { gte: now },
+          isGlobal: true
         },
-        take: 5
+        take: 3
       });
-      return NextResponse.json(globalAds);
+      return NextResponse.json(globalFallback);
     }
 
     return NextResponse.json(ads);
   } catch (error) {
+    console.error("Ad Engine Error:", error);
     return NextResponse.json({ error: "Fallo al cargar publicidad" }, { status: 500 });
   }
 }
 
-// Endpoint para registrar clics
+// Registro de clics
 export async function POST(req: Request) {
   try {
     const { id } = await req.json();

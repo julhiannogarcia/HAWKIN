@@ -20,6 +20,8 @@ export default function ManageAds() {
   const [status, setStatus] = useState('ACTIVE');
   const [startDate, setStartDate] = useState('');
   const [endDate, setEndDate] = useState('');
+  const [isGlobal, setIsGlobal] = useState(false);
+  const [targetCountry, setTargetCountry] = useState('PE');
 
   // Estado de UI
   const [campaigns, setCampaigns] = useState<any[]>([]);
@@ -64,14 +66,16 @@ export default function ManageAds() {
           targetUrl,
           placement,
           status,
+          isGlobal,
+          targetCountry: isGlobal ? null : targetCountry,
           startDate: startDate || undefined,
           endDate: endDate || undefined,
         }),
       });
 
+      const resData = await res.json();
       if (!res.ok) {
-        const errData = await res.json();
-        throw new Error(errData.message || 'Error en la inyección de pauta.');
+        throw new Error(resData.error || resData.message || 'Error en la inyección de pauta.');
       }
 
       setSuccess(editId ? 'Pauta actualizada con éxito.' : 'Nueva pauta inyectada al ecosistema.');
@@ -93,6 +97,8 @@ export default function ManageAds() {
     setTargetUrl(ad.targetUrl || '');
     setPlacement(ad.placement);
     setStatus(ad.status);
+    setIsGlobal(!!ad.isGlobal);
+    setTargetCountry(ad.targetCountry || 'PE');
     setStartDate(ad.startDate ? new Date(ad.startDate).toISOString().split('T')[0] : '');
     setEndDate(ad.endDate ? new Date(ad.endDate).toISOString().split('T')[0] : '');
     setShowForm(true);
@@ -124,6 +130,8 @@ export default function ManageAds() {
     setTargetUrl('');
     setPlacement('TOP_BANNER');
     setStatus('ACTIVE');
+    setIsGlobal(false);
+    setTargetCountry('PE');
     setStartDate('');
     setEndDate('');
     setShowForm(false);
@@ -137,10 +145,9 @@ export default function ManageAds() {
         <div>
            <div className="flex items-center gap-3 mb-2">
               <ShoppingBag className="text-blue-400" size={18} />
-              <span className="text-[10px] font-black uppercase tracking-[0.4em] text-blue-500">HAWKIN AD ENGINE v1.0</span>
+              <span className="text-[10px] font-black uppercase tracking-[0.4em] text-blue-500">HAWKIN AD ENGINE v2.0</span>
            </div>
            <h1 className="text-4xl md:text-6xl font-black tracking-tighter italic uppercase">Gestión de <span className="text-white">Pauta.</span></h1>
-           <p className="text-gray-500 mt-2 font-light italic border-l-2 border-blue-500 pl-4">Control total sobre los activos publicitarios del imperio.</p>
         </div>
         {!showForm ? (
           <button 
@@ -186,18 +193,43 @@ export default function ManageAds() {
                             className="w-full bg-black border border-white/10 rounded-2xl p-4 text-xl font-black italic uppercase outline-none focus:border-blue-500 transition-all text-white placeholder:text-gray-900"
                          />
                       </div>
-                      <div>
-                         <label className="text-[8px] font-black text-gray-600 uppercase tracking-widest mb-2 block">Ubicación Estratégica (Placement)</label>
-                         <select 
-                            value={placement}
-                            onChange={(e) => setPlacement(e.target.value)}
-                            className="w-full bg-black border border-white/10 rounded-2xl p-4 text-[10px] font-black uppercase tracking-widest outline-none focus:border-blue-500 transition-all text-white appearance-none"
-                         >
-                            <option value="TOP_BANNER">Plus Streaming & Hero (Banner Gigante)</option>
-                            <option value="NEWS_FEED">Native Radar (Entre Noticias)</option>
-                            <option value="SIDEBAR">Impact Sidebar (Lateral Táctico)</option>
-                         </select>
+                      <div className="grid grid-cols-2 gap-6">
+                         <div>
+                            <label className="text-[8px] font-black text-gray-600 uppercase tracking-widest mb-2 block">Ubicación</label>
+                            <select 
+                                value={placement}
+                                onChange={(e) => setPlacement(e.target.value)}
+                                className="w-full bg-black border border-white/10 rounded-2xl p-4 text-[10px] font-black uppercase tracking-widest outline-none focus:border-blue-500 transition-all text-white appearance-none"
+                            >
+                                <option value="TOP_BANNER">Plus Streaming</option>
+                                <option value="NEWS_FEED">Native Radar</option>
+                                <option value="SIDEBAR">Sidebar Táctico</option>
+                            </select>
+                         </div>
+                         <div>
+                            <label className="text-[8px] font-black text-gray-600 uppercase tracking-widest mb-2 block">Alcance</label>
+                            <select 
+                                value={isGlobal ? 'GLOBAL' : 'LOCAL'}
+                                onChange={(e) => setIsGlobal(e.target.value === 'GLOBAL')}
+                                className="w-full bg-black border border-white/10 rounded-2xl p-4 text-[10px] font-black uppercase tracking-widest outline-none focus:border-blue-500 transition-all text-white appearance-none"
+                            >
+                                <option value="LOCAL">Local (Por País)</option>
+                                <option value="GLOBAL">Global (Todo el Mundo)</option>
+                            </select>
+                         </div>
                       </div>
+                      {!isGlobal && (
+                        <motion.div initial={{ opacity: 0 }} animate={{ opacity: 1 }}>
+                           <label className="text-[8px] font-black text-gray-600 uppercase tracking-widest mb-2 block">País Objetivo (ISO)</label>
+                           <input 
+                             type="text" 
+                             value={targetCountry}
+                             onChange={(e) => setTargetCountry(e.target.value.toUpperCase())}
+                             placeholder="EJ: PE, MX, US..."
+                             className="w-full bg-black border border-white/10 rounded-2xl p-4 text-xs font-black text-white focus:border-blue-500 outline-none"
+                           />
+                        </motion.div>
+                      )}
                    </div>
 
                    <div className="grid grid-cols-2 gap-8">
@@ -226,18 +258,17 @@ export default function ManageAds() {
                 <div className="space-y-10">
                    <div className="space-y-6">
                       <h3 className="text-xs font-black uppercase tracking-[0.4em] text-cyan-400 flex items-center gap-3">
-                         <Globe size={16} /> Activos Digitales (Soporta Video 4K)
+                         <Globe size={16} /> Activos Digitales (Soporta Video)
                       </h3>
                       <div>
-                         <label className="text-[8px] font-black text-gray-600 uppercase tracking-widest mb-2 block">URL del Banner (JPG/PNG o MP4/YouTube)</label>
+                         <label className="text-[8px] font-black text-gray-600 uppercase tracking-widest mb-2 block">URL del Banner (JPG/PNG o YouTube/MP4)</label>
                          <input 
                             type="text" 
                             value={bannerUrl}
                             onChange={(e) => setBannerUrl(e.target.value)}
-                            placeholder="https://... (.mp4 o youtube.com/watch?v=...)"
+                            placeholder="https://..."
                             className="w-full bg-black border border-white/10 rounded-2xl p-4 text-[10px] font-bold text-white outline-none focus:border-cyan-500 transition-all"
                          />
-                         <p className="text-[7px] text-gray-500 mt-2 font-bold uppercase tracking-widest italic">* Usa enlaces directos a .mp4 o links de YouTube para activar el modo video.</p>
                       </div>
                       <div>
                          <label className="text-[8px] font-black text-gray-600 uppercase tracking-widest mb-2 block">URL de Destino (Clic del Usuario)</label>
@@ -260,7 +291,6 @@ export default function ManageAds() {
                             <p className="text-[9px] font-black text-gray-700 uppercase tracking-widest">Vista previa del anuncio</p>
                          </div>
                       )}
-                      <div className="absolute inset-0 bg-gradient-to-t from-black/60 to-transparent opacity-0 group-hover:opacity-100 transition-opacity" />
                    </div>
                 </div>
 
@@ -348,8 +378,11 @@ export default function ManageAds() {
               >
                  <div className="h-48 bg-gray-900 relative">
                     <img src={ad.bannerUrl} className="w-full h-full object-cover opacity-60 group-hover:scale-110 transition-transform duration-[2s]" alt="" />
-                    <div className="absolute top-4 left-4 flex gap-2">
+                    <div className="absolute top-4 left-4 flex flex-col gap-2">
                        <span className="text-[7px] font-black bg-blue-600 text-white px-3 py-1 rounded-full uppercase shadow-xl">{ad.placement}</span>
+                       <span className={`text-[7px] font-black ${ad.isGlobal ? 'bg-purple-600' : 'bg-gray-700'} text-white px-3 py-1 rounded-full uppercase shadow-xl`}>
+                          {ad.isGlobal ? 'GLOBAL' : `LOCAL (${ad.targetCountry})`}
+                       </span>
                     </div>
                     <div className="absolute top-4 right-4 flex gap-2">
                        <button 
@@ -400,25 +433,6 @@ export default function ManageAds() {
                  <p className="text-xs font-black text-gray-700 uppercase tracking-widest">No hay pautas publicitarias registradas</p>
               </div>
             )}
-         </div>
-      </div>
-
-      {/* MONITOR DE LOGS B2B */}
-      <div className="mt-20 space-y-8">
-         <div className="flex justify-between items-center">
-            <h3 className="text-xl font-black uppercase italic tracking-tighter text-red-500 flex items-center gap-3">
-               <ShieldCheck size={20} /> Registro de Operaciones Comerciales
-            </h3>
-            <button className="text-[9px] font-black text-gray-600 uppercase hover:text-white transition-all underline">Limpiar Terminal</button>
-         </div>
-
-         <div className="bg-black border border-red-900/30 rounded-[40px] p-10 font-mono text-[11px] leading-relaxed relative overflow-hidden shadow-2xl">
-            <div className="absolute top-0 right-0 w-full h-1 bg-gradient-to-r from-transparent via-red-500/20 to-transparent" />
-            <div className="space-y-2">
-               <p className="text-gray-600">[{new Date().toISOString()}] INFO: Motor Publicitario HAWKIN Inicializado.</p>
-               <p className="text-gray-400">[{new Date().toISOString()}] SUCCESS: Nodo de Base de Datos Sincronizado en Puerto 5432.</p>
-               <p className="text-blue-400 animate-pulse">{'>'} Esperando comandos del Administrador...</p>
-            </div>
          </div>
       </div>
     </div>

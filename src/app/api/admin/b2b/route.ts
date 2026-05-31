@@ -3,15 +3,46 @@ import { prisma } from "@/lib/prisma";
 
 export async function POST(req: Request) {
   try {
-    const { companyName, bannerUrl, targetUrl, placement, startDate, endDate, status } = await req.json();
+    const { companyName, bannerUrl, targetUrl, placement, startDate, endDate, status, targetCountry, isGlobal } = await req.json();
 
     if (!companyName || !bannerUrl || !placement) {
       return NextResponse.json({ error: "Faltan datos obligatorios para la campaña" }, { status: 400 });
     }
 
-    // Ajustar endDate al final del día (23:59:59)
-    const finalEndDate = endDate ? new Date(endDate) : new Date(Date.now() + 30 * 24 * 60 * 60 * 1000);
-    finalEndDate.setHours(23, 59, 59, 999);
+    // 1. Verificar cupos reales (Límite 5 por día)
+    const sDate = new Date(startDate || Date.now());
+    const eDate = new Date(endDate || Date.now() + 30 * 24 * 60 * 60 * 1000);
+    eDate.setHours(23, 59, 59, 999);
+
+    const conflictingAds = await prisma.adCampaign.findMany({
+      where: {
+        status: 'ACTIVE',
+        placement,
+        OR: [
+          { isGlobal: true },
+          { targetCountry: isGlobal ? undefined : (targetCountry || 'GLOBAL') }
+        ],
+        AND: [
+          { startDate: { lte: eDate } },
+          { endDate: { gte: sDate } }
+        ]
+      }
+    });
+
+    // Validar cada día del rango
+    const SLOTS_PER_DAY = 5;
+    let isFull = false;
+    for (let d = new Date(sDate); d <= eDate; d.setDate(d.getDate() + 1)) {
+      const adsOnDay = conflictingAds.filter(ad => d >= ad.startDate && d <= ad.endDate).length;
+      if (adsOnDay >= SLOTS_PER_DAY) {
+        isFull = true;
+        break;
+      }
+    }
+
+    if (isFull) {
+      return NextResponse.json({ error: "Cupos agotados para estas fechas y ubicación." }, { status: 409 });
+    }
 
     const campaign = await prisma.adCampaign.create({
       data: {
@@ -19,8 +50,10 @@ export async function POST(req: Request) {
         bannerUrl,
         targetUrl: targetUrl || null,
         placement,
-        startDate: startDate ? new Date(startDate) : new Date(),
-        endDate: finalEndDate,
+        targetCountry: isGlobal ? null : (targetCountry || 'PE'),
+        isGlobal: !!isGlobal,
+        startDate: sDate,
+        endDate: eDate,
         status: status || "ACTIVE",
       }
     });
@@ -48,7 +81,7 @@ export async function GET() {
 
 export async function PUT(req: Request) {
   try {
-    const { id, companyName, bannerUrl, targetUrl, placement, startDate, endDate, status } = await req.json();
+    const { id, companyName, bannerUrl, targetUrl, placement, startDate, endDate, status, targetCountry, isGlobal } = await req.json();
 
     if (!id) return NextResponse.json({ error: "ID requerido" }, { status: 400 });
 
@@ -59,6 +92,8 @@ export async function PUT(req: Request) {
         bannerUrl,
         targetUrl,
         placement,
+        targetCountry,
+        isGlobal,
         startDate: startDate ? new Date(startDate) : undefined,
         endDate: endDate ? new Date(endDate) : undefined,
         status,
