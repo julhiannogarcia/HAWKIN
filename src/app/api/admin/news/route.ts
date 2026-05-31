@@ -25,10 +25,10 @@ export async function POST(req: Request) {
 
     return NextResponse.json(news);
   } catch (error: any) {
-    console.error("Error creating news:", error);
+    console.error("DEBUG - NEWS CREATION ERROR:", error);
     return NextResponse.json({ 
-      error: "Error de Base de Datos", 
-      message: error.message || "Fallo técnico en el núcleo." 
+      error: "DATABASE_CONNECTION_ERROR", 
+      message: `${error.code || 'ERROR'}: ${error.message || 'Error desconocido en el núcleo.'}`
     }, { status: 500 });
   }
 }

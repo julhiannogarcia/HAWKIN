@@ -63,7 +63,8 @@ export default function ManageNews() {
 
       if (!res.ok) {
         const errData = await res.json();
-        throw new Error(errData.error || errData.message || 'Fallo de inyección Alpha');
+        const technicalMsg = errData.message || errData.error || 'Fallo de inyección Alpha';
+        throw new Error(technicalMsg);
       }
 
       setShowSuccess(true);
@@ -74,8 +75,8 @@ export default function ManageNews() {
       fetchNews(); // Recargar lista
       setTimeout(() => setShowSuccess(false), 5000);
     } catch (e: any) {
-      console.error("Injection error:", e);
-      setError(e.message || 'Error al inyectar noticia al radar.');
+      console.error("Injection error details:", e);
+      setError(e.message);
     } finally {
       setIsLoading(false);
     }
