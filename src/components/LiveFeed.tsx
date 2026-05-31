@@ -3,9 +3,12 @@
 import { useState, useEffect } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
 import NewsCard from '@/components/NewsCard';
+import AdSpace from '@/components/AdSpace';
 import { Globe, Coins, ShieldAlert, Laptop, ChevronDown, Sparkles, Loader2 } from 'lucide-react';
+import { useSession } from 'next-auth/react';
 
 export default function LiveFeed() {
+  const { data: session } = useSession();
   const [activeTab, setActiveTab] = useState<'radar' | 'gold'>('radar');
   const [data, setData] = useState<{news: any[], shield: any[], hardware: any[]}>({news: [], shield: [], hardware: []});
   const [goldNews, setGoldNews] = useState<any[]>([]);
@@ -81,13 +84,19 @@ export default function LiveFeed() {
 
       <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
         <AnimatePresence>
-          {currentItems.slice(0, visibleCount).map((item) => (
+          {currentItems.slice(0, visibleCount).map((item, idx) => (
             <motion.div
               key={item.id}
               initial={{ opacity: 0, y: 20 }}
               animate={{ opacity: 1, y: 0 }}
               exit={{ opacity: 0, y: -20 }}
             >
+              {/* Insertar un Ad después de la 3ra noticia para máxima visibilidad */}
+              {idx === 3 && (
+                <div className="mb-8">
+                   <AdSpace isPremium={!!session} type="inline" />
+                </div>
+              )}
               <NewsCard {...item} />
             </motion.div>
           ))}

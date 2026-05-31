@@ -25,15 +25,24 @@ export default function AdSpace({ isPremium, type = 'banner' }: AdSpaceProps) {
     const fetchAd = async () => {
       try {
         const placement = TYPE_MAP[type];
+        console.log(`[HAWKIN ADS] Solicitando pauta para: ${placement}`);
         const res = await fetch(`/api/ads?placement=${placement}`);
         const data = await res.json();
         
         if (Array.isArray(data) && data.length > 0) {
-          // Seleccionar uno al azar si hay varios
           setAd(data[Math.floor(Math.random() * data.length)]);
+          console.log(`[HAWKIN ADS] Pauta cargada: ${data[0].companyName}`);
+        } else {
+          console.log(`[HAWKIN ADS] No hay pautas activas para ${placement}. Buscando pauta global...`);
+          // Si no hay en esa posición, intentar traer cualquiera activa
+          const resGlobal = await fetch(`/api/ads`);
+          const dataGlobal = await resGlobal.json();
+          if (dataGlobal.length > 0) {
+             setAd(dataGlobal[Math.floor(Math.random() * dataGlobal.length)]);
+          }
         }
       } catch (e) {
-        console.error("Ad fetch error", e);
+        console.error("[HAWKIN ADS] Error al sincronizar publicidad:", e);
       } finally {
         setLoading(false);
       }
