@@ -7,7 +7,8 @@ import GlobalTicker from '@/components/Ticker';
 import { motion, AnimatePresence } from 'framer-motion';
 import { 
   ShieldCheck, Loader2, MessageCircle, Radio, 
-  LayoutDashboard, ShoppingBag, Target, Tv, Eye, ExternalLink, Play
+  LayoutDashboard, ShoppingBag, Target, Tv, Eye, ExternalLink, Play,
+  Sparkles, Calendar
 } from 'lucide-react';
 
 // =====================================================================
@@ -21,9 +22,42 @@ export default function B2BPage() {
   const paypalRef = useRef<HTMLDivElement>(null);
 
   const AD_PLANS = useMemo(() => [
-    { id: 'plus', title: 'Plus Streaming & Hero', pricePEN: 999, priceUSD: "265.00", placement: 'Banner Principal + Live', reach: '2.5M+ Views', desc: 'Tu marca en la cabecera principal con video en tiempo real.', icon: <Radio className="text-blue-400" /> },
-    { id: 'sidebar', title: 'Sidebar de Impacto', pricePEN: 699, priceUSD: "185.00", placement: 'Lateral del Ecosistema', reach: '1M+ Views', desc: 'Presencia constante al lado de reportes y herramientas de élite.', icon: <LayoutDashboard className="text-blue-300" /> },
-    { id: 'native', title: 'Pauta Nativa Radar', pricePEN: 399, priceUSD: "105.00", placement: 'Entre Noticias', reach: '500k+ Clics', desc: 'Anuncio integrado orgánicamente en el feed de inteligencia.', icon: <ShoppingBag className="text-blue-200" /> },
+    { 
+      id: 'plus', 
+      title: 'Plan Maestro Plus', 
+      pricePEN: 999, 
+      priceUSD: "265.00", 
+      duration: '20 DÍAS',
+      placement: 'Banner Principal + Live + Video', 
+      reach: '2.5M+ Views', 
+      desc: 'El máximo nivel de impacto. Incluye video 4K en la cabecera global y rotación prioritaria.', 
+      features: ['Soporta Video MP4', 'Imágenes Alta Fidelidad', 'Ubicación Premium'],
+      icon: <Sparkles className="text-blue-400" /> 
+    },
+    { 
+      id: 'sidebar', 
+      title: 'Plan Táctico Intermedio', 
+      pricePEN: 699, 
+      priceUSD: "185.00", 
+      duration: '15 DÍAS',
+      placement: 'Lateral de todo el ecosistema', 
+      reach: '1M+ Views', 
+      desc: 'Presencia constante en el sidebar. Sólo imágenes estáticas de alta calidad.', 
+      features: ['Sólo Imágenes', 'Ubicación Lateral', 'Alta Visibilidad'],
+      icon: <LayoutDashboard className="text-blue-300" /> 
+    },
+    { 
+      id: 'native', 
+      title: 'Plan Escencial 7', 
+      pricePEN: 399, 
+      priceUSD: "105.00", 
+      duration: '7 DÍAS',
+      placement: 'Nativo en Radar (Sin Banner Top)', 
+      reach: '500k+ Clics', 
+      desc: 'Impacto rápido para campañas cortas. Sin banner principal y sin video.', 
+      features: ['7 Días de Pauta', 'Anuncio Nativo', 'Económico'],
+      icon: <ShoppingBag className="text-blue-200" /> 
+    },
   ], []);
 
   const selectedPlacement = AD_PLANS.find(p => p.id === selectedId) || AD_PLANS[0];
@@ -98,7 +132,7 @@ export default function B2BPage() {
           </h1>
           <p className="text-gray-400 text-xl max-w-3xl mx-auto font-light leading-relaxed">
              Visualiza tu marca y activa tu pauta publicitaria al instante. 
-             Localización total por IP y cobro express garantizado.
+             Localización total por IP y duraciones calibradas para el éxito.
           </p>
         </section>
 
@@ -116,9 +150,12 @@ export default function B2BPage() {
                   onClick={() => { setSelectedId(ad.id); setIsPaypalReady(false); setTimeout(() => { if((window as any).paypal) setIsPaypalReady(true); }, 500); }} 
                   className={`w-full p-8 rounded-[40px] border-2 text-left transition-all ${selectedId === ad.id ? 'border-blue-500 bg-blue-500/5 shadow-[0_0_40px_rgba(59,130,246,0.1)]' : 'border-white/5 bg-white/[0.01]'}`}
                 >
-                   <div className="flex items-center gap-4 mb-4">
-                      <div className={`w-10 h-10 rounded-xl flex items-center justify-center ${selectedId === ad.id ? 'bg-blue-500 text-black' : 'bg-white/5'}`}>{ad.icon}</div>
-                      <p className="text-base font-black uppercase italic leading-none">{ad.title}</p>
+                   <div className="flex items-center justify-between gap-4 mb-4">
+                      <div className="flex items-center gap-4">
+                        <div className={`w-10 h-10 rounded-xl flex items-center justify-center ${selectedId === ad.id ? 'bg-blue-500 text-black' : 'bg-white/5'}`}>{ad.icon}</div>
+                        <p className="text-base font-black uppercase italic leading-none">{ad.title}</p>
+                      </div>
+                      <span className="text-[8px] font-black bg-white/10 px-2 py-1 rounded text-blue-400 border border-blue-500/20">{ad.duration}</span>
                    </div>
                    <div className="flex justify-between items-end">
                       <p className="text-[9px] text-gray-500 font-bold uppercase tracking-widest pl-1">Reach: <span className="text-white">{ad.reach}</span></p>
@@ -126,6 +163,25 @@ export default function B2BPage() {
                    </div>
                 </button>
               ))}
+
+              {/* CALENDARIO DE DISPONIBILIDAD */}
+              <div className="p-8 bg-white/[0.02] border border-white/5 rounded-[40px] space-y-6 mt-12">
+                 <div className="flex items-center gap-3">
+                    <Calendar className="text-blue-500" size={16} />
+                    <h4 className="text-xs font-black uppercase tracking-widest">Disponibilidad Mayo 2026</h4>
+                 </div>
+                 <div className="grid grid-cols-7 gap-2">
+                    {Array.from({ length: 31 }, (_, i) => ({
+                      day: i + 1,
+                      available: Math.random() > 0.3
+                    })).map((d) => (
+                      <div key={d.day} className={`aspect-square rounded-lg flex items-center justify-center text-[8px] font-black border ${d.available ? 'bg-green-500/20 border-green-500/30 text-green-500' : 'bg-red-500/10 border-red-500/20 text-red-900 opacity-30'}`}>
+                         {d.day}
+                      </div>
+                    ))}
+                 </div>
+                 <p className="text-[7px] font-bold text-gray-600 uppercase text-center tracking-[0.2em]">Celdas verdes indican disponibilidad inmediata</p>
+              </div>
            </div>
 
            {/* MONITOR DE VISIÓN */}
@@ -163,12 +219,17 @@ export default function B2BPage() {
               {/* PASARELA DE PAGO */}
               <div className="grid grid-cols-1 md:grid-cols-2 gap-8">
                  <div className="p-10 rounded-[50px] bg-white/[0.02] border border-white/5 flex flex-col justify-between h-full shadow-xl">
-                    <div className="space-y-4">
+                    <div className="space-y-6">
                        <h5 className="text-xl font-black uppercase italic text-white leading-tight underline decoration-blue-500/30">{selectedPlacement.placement}</h5>
                        <p className="text-gray-500 text-xs font-light leading-relaxed">{selectedPlacement.desc}</p>
+                       <div className="flex flex-wrap gap-2">
+                          {selectedPlacement.features.map((f: string, i: number) => (
+                             <span key={i} className="text-[8px] font-black bg-blue-500/10 text-blue-400 border border-blue-500/20 px-3 py-1 rounded-full">{f}</span>
+                          ))}
+                       </div>
                     </div>
                     <div className="mt-8">
-                       <p className="text-[9px] font-black text-gray-600 uppercase tracking-widest">Inversión Semanal</p>
+                       <p className="text-[9px] font-black text-gray-600 uppercase tracking-widest">Inversión por {selectedPlacement.duration}</p>
                        <p className="text-4xl font-black text-blue-500">S/{selectedPlacement.pricePEN}</p>
                     </div>
                  </div>
