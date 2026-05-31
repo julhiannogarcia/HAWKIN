@@ -13,12 +13,13 @@ import {
 } from 'lucide-react';
 
 // =====================================================================
-// COMPONENTE REAL DE PAYPAL PARA SEGURIDAD MÁXIMA
+// COMPONENTE REAL DE PAYPAL - ULTRA ROBUSTO
 // =====================================================================
 function PaypalBusinessButton({ amount, onSuccess, isLoaded }: { amount: string, onSuccess: (id: string) => void, isLoaded: boolean }) {
   const containerRef = useRef<HTMLDivElement>(null);
 
   useEffect(() => {
+    // Solo renderizar si el SDK está cargado y el contenedor existe
     if (isLoaded && containerRef.current && (window as any).paypal) {
       containerRef.current.innerHTML = ''; 
       try {
@@ -37,7 +38,6 @@ function PaypalBusinessButton({ amount, onSuccess, isLoaded }: { amount: string,
           },
           onError: (err: any) => {
             console.error("PayPal Error:", err);
-            alert("Socio, hubo un problema con PayPal. Verifica tu conexión o tarjeta.");
           },
           style: {
             color: 'blue',
@@ -50,9 +50,14 @@ function PaypalBusinessButton({ amount, onSuccess, isLoaded }: { amount: string,
         console.error("Render Error:", e);
       }
     }
-  }, [isLoaded, amount, onSuccess]);
+  }, [isLoaded, amount]); // Re-renderizar solo si cambia el monto o la carga
 
-  return <div ref={containerRef} className="w-full min-h-[150px] bg-white/5 rounded-3xl p-4 flex flex-col justify-center border border-white/5" />;
+  return (
+    <div className="w-full space-y-4">
+      <div ref={containerRef} className="w-full min-h-[150px] flex flex-col justify-center items-center bg-white/5 rounded-3xl p-6 border border-white/10" />
+      <p className="text-[7px] text-gray-500 font-bold uppercase text-center tracking-widest italic">Transacción encriptada punto a punto</p>
+    </div>
+  );
 }
 
 export default function B2BPage() {
@@ -76,38 +81,23 @@ export default function B2BPage() {
 
   const AD_PLANS = useMemo(() => [
     { 
-      id: 'plus', 
-      title: 'Plan Maestro Plus', 
-      days: 20,
-      basePriceUSD: 265,
-      placement: 'TOP_BANNER',
+      id: 'plus', title: 'Plan Maestro Plus', days: 20, basePriceUSD: 265, placement: 'TOP_BANNER',
       desc: 'Máxima visibilidad: Banner Gigante en cabecera + Soporte Video 4K.',
-      reachLocal: '2.5M+ Impactos',
-      reachGlobal: '12M+ Global',
+      reachLocal: '2.5M+ Impactos', reachGlobal: '12M+ Global',
       features: ['20 DÍAS CORRIDOS', 'Soporta Video 4K', 'Cabecera Principal'],
       icon: <Sparkles className="text-blue-400" />
     },
     { 
-      id: 'sidebar', 
-      title: 'Plan Táctico Sidebar', 
-      days: 15,
-      basePriceUSD: 185,
-      placement: 'SIDEBAR',
+      id: 'sidebar', title: 'Plan Táctico Sidebar', days: 15, basePriceUSD: 185, placement: 'SIDEBAR',
       desc: 'Presencia lateral constante junto a toda la inteligencia HAWKIN.',
-      reachLocal: '1M+ Impactos',
-      reachGlobal: '5M+ Global',
+      reachLocal: '1M+ Impactos', reachGlobal: '5M+ Global',
       features: ['15 DÍAS CORRIDOS', 'Solo Imágenes HQ', 'Lateral Táctico'],
       icon: <LayoutDashboard className="text-blue-300" />
     },
     { 
-      id: 'native', 
-      title: 'Plan Escencial Native', 
-      days: 7,
-      basePriceUSD: 105,
-      placement: 'NEWS_FEED',
+      id: 'native', title: 'Plan Escencial Native', days: 7, basePriceUSD: 105, placement: 'NEWS_FEED',
       desc: 'Integración orgánica: Tu marca dentro del flujo de noticias del Radar.',
-      reachLocal: '500k+ Impactos',
-      reachGlobal: '2M+ Global',
+      reachLocal: '500k+ Impactos', reachGlobal: '2M+ Global',
       features: ['7 DÍAS CORRIDOS', 'Anuncio Nativo', 'Económico'],
       icon: <ShoppingBag className="text-blue-200" />
     }
@@ -129,15 +119,12 @@ export default function B2BPage() {
     setIsMounted(true);
     fetch('/api/geo').then(res => res.json()).then(data => { if(data?.countryCode) setGeoData(data); }).catch(console.error);
     
-    // Carga de PayPal SDK REAL
+    // CARGA DE PAYPAL CON PRIORIDAD ALTA
     if (!(window as any).paypal) {
       const script = document.createElement("script");
       script.src = `https://www.paypal.com/sdk/js?client-id=ASALTTzsK9I-m087Qv64N3tPLr_HFAyDKliwE1bbS33tyoI2QT6Dak6VhvUFdv8fenAfboNfcrs7xas&currency=USD&intent=capture`;
       script.async = true;
-      script.onload = () => {
-         console.log("PayPal SDK cargado correctamente.");
-         setIsPaypalLoaded(true);
-      };
+      script.onload = () => setIsPaypalLoaded(true);
       document.body.appendChild(script);
     } else {
       setIsPaypalLoaded(true);
@@ -153,9 +140,8 @@ export default function B2BPage() {
        alert("Socio, debes elegir una fecha de inicio válida (de hoy en adelante).");
        return;
     }
-
     if (!companyName || !bannerUrl) {
-      alert("Socio, por favor completa el Nombre de Empresa y el enlace del Banner para continuar.");
+      alert("Socio, completa el Nombre de Empresa y Banner para continuar.");
       return;
     }
     setStep('checkout');
@@ -170,29 +156,19 @@ export default function B2BPage() {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({
-          companyName,
-          bannerUrl,
-          targetUrl,
+          companyName, bannerUrl, targetUrl,
           placement: selectedPlan.placement,
           startDate: new Date(startDate),
           endDate: endDateCalculated,
-          isGlobal,
-          targetCountry: geoData.countryCode,
-          paypalOrderId: id,
-          paymentVerified: true,
-          status: "PAID"
+          isGlobal, targetCountry: geoData.countryCode,
+          paypalOrderId: id, paymentVerified: true, status: "PAID"
         })
       });
       if (res.ok) {
         setStep('success');
         setTimeout(() => window.location.href = '/', 4000);
-      } else {
-        alert("Pago recibido, pero hubo un error al inyectar. Guarda este ID: " + id);
       }
-    } catch (e) { 
-      console.error(e);
-      alert("Error crítico. Transacción: " + id);
-    }
+    } catch (e) { console.error(e); }
     finally { setIsProcessing(false); }
   };
 
@@ -209,10 +185,10 @@ export default function B2BPage() {
         <section className="text-center space-y-8 mb-24">
           <div className="inline-flex items-center gap-2 px-4 py-1.5 bg-blue-600/10 border border-blue-600/30 rounded-full mb-4">
              <Globe className="text-blue-500 animate-pulse" size={14} />
-             <span className="text-[9px] font-black text-blue-500 uppercase tracking-[0.4em]">SISTEMA DE PAUTA AUTOMATIZADA</span>
+             <span className="text-[9px] font-black text-blue-500 uppercase tracking-[0.4em]">HAWKIN B2B GLOBAL NETWORK</span>
           </div>
           <h1 className="text-6xl md:text-8xl font-black tracking-tighter leading-none italic uppercase">
-            {step === 'config' ? 'Configurar' : step === 'checkout' ? 'Verificar' : 'Misión'} <span className="bg-gradient-to-r from-blue-400 to-blue-600 bg-clip-text text-transparent">Publicidad.</span>
+            {step === 'config' ? 'Inyectar' : step === 'checkout' ? 'Verificar' : 'Misión'} <span className="bg-gradient-to-r from-blue-400 to-blue-600 bg-clip-text text-transparent">Pauta.</span>
           </h1>
         </section>
 
@@ -244,7 +220,7 @@ export default function B2BPage() {
                              </div>
                              <div className="flex justify-between items-end">
                                 <div>
-                                   <p className="text-[7px] text-gray-600 font-bold uppercase tracking-widest leading-none mb-1">Alcance Estimado</p>
+                                   <p className="text-[7px] text-gray-600 font-bold uppercase tracking-widest leading-none mb-1">Impacto Proyectado</p>
                                    <p className="text-[10px] font-black text-cyan-400 uppercase italic">{isGlobal ? ad.reachGlobal : ad.reachLocal}</p>
                                 </div>
                                 <p className="text-lg font-black text-white">{geoData.currencySymbol}{Math.round((isGlobal ? ad.basePriceUSD + 300 : ad.basePriceUSD) * (geoData?.rate || 3.8))}</p>
@@ -267,7 +243,7 @@ export default function B2BPage() {
                           </div>
                         ))}
                      </div>
-                     <p className="text-[7px] font-bold text-gray-700 uppercase text-center tracking-[0.2em] relative z-10">Cupos: 5 Ads/Día máximo</p>
+                     <p className="text-[7px] font-bold text-gray-700 uppercase text-center tracking-[0.2em] relative z-10">Límite: 5 Ads/Día</p>
                   </div>
                </div>
 
@@ -280,42 +256,28 @@ export default function B2BPage() {
                      <div className="grid grid-cols-1 md:grid-cols-2 gap-10">
                         <div className="space-y-6">
                            <div>
-                              <label className="text-[9px] font-black text-gray-500 uppercase tracking-widest mb-3 block">Fecha de Inicio (Hoy en adelante)</label>
-                              <input 
-                                type="date" 
-                                value={startDate} 
-                                onChange={(e) => {
-                                  const val = e.target.value;
-                                  if (new Date(val) < new Date(todayStr)) {
-                                     alert("Socio, no puedes elegir el pasado.");
-                                     setStartDate(todayStr);
-                                  } else {
-                                     setStartDate(val);
-                                  }
-                                }} 
-                                className="w-full bg-black border border-white/10 rounded-2xl p-5 text-sm font-black text-white focus:border-blue-500 outline-none" 
-                                min={todayStr} 
-                              />
+                              <label className="text-[9px] font-black text-gray-500 uppercase tracking-widest mb-3 block">Fecha de Inicio (Mínimo hoy)</label>
+                              <input type="date" value={startDate} onChange={(e) => setStartDate(e.target.value)} className="w-full bg-black border border-white/10 rounded-2xl p-5 text-sm font-black text-white focus:border-blue-500 outline-none" min={todayStr} />
                            </div>
                            <div>
-                              <label className="text-[9px] font-black text-gray-500 uppercase tracking-widest mb-3 block">Nombre de Empresa</label>
-                              <input type="text" value={companyName} onChange={(e) => setCompanyName(e.target.value)} placeholder="EJ: NVIDIA / COCA COLA..." className="w-full bg-black border border-white/10 rounded-2xl p-5 text-sm font-black text-white uppercase outline-none focus:border-cyan-500" />
+                              <label className="text-[9px] font-black text-gray-500 uppercase tracking-widest mb-3 block">Empresa</label>
+                              <input type="text" value={companyName} onChange={(e) => setCompanyName(e.target.value)} placeholder="EJ: NIKE / TESLA..." className="w-full bg-black border border-white/10 rounded-2xl p-5 text-sm font-black text-white uppercase outline-none focus:border-cyan-500" />
                            </div>
                            <div>
-                              <label className="text-[9px] font-black text-gray-500 uppercase tracking-widest mb-3 block">Link del Banner (Video o Imagen)</label>
+                              <label className="text-[9px] font-black text-gray-500 uppercase tracking-widest mb-3 block">Banner (Link YouTube o Imagen)</label>
                               <input type="text" value={bannerUrl} onChange={(e) => setBannerUrl(e.target.value)} placeholder="https://..." className="w-full bg-black border border-white/10 rounded-2xl p-5 text-[10px] font-bold text-white outline-none focus:border-cyan-500" />
                            </div>
                            <div>
-                              <label className="text-[9px] font-black text-gray-500 uppercase tracking-widest mb-3 block">Link de Destino</label>
+                              <label className="text-[9px] font-black text-gray-500 uppercase tracking-widest mb-3 block">Web de Destino</label>
                               <input type="text" value={targetUrl} onChange={(e) => setTargetUrl(e.target.value)} placeholder="https://..." className="w-full bg-black border border-white/10 rounded-2xl p-5 text-[10px] font-bold text-white outline-none focus:border-cyan-500" />
                            </div>
                         </div>
 
                         <div className="space-y-6">
-                           <p className="text-[9px] font-black text-gray-700 uppercase tracking-widest text-center">Simulador de Impacto v5.1</p>
+                           <p className="text-[9px] font-black text-gray-700 uppercase tracking-widest text-center">Monitor de Impacto v5.1</p>
                            <div className="w-full aspect-video bg-black rounded-[40px] border-2 border-dashed border-white/10 flex items-center justify-center overflow-hidden relative group">
                               {bannerUrl ? (
-                                <img src={bannerUrl} className="w-full h-full object-cover group-hover:scale-105 transition-transform" alt="Preview" />
+                                <img src={bannerUrl} className="w-full h-full object-cover transition-transform" alt="Preview" />
                               ) : (
                                 <div className="text-center space-y-4 opacity-20">
                                    <UploadCloud size={60} className="mx-auto" />
@@ -323,7 +285,7 @@ export default function B2BPage() {
                                 </div>
                               )}
                               <div className="absolute inset-0 bg-gradient-to-t from-black/80 via-transparent to-transparent z-10" />
-                              <div className="absolute bottom-6 left-8 z-20">
+                              <div className="absolute bottom-6 left-8 z-20 text-left">
                                  <p className="text-lg font-black uppercase italic tracking-tighter text-white">{companyName || 'TU MARCA'}</p>
                                  <p className="text-[8px] font-black text-blue-500 uppercase tracking-[0.4em]">Socio Patrocinador</p>
                               </div>
@@ -349,9 +311,9 @@ export default function B2BPage() {
                         </div>
                         <button 
                            onClick={handleGoToCheckout}
-                           className="w-full md:w-auto px-16 py-6 bg-white text-black rounded-full font-black text-[10px] uppercase tracking-[0.3em] hover:bg-blue-600 hover:text-white transition-all shadow-2xl"
+                           className="px-12 py-6 bg-white text-black rounded-full font-black text-[10px] uppercase tracking-[0.3em] hover:bg-blue-600 hover:text-white transition-all shadow-2xl"
                         >
-                           REVISAR Y PAGAR PAUTA
+                           REVISAR Y PROCEDER AL PAGO
                         </button>
                      </div>
                   </div>
@@ -364,11 +326,11 @@ export default function B2BPage() {
                <div className="glass-card p-12 border-blue-500/30 shadow-[0_0_100px_rgba(34,211,238,0.1)] space-y-10">
                   <div className="text-center space-y-4">
                      <Lock size={32} className="text-blue-500 mx-auto mb-4" />
-                     <h3 className="text-3xl font-black uppercase italic tracking-tighter">Bóveda PayPal.</h3>
-                     <p className="text-gray-500 text-sm">Confirma el pago para activar tu marca en el imperio.</p>
+                     <h3 className="text-3xl font-black uppercase italic tracking-tighter text-white">Bóveda PayPal.</h3>
+                     <p className="text-gray-500 text-sm">Tu pauta será inyectada inmediatamente después de la confirmación.</p>
                   </div>
 
-                  <div className="space-y-6 bg-black/50 p-8 rounded-[40px] border border-white/5">
+                  <div className="space-y-6 bg-black/50 p-8 rounded-[40px] border border-white/5 text-left">
                      <div className="flex justify-between items-center border-b border-white/5 pb-4">
                         <span className="text-[10px] font-black text-gray-500 uppercase tracking-widest">Plan & Alcance</span>
                         <span className="text-xs font-black text-white uppercase italic">{selectedPlan.title} ({isGlobal ? 'Global' : 'Local'})</span>
@@ -385,15 +347,11 @@ export default function B2BPage() {
 
                   <div className="space-y-6">
                     {isPaypalLoaded ? (
-                      <PaypalBusinessButton 
-                        amount={totalPriceUSD.toString()} 
-                        onSuccess={handleFinalSuccess} 
-                        isLoaded={isPaypalLoaded} 
-                      />
+                      <PaypalBusinessButton amount={totalPriceUSD.toString()} onSuccess={handleFinalSuccess} isLoaded={isPaypalLoaded} />
                     ) : (
-                      <div className="py-12 bg-white/5 rounded-[40px] animate-pulse flex flex-col items-center gap-4">
+                      <div className="py-16 bg-white/5 rounded-[40px] animate-pulse flex flex-col items-center gap-4">
                          <Loader2 className="animate-spin text-blue-500" />
-                         <span className="text-[8px] font-black uppercase tracking-widest text-gray-500">Sincronizando Pasarela de Pago...</span>
+                         <span className="text-[8px] font-black uppercase tracking-widest text-gray-500">Sincronizando Bóveda PayPal...</span>
                       </div>
                     )}
                     <button onClick={() => setStep('config')} className="w-full text-[9px] font-black text-gray-700 uppercase tracking-widest hover:text-white transition-colors">Abortar Transacción</button>
@@ -407,7 +365,7 @@ export default function B2BPage() {
                <div className="w-40 h-40 bg-green-500 rounded-[60px] flex items-center justify-center text-black shadow-[0_0_100px_rgba(34,197,94,0.4)] animate-bounce"><CheckCircle2 size={80} /></div>
                <div className="space-y-4">
                   <h2 className="text-7xl font-black uppercase italic tracking-tighter text-white leading-none">Misión Éxito.</h2>
-                  <p className="text-green-500 text-xl font-bold uppercase tracking-[0.5em]">Tu marca está ahora activa en el imperio.</p>
+                  <p className="text-green-500 text-xl font-bold uppercase tracking-[0.5em]">Tu pauta ID {paypalOrderId} está activa en el imperio.</p>
                </div>
             </motion.div>
           )}

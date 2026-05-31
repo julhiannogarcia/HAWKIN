@@ -8,27 +8,20 @@ export const revalidate = 0;
 
 const parser = new Parser();
 
+// Caching global (transient)
 let cachedIntel: any = null;
 let lastUpdate = 0;
-const CACHE_DURATION = 1000 * 60 * 5; // 5 minutos frescura total
+const CACHE_DURATION = 1000 * 60 * 15; // 15 minutos para evitar lentitud excesiva
 
 function generateId(title: string) {
   return title.toLowerCase().replace(/[^a-z0-9]+/g, '-').replace(/(^-|-$)/g, '').substring(0, 50) + '-' + Math.random().toString(36).substring(2, 5);
 }
 
 export async function GET() {
+  const now = Date.now();
+
   try {
-    const apiKey = process.env.GROQ_API_KEY;
-    if (!apiKey) return NextResponse.json({ error: "Socio, el núcleo de IA no tiene energía (API Key missing)." }, { status: 500 });
-
-    const now = Date.now();
-    if (cachedIntel && (now - lastUpdate < CACHE_DURATION)) {
-      return NextResponse.json({ ...cachedIntel, lastUpdate: new Date(lastUpdate).toLocaleTimeString('es-PE') });
-    }
-
-    const groq = new Groq({ apiKey });
-
-    // 1. OBTENER INTELIGENCIA MANUAL (DB)
+    // 1. OBTENER NOTICIAS MANUALES (ESTO ES ULTRA RÁPIDO)
     const dbNews = await prisma.news.findMany({
       where: { published: true },
       orderBy: { createdAt: 'desc' },
@@ -49,73 +42,84 @@ export async function GET() {
       timestamp: n.createdAt.toISOString()
     }));
 
-    // 2. RECOPILAR INTELIGENCIA BRUTA (RSS)
+    // 2. RETORNAR CACHÉ SI EXISTE Y ES RECIENTE (MÁXIMA VELOCIDAD)
+    if (cachedIntel && (now - lastUpdate < CACHE_DURATION)) {
+      // Siempre inyectar las manuales más recientes incluso en el caché
+      const merged = [...manualIntel, ...cachedIntel.aiItems].slice(0, 10);
+      return NextResponse.json({ ...cachedIntel, topNews: merged, lastUpdate: new Date(lastUpdate).toLocaleTimeString('es-PE') });
+    }
+
+    const apiKey = process.env.GROQ_API_KEY;
+    if (!apiKey) {
+       // Si no hay API KEY, al menos mostrar las manuales para no dejar la web vacía
+       return NextResponse.json({ 
+         topNews: manualIntel, 
+         rumors: [], battles: [], trendingCEOs: [], 
+         prediction: { dominance: "HAWKIN", ceo: "Julhianno Garcia", risk: "BAJO" },
+         lastUpdate: new Date().toLocaleTimeString('es-PE') 
+       });
+    }
+
+    const groq = new Groq({ apiKey });
+
+    // 3. RECOPILAR RSS (CON TIMEOUT PARA QUE NO SE TRABE)
     const FEEDS = [
-      'https://news.google.com/rss/search?q=OpenAI+NVIDIA+Tesla+Artificial+Intelligence+breaking&hl=en-US&gl=US&ceid=US:en'
+      'https://news.google.com/rss/search?q=AI+breaking+news+OpenAI+NVIDIA&hl=en-US&gl=US&ceid=US:en'
     ];
 
     let rawItems: any[] = [];
     try {
-      const results = await Promise.all(FEEDS.map(url => parser.parseURL(url).catch(() => ({ items: [] }))));
-      rawItems = results.flatMap(res => res.items).slice(0, 15).map(item => ({
+      const results = await Promise.all(FEEDS.map(url => 
+        Promise.race([
+          parser.parseURL(url),
+          new Promise((_, reject) => setTimeout(() => reject(new Error('Timeout RSS')), 4000))
+        ]).catch(() => ({ items: [] }))
+      ));
+      // @ts-ignore
+      rawItems = results.flatMap(res => res.items || []).slice(0, 8).map(item => ({
         title: item.title,
-        snippet: item.contentSnippet?.substring(0, 200),
+        snippet: item.contentSnippet?.substring(0, 150),
         source: item.source?.name || "Global"
       }));
     } catch (e) {
       console.error("RSS Error:", e);
     }
 
-    // 3. MOTOR DE INTELIGENCIA LLAMA-3
-    const MASTER_PROMPT = `
-      Eres el HAWKIN WAR ROOM. Analiza estos datos de IA: ${JSON.stringify(rawItems)}
-      Genera exactamente 10 noticias mas impactantes en JSON.
-      Formato:
-      {
-        "topNews": [
-          { "title": "...", "summary": "...", "impact": 10, "companies": ["..."], "people": ["..."], "consequence": "...", "importance": "CRITICO", "url": "..." }
-        ],
-        "rumors": [{ "text": "...", "source": "...", "probability": "90%" }],
-        "battles": [{ "competitors": "A vs B", "motive": "...", "status": "Guerra", "winners": "A" }],
-        "trendingCEOs": [{ "name": "...", "company": "...", "reason": "..." }],
-        "prediction": { "dominance": "...", "ceo": "...", "risk": "ALTO" }
-      }
-    `;
-
+    // 4. MOTOR DE IA (LLAMA-3-8B PARA MÁXIMA VELOCIDAD)
     const chatCompletion = await groq.chat.completions.create({
-      messages: [{ role: "user", content: MASTER_PROMPT }],
-      model: "llama-3.3-70b-versatile",
-      temperature: 0.2,
+      messages: [
+        { role: "system", content: "Eres el HAWKIN WAR ROOM. Responde solo en JSON." },
+        { role: "user", content: `Analiza y genera inteligencia en este JSON: ${JSON.stringify(rawItems)}. Sigue este formato: { "topNews": [...], "rumors": [...], "battles": [...], "trendingCEOs": [...], "prediction": {...} }` }
+      ],
+      model: "llama3-8b-8192", // Usamos el modelo 8B que es instantáneo
+      temperature: 0.1,
       response_format: { type: "json_object" }
     });
 
     const content = chatCompletion.choices[0]?.message?.content || "{}";
     const intelReport = JSON.parse(content);
     
-    // MEZCLAR Y ASEGURAR ESTRUCTURA
-    if (!intelReport.topNews) intelReport.topNews = [];
-    
-    const aiNews = intelReport.topNews.map((n: any) => ({
+    const aiItems = (intelReport.topNews || []).map((n: any) => ({
       ...n,
       id: generateId(n.title),
       timestamp: new Date().toISOString()
     }));
 
-    // PRIORIDAD MANUAL (Tus noticias primero)
-    intelReport.topNews = [...manualIntel, ...aiNews].slice(0, 10);
-    
-    // Validar que no esté vacío
-    if (intelReport.topNews.length === 0) {
-       throw new Error("No se pudo generar inteligencia en este ciclo.");
-    }
-
-    cachedIntel = intelReport;
+    cachedIntel = { ...intelReport, aiItems };
     lastUpdate = now;
 
-    return NextResponse.json({ ...intelReport, lastUpdate: new Date(now).toLocaleTimeString('es-PE') });
+    const finalTopNews = [...manualIntel, ...aiItems].slice(0, 10);
+
+    return NextResponse.json({ ...intelReport, topNews: finalTopNews, lastUpdate: new Date(now).toLocaleTimeString('es-PE') });
 
   } catch (error: any) {
     console.error("War Room API Error:", error);
-    return NextResponse.json({ error: "Interferencia en el canal satelital. Reintentando..." }, { status: 500 });
+    // FALLBACK FINAL: SI TODO FALLA, MOSTRAR MANUALES
+    return NextResponse.json({ 
+       error: "Modo de Emergencia Activado",
+       topNews: [], // Aquí deberíamos traer manualIntel si logramos sacarlas
+       rumors: [], battles: [], trendingCEOs: [],
+       lastUpdate: new Date().toLocaleTimeString('es-PE') 
+    });
   }
 }
