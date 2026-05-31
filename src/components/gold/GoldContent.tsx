@@ -3,18 +3,24 @@
 // HAWKIN GOLD v4.8 - REPARACIÓN DE ESTABILIDAD Y FECHAS
 import { motion, AnimatePresence } from 'framer-motion';
 import { useState, useEffect } from 'react';
+import dynamic from 'next/dynamic';
 import Header from '@/components/Header';
 import Footer from '@/components/Footer';
 import GlobalTicker from '@/components/Ticker';
-import TickerTapeWidget from '@/components/TickerTapeWidget';
-import TradingViewWidget from '@/components/TradingViewWidget';
-import TechnicalGaugeWidget from '@/components/TechnicalGaugeWidget';
-import MarketOverviewWidget from '@/components/MarketOverviewWidget';
-import EconomicCalendarWidget from '@/components/EconomicCalendarWidget';
-import CryptoHeatMapWidget from '@/components/CryptoHeatMapWidget';
+import AdSpace from '@/components/AdSpace';
 import { Activity, ShieldCheck, Zap, Globe, Clock, Bell, BellRing, Loader2, ChartNoAxesColumn, TrendingUp, LayoutGrid, Radio, ExternalLink, Info } from 'lucide-react';
+import { useSession } from 'next-auth/react';
+
+// CARGA DINÁMICA DE WIDGETS PARA EVITAR CLIENT-SIDE EXCEPTIONS
+const TickerTapeWidget = dynamic(() => import('@/components/TickerTapeWidget'), { ssr: false });
+const TradingViewWidget = dynamic(() => import('@/components/TradingViewWidget'), { ssr: false });
+const TechnicalGaugeWidget = dynamic(() => import('@/components/TechnicalGaugeWidget'), { ssr: false });
+const MarketOverviewWidget = dynamic(() => import('@/components/MarketOverviewWidget'), { ssr: false });
+const EconomicCalendarWidget = dynamic(() => import('@/components/EconomicCalendarWidget'), { ssr: false });
+const CryptoHeatMapWidget = dynamic(() => import('@/components/CryptoHeatMapWidget'), { ssr: false });
 
 export default function GoldPage() {
+  const { data: session } = useSession();
   const [isMounted, setIsMounted] = useState(false);
   const [news, setNews] = useState<any[]>([]);
   const [insights, setInsights] = useState<any[]>([]);
@@ -90,6 +96,11 @@ export default function GoldPage() {
 
       <div className="max-w-[1900px] mx-auto px-6 pt-56 pb-32">
         
+        {/* PUBLICIDAD DE ALTO IMPACTO GOLD */}
+        <div className="mb-16">
+           <AdSpace isPremium={!!session} type="banner" />
+        </div>
+
         <header className="flex flex-col xl:flex-row justify-between items-start xl:items-end mb-16 gap-12 border-l-4 border-[#FFD700] pl-8">
           <div className="space-y-6">
             <div className="flex items-center gap-4">
@@ -188,6 +199,11 @@ export default function GoldPage() {
                 ))}
              </div>
            )}
+
+           {/* PUBLICIDAD DE IMPACTO GOLD */}
+           <div className="pt-10">
+              <AdSpace isPremium={!!session} type="inline" />
+           </div>
         </div>
 
         <div className="grid grid-cols-1 lg:grid-cols-12 gap-8">
@@ -208,7 +224,7 @@ export default function GoldPage() {
               </div>
               <div className="space-y-6">
                  <h4 className="text-[10px] font-black uppercase tracking-[0.4em] text-gray-500 border-b border-white/5 pb-4">Gold Sponsor</h4>
-                 <AdSpace isPremium={false} type="sidebar" />
+                 <AdSpace isPremium={!!session} type="sidebar" />
               </div>
 
               <div className="h-full p-4">
