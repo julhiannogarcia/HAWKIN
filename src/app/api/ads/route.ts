@@ -16,13 +16,14 @@ export async function GET(req: Request) {
     // 4. Sean GLOBALES o coincidan con el PAÍS del usuario
     const ads = await prisma.adCampaign.findMany({
       where: {
-        status: 'ACTIVE',
+        status: { in: ['ACTIVE', 'PAID'] }, // Permitir ambos estados para visibilidad
         placement: placement || undefined,
         startDate: { lte: now },
         endDate: { gte: now },
         OR: [
           { isGlobal: true },
-          { targetCountry: countryCode }
+          { targetCountry: countryCode },
+          { targetCountry: null } // Si no tiene país, es global por defecto
         ]
       },
     });
