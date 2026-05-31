@@ -128,15 +128,17 @@ model Quiz {
 // --- B2B Y PUBLICIDAD ---
 model AdCampaign {
   id               String   @id @default(cuid())
-  companyName      String
-  bannerUrl        String
-  targetUrl        String?  // Enlace a donde lleva el anuncio
+  companyName      String?  // Puede ser nulo al reservar, se llena al publicar
+  bannerUrl        String?  // Se llena al publicar
+  targetUrl        String?  
   placement        String   // TOP_BANNER, NEWS_FEED, SIDEBAR
-  targetCountry    String?  // Código de país (ISO) para segmentación local
-  isGlobal         Boolean  @default(false) // Si es true, se ignora targetCountry y sale en todo el mundo
+  targetCountry    String?  
+  isGlobal         Boolean  @default(false)
   startDate        DateTime
   endDate          DateTime
-  status           String   @default("PENDING") // PENDING, ACTIVE, COMPLETED
+  status           String   @default("PENDING") // PENDING, PAID, ACTIVE, COMPLETED
+  paymentVerified  Boolean  @default(false)    // Nueva marca de seguridad
+  paypalOrderId    String?  @unique            // ID de transacción para auditoría
   stripePaymentId  String?
   clicks           Int      @default(0)
   views            Int      @default(0)
