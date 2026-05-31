@@ -26,12 +26,23 @@ export default function AdSpace({ isPremium, type = 'banner' }: AdSpaceProps) {
     const fetchAd = async () => {
       try {
         const placement = TYPE_MAP[type];
-        const res = await fetch(`/api/ads?placement=${placement}`);
+        
+        // 1. Intentar obtener geoData primero para segmentación precisa
+        const geoRes = await fetch('/api/geo').catch(() => null);
+        const geoData = geoRes ? await geoRes.json().catch(() => ({ countryCode: 'PE' })) : { countryCode: 'PE' };
+        const country = geoData.countryCode || 'PE';
+
+        console.log(`[HAWKIN ADS] Solicitando pauta para: ${placement} en ${country}`);
+        
+        // 2. Consultar API con país
+        const res = await fetch(`/api/ads?placement=${placement}&country=${country}`);
         const data = await res.json();
         
         if (Array.isArray(data) && data.length > 0) {
           setAd(data[Math.floor(Math.random() * data.length)]);
         } else {
+          // 3. Fallback: Si no hay en esa ubicación o país, traer CUALQUIER pauta activa
+          console.log(`[HAWKIN ADS] Sin pauta específica. Buscando disponibilidad global...`);
           const resGlobal = await fetch(`/api/ads`);
           const dataGlobal = await resGlobal.json();
           if (Array.isArray(dataGlobal) && dataGlobal.length > 0) {
@@ -39,7 +50,7 @@ export default function AdSpace({ isPremium, type = 'banner' }: AdSpaceProps) {
           }
         }
       } catch (e) {
-        console.error("[HAWKIN ADS] Error:", e);
+        console.error("[HAWKIN ADS] Error de conexión:", e);
       } finally {
         setLoading(false);
       }
@@ -85,7 +96,7 @@ export default function AdSpace({ isPremium, type = 'banner' }: AdSpaceProps) {
   if (!ad && !loading) {
     return (
       <div className={`w-full ${type === 'inline' ? 'my-12 p-8 h-40' : 'h-24'} bg-white/[0.01] border border-dashed border-white/5 rounded-[30px] flex items-center justify-center group hover:border-blue-500/30 transition-all cursor-pointer relative overflow-hidden`}>
-         <a href="/b2b" className="flex items-center gap-4 text-gray-700 group-hover:text-blue-500 transition-colors">
+         <a href="/b2b" className="flex items-center gap-4 text-gray-800 group-hover:text-blue-500 transition-colors">
             <Building2 size={20} />
             <span className="text-[10px] font-black uppercase tracking-widest">Reserva este espacio de alto impacto</span>
             <ExternalLink size={12} />
@@ -130,7 +141,7 @@ export default function AdSpace({ isPremium, type = 'banner' }: AdSpaceProps) {
     }
   };
 
-  // FORMATO 1: PLUS STREAMING
+  // FORMATO 1: PLUS STREAMING (LIMPIO DE BRANDING HAWKIN)
   if (type === 'banner' || type === 'video-hero') {
     return (
       <motion.div 
@@ -148,7 +159,6 @@ export default function AdSpace({ isPremium, type = 'banner' }: AdSpaceProps) {
            </h4>
         </div>
 
-        {/* Indicador de Video en Vivo si aplica */}
         {(urlType === 'direct-video' || urlType === 'youtube' || urlType === 'vimeo') && (
           <div className="absolute top-8 right-8 bg-red-600 px-4 py-1.5 rounded-full flex items-center gap-2 animate-pulse shadow-xl">
              <div className="w-1.5 h-1.5 bg-white rounded-full" />
