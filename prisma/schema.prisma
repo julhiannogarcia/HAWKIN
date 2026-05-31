@@ -130,6 +130,7 @@ model AdCampaign {
   id               String   @id @default(cuid())
   companyName      String
   bannerUrl        String
+  targetUrl        String?  // Enlace a donde lleva el anuncio
   placement        String   // TOP_BANNER, NEWS_FEED, SIDEBAR
   startDate        DateTime
   endDate          DateTime
@@ -137,6 +138,7 @@ model AdCampaign {
   stripePaymentId  String?
   clicks           Int      @default(0)
   views            Int      @default(0)
+  createdAt        DateTime @default(now())
 }
 
 // --- PHILANTHROPY ---
