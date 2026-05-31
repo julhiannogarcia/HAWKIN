@@ -44,6 +44,38 @@ export async function GET() {
   }
 }
 
+export async function PUT(req: Request) {
+  try {
+    const { id, title, content, excerpt, category, isUrgent, isLocked, image, url } = await req.json();
+
+    if (!id || !title || !content) {
+      return NextResponse.json({ error: "ID, título y contenido son requeridos" }, { status: 400 });
+    }
+
+    const news = await prisma.news.update({
+      where: { id },
+      data: {
+        title,
+        content,
+        excerpt: excerpt || content.substring(0, 150) + "...",
+        category: category || "NOTICIA",
+        isUrgent: !!isUrgent,
+        isLocked: !!isLocked,
+        image: image || "https://images.unsplash.com/photo-1451187580459-43490279c0fa?auto=format&fit=crop&q=80&w=800",
+        url: url || null,
+      }
+    });
+
+    return NextResponse.json(news);
+  } catch (error: any) {
+    console.error("DEBUG - NEWS UPDATE ERROR:", error);
+    return NextResponse.json({ 
+      error: "DATABASE_UPDATE_ERROR", 
+      message: `${error.code || 'ERROR'}: ${error.message || 'Error al actualizar la noticia.'}`
+    }, { status: 500 });
+  }
+}
+
 export async function DELETE(req: Request) {
   try {
     const { id } = await req.json();

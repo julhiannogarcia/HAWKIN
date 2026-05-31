@@ -1,11 +1,12 @@
 'use client';
 
 import { useState, useEffect } from 'react';
-import { Loader2, CircleCheckBig, CircleAlert, Newspaper, Sparkles, Send, Globe, Trash2, Link as LinkIcon, Image as ImageIcon, ExternalLink, Clock, X, Terminal } from 'lucide-react';
+import { Loader2, CircleCheckBig, CircleAlert, Newspaper, Sparkles, Send, Globe, Trash2, Link as LinkIcon, Image as ImageIcon, ExternalLink, Clock, X, Terminal, Edit3 } from 'lucide-react';
 import { motion, AnimatePresence } from 'framer-motion';
 
 export default function ManageNews() {
-  // Estado para creación
+  // Estado para creación/edición
+  const [editId, setEditId] = useState<string | null>(null);
   const [title, setTitle] = useState('');
   const [content, setContent] = useState('');
   const [image, setImage] = useState('');
@@ -47,10 +48,12 @@ export default function ManageNews() {
 
     setIsLoading(true);
     try {
+      const method = editId ? 'PUT' : 'POST';
       const res = await fetch('/api/admin/news', {
-        method: 'POST',
+        method,
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({
+          id: editId,
           title,
           content,
           category,
@@ -68,10 +71,7 @@ export default function ManageNews() {
       }
 
       setShowSuccess(true);
-      setTitle('');
-      setContent('');
-      setImage('');
-      setUrl('');
+      resetForm();
       fetchNews(); // Recargar lista
       setTimeout(() => setShowSuccess(false), 5000);
     } catch (e: any) {
@@ -80,6 +80,29 @@ export default function ManageNews() {
     } finally {
       setIsLoading(false);
     }
+  };
+
+  const handleEdit = (news: any) => {
+    setEditId(news.id);
+    setTitle(news.title);
+    setContent(news.content);
+    setImage(news.image || '');
+    setUrl(news.url || '');
+    setCategory(news.category);
+    setIsUrgent(news.isUrgent);
+    setIsLocked(news.isLocked);
+    window.scrollTo({ top: 0, behavior: 'smooth' });
+  };
+
+  const resetForm = () => {
+    setEditId(null);
+    setTitle('');
+    setContent('');
+    setImage('');
+    setUrl('');
+    setCategory('Big Tech');
+    setIsUrgent(false);
+    setIsLocked(true);
   };
 
   const handleDelete = async (id: string) => {
@@ -94,6 +117,7 @@ export default function ManageNews() {
 
       if (res.ok) {
         setExistingNews(prev => prev.filter(n => n.id !== id));
+        if (editId === id) resetForm();
       }
     } catch (e) {
       console.error("Delete error", e);
@@ -108,26 +132,42 @@ export default function ManageNews() {
         <div className="text-center md:text-left">
           <div className="flex items-center justify-center md:justify-start gap-3 mb-2">
               <div className="w-2 h-2 bg-cyan-500 rounded-full animate-ping" />
-              <span className="text-[10px] font-black uppercase tracking-[0.4em] text-cyan-500">Master News Injector v2.5</span>
+              <span className="text-[10px] font-black uppercase tracking-[0.4em] text-cyan-500">
+                {editId ? 'Modo Edición Activo' : 'Master News Injector v2.7'}
+              </span>
           </div>
-          <h1 className="text-4xl md:text-7xl font-black tracking-tighter italic uppercase">War <span className="text-white">Editor.</span></h1>
+          <h1 className="text-4xl md:text-7xl font-black tracking-tighter italic uppercase">
+            {editId ? 'Update' : 'War'} <span className="text-white">Editor.</span>
+          </h1>
         </div>
         
-        <button 
-          onClick={handlePublish}
-          disabled={isLoading}
-          className="w-full md:w-auto px-16 py-6 bg-gradient-to-r from-cyan-600 to-blue-700 text-white rounded-full font-black text-[12px] uppercase tracking-[0.3em] shadow-[0_0_50px_rgba(34,211,238,0.2)] hover:scale-105 active:scale-95 transition-all flex items-center justify-center gap-4 disabled:opacity-50"
-        >
-          {isLoading ? <Loader2 className="animate-spin" size={20} /> : <Send size={20} />}
-          {isLoading ? 'SINCRONIZANDO...' : 'INYECTAR AHORA'}
-        </button>
+        <div className="flex flex-col md:flex-row gap-4 w-full md:w-auto">
+          {editId && (
+            <button 
+              onClick={resetForm}
+              className="px-8 py-6 bg-white/5 border border-white/10 text-gray-400 rounded-full font-black text-[12px] uppercase tracking-[0.3em] hover:bg-white/10 transition-all"
+            >
+              Cancelar Edición
+            </button>
+          )}
+          <button 
+            onClick={handlePublish}
+            disabled={isLoading}
+            className="px-16 py-6 bg-gradient-to-r from-cyan-600 to-blue-700 text-white rounded-full font-black text-[12px] uppercase tracking-[0.3em] shadow-[0_0_50px_rgba(34,211,238,0.2)] hover:scale-105 active:scale-95 transition-all flex items-center justify-center gap-4 disabled:opacity-50"
+          >
+            {isLoading ? <Loader2 className="animate-spin" size={20} /> : (editId ? <Sparkles size={20} /> : <Send size={20} />)}
+            {isLoading ? 'SINCRONIZANDO...' : (editId ? 'ACTUALIZAR REPORTE' : 'INYECTAR AHORA')}
+          </button>
+        </div>
       </header>
 
       <AnimatePresence>
         {showSuccess && (
             <motion.div initial={{opacity:0, scale:0.9}} animate={{opacity:1, scale:1}} exit={{opacity:0}} className="bg-green-500/20 border-2 border-green-500/50 p-8 rounded-[40px] flex items-center justify-center gap-6 shadow-[0_0_100px_rgba(34,197,94,0.2)]">
               <CircleCheckBig className="text-green-500" size={40} />
-              <p className="text-xl font-black text-white uppercase tracking-tighter italic">¡Reporte inyectado con éxito al radar mundial!</p>
+              <p className="text-xl font-black text-white uppercase tracking-tighter italic">
+                {editId ? '¡Reporte actualizado con éxito!' : '¡Reporte inyectado con éxito al radar mundial!'}
+              </p>
             </motion.div>
         )}
         {error && (
@@ -254,15 +294,23 @@ export default function ManageNews() {
                   <Loader2 className="animate-spin text-cyan-500 mx-auto" size={40} />
                </div>
             ) : existingNews.map((news) => (
-               <div key={news.id} className="glass-card group relative p-0 overflow-hidden h-96 flex flex-col border-white/5 hover:border-red-500/30 transition-all">
+               <div key={news.id} className={`glass-card group relative p-0 overflow-hidden h-96 flex flex-col border-white/5 transition-all ${editId === news.id ? 'border-cyan-500 shadow-[0_0_30px_rgba(34,211,238,0.2)]' : 'hover:border-red-500/30'}`}>
                   <div className="h-40 bg-gray-900 relative">
                      <img src={news.image} className="w-full h-full object-cover opacity-40 group-hover:scale-110 transition-transform duration-700" alt="" />
-                     <button 
-                        onClick={() => handleDelete(news.id)}
-                        className="absolute top-4 right-4 p-3 bg-red-600/20 hover:bg-red-600 text-red-500 hover:text-white rounded-xl transition-all border border-red-500/20"
-                     >
-                        <Trash2 size={16} />
-                     </button>
+                     <div className="absolute top-4 right-4 flex gap-2">
+                        <button 
+                           onClick={() => handleEdit(news)}
+                           className="p-3 bg-cyan-600/20 hover:bg-cyan-600 text-cyan-500 hover:text-white rounded-xl transition-all border border-cyan-500/20"
+                        >
+                           <Edit3 size={16} />
+                        </button>
+                        <button 
+                           onClick={() => handleDelete(news.id)}
+                           className="p-3 bg-red-600/20 hover:bg-red-600 text-red-500 hover:text-white rounded-xl transition-all border border-red-500/20"
+                        >
+                           <Trash2 size={16} />
+                        </button>
+                     </div>
                   </div>
                   <div className="p-6 space-y-4 flex-1 flex flex-col">
                      <h4 className="text-sm font-black uppercase italic leading-tight line-clamp-2">{news.title}</h4>
