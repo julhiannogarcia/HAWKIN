@@ -1,32 +1,55 @@
 import NextAuth from "next-auth"
-import { PrismaAdapter } from "@auth/prisma-adapter"
-import { prisma } from "@/lib/prisma"
 import GoogleProvider from "next-auth/providers/google"
 
-export const authOptions = {
-  adapter: PrismaAdapter(prisma),
+// CONFIGURACIÓN DE EMERGENCIA FINAL v8.0 - ELIMINACIÓN DE ERROR OAUTHSIGNIN
+const authOptions: any = {
   providers: [
     GoogleProvider({
-      clientId: process.env.GOOGLE_CLIENT_ID || "",
-      clientSecret: process.env.GOOGLE_CLIENT_SECRET || "",
+      clientId: process.env.GOOGLE_CLIENT_ID as string,
+      clientSecret: process.env.GOOGLE_CLIENT_SECRET as string,
+      authorization: {
+        params: {
+          prompt: "consent",
+          access_type: "offline",
+          response_type: "code"
+        }
+      }
     }),
   ],
   secret: process.env.NEXTAUTH_SECRET,
   session: {
-    strategy: "database", // Forzamos uso de DB para sincronizar XP y socios
+    strategy: "jwt",
   },
+  // VITAL PARA VERCEL: Trust the host
+  trustHost: true,
   callbacks: {
-    async session({ session, user }: any) {
+    async jwt({ token, account }: any) {
+      if (account) {
+        token.accessToken = account.access_token;
+      }
+      return token;
+    },
+    async session({ session, token }: any) {
       if (session.user) {
-        session.user.id = user.id;
-        session.user.role = user.role;
+        (session.user as any).id = token.sub;
       }
       return session;
     },
   },
-  debug: true, // Habilitado para ver logs en Vercel
+  pages: {
+    signIn: '/auth/signin',
+    error: '/auth/signin',
+  },
+  debug: true,
 }
 
-const handler = NextAuth(authOptions)
+const handler = (req: any, res: any) => {
+  console.log("NEXTAUTH DEBUG - ENV CHECK:");
+  console.log("CLIENT_ID PRESENT:", !!process.env.GOOGLE_CLIENT_ID);
+  console.log("SECRET PRESENT:", !!process.env.NEXTAUTH_SECRET);
+  console.log("NEXTAUTH_URL:", process.env.NEXTAUTH_URL);
+  
+  return NextAuth(req, res, authOptions);
+}
 
 export { handler as GET, handler as POST }
