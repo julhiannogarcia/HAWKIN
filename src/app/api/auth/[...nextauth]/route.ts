@@ -2,7 +2,7 @@ import NextAuth from "next-auth"
 import GoogleProvider from "next-auth/providers/google"
 
 // CONFIGURACIÓN DE EMERGENCIA FINAL v8.0 - ELIMINACIÓN DE ERROR OAUTHSIGNIN
-const authOptions: any = {
+export const authOptions: any = {
   providers: [
     GoogleProvider({
       clientId: process.env.GOOGLE_CLIENT_ID as string,
@@ -20,7 +20,6 @@ const authOptions: any = {
   session: {
     strategy: "jwt",
   },
-  // VITAL PARA VERCEL: Trust the host
   trustHost: true,
   callbacks: {
     async jwt({ token, account }: any) {
@@ -47,7 +46,6 @@ const handler = (req: any, res: any) => {
   console.log("NEXTAUTH DEBUG - ENV CHECK:");
   console.log("CLIENT_ID PRESENT:", !!process.env.GOOGLE_CLIENT_ID);
   console.log("SECRET PRESENT:", !!process.env.NEXTAUTH_SECRET);
-  console.log("NEXTAUTH_URL:", process.env.NEXTAUTH_URL);
   
   return NextAuth(req, res, authOptions);
 }
