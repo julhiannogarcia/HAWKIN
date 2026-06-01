@@ -7,21 +7,13 @@ export const authOptions = {
   adapter: PrismaAdapter(prisma),
   providers: [
     GoogleProvider({
-      clientId: process.env.GOOGLE_CLIENT_ID!,
-      clientSecret: process.env.GOOGLE_CLIENT_SECRET!,
+      clientId: process.env.GOOGLE_CLIENT_ID || "",
+      clientSecret: process.env.GOOGLE_CLIENT_SECRET || "",
     }),
   ],
   secret: process.env.NEXTAUTH_SECRET,
-  cookies: {
-    sessionToken: {
-      name: `__Secure-next-auth.session-token`,
-      options: {
-        httpOnly: true,
-        sameSite: 'lax',
-        path: '/',
-        secure: true
-      }
-    }
+  session: {
+    strategy: "database", // Forzamos uso de DB para sincronizar XP y socios
   },
   callbacks: {
     async session({ session, user }: any) {
@@ -32,28 +24,9 @@ export const authOptions = {
       return session;
     },
   },
-  debug: true,
-  logger: {
-    error(code, metadata) {
-      console.error("NEXTAUTH ERROR:", code, metadata);
-    },
-    warn(code) {
-      console.warn("NEXTAUTH WARN:", code);
-    },
-    debug(code, metadata) {
-      console.log("NEXTAUTH DEBUG:", code, metadata);
-    },
-  },
+  debug: true, // Habilitado para ver logs en Vercel
 }
 
-const handler = (req: any, res: any) => {
-  if (!process.env.NEXTAUTH_SECRET) {
-    console.error("CRITICAL: NEXTAUTH_SECRET is not defined!");
-  }
-  if (!process.env.GOOGLE_CLIENT_ID) {
-    console.error("CRITICAL: GOOGLE_CLIENT_ID is not defined!");
-  }
-  return NextAuth(req, res, authOptions);
-}
+const handler = NextAuth(authOptions)
 
 export { handler as GET, handler as POST }
