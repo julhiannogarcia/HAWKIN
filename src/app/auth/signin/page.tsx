@@ -4,6 +4,8 @@ import { motion } from 'framer-motion';
 import Header from '@/components/Header';
 import Footer from '@/components/Footer';
 
+import { signIn } from 'next-auth/react';
+
 export default function SignInPage() {
   return (
     <main className="min-h-screen bg-black flex items-center justify-center px-4">
@@ -16,8 +18,11 @@ export default function SignInPage() {
         <div className="text-3xl font-black tracking-widest text-cyan-400 mb-8">HAWKIN</div>
         <h1 className="text-xl font-bold text-white mb-2">Acceso al Ecosistema</h1>
         <p className="text-gray-500 text-sm mb-10">Inicia sesión para acceder a tu radar personalizado.</p>
-        
-        <button className="w-full py-4 bg-white text-black rounded-2xl font-black uppercase tracking-widest text-xs hover:bg-cyan-400 transition-all flex items-center justify-center gap-3">
+
+        <button 
+          onClick={() => signIn('google', { callbackUrl: '/' })}
+          className="w-full py-4 bg-white text-black rounded-2xl font-black uppercase tracking-widest text-xs hover:bg-cyan-400 transition-all flex items-center justify-center gap-3"
+        >
           <img src="https://www.google.com/favicon.ico" className="w-4 h-4" alt="Google" />
           Entrar con Google
         </button>
