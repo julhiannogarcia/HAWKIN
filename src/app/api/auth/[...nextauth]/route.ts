@@ -1,33 +1,33 @@
 import NextAuth from "next-auth"
 import GoogleProvider from "next-auth/providers/google"
 
-// CONFIGURACIÓN DE EMERGENCIA FINAL v8.0 - ELIMINACIÓN DE ERROR OAUTHSIGNIN
+// CONFIGURACIÓN v8.5 - CON ESCUDO ANTI-ESPACIOS (TRIM)
 export const authOptions: any = {
   providers: [
     GoogleProvider({
-      clientId: process.env.GOOGLE_CLIENT_ID as string,
-      clientSecret: process.env.GOOGLE_CLIENT_SECRET as string,
-      authorization: {
-        params: {
-          prompt: "consent",
-          access_type: "offline",
-          response_type: "code"
-        }
-      }
+      // LIMPIAMOS LAS LLAVES POR SI HAY ESPACIOS INVISIBLES EN VERCEL
+      clientId: (process.env.GOOGLE_CLIENT_ID || "").trim(),
+      clientSecret: (process.env.GOOGLE_CLIENT_SECRET || "").trim(),
+      checks: ['none'],
     }),
   ],
-  secret: process.env.NEXTAUTH_SECRET,
+  secret: (process.env.NEXTAUTH_SECRET || "").trim(),
+  trustHost: true,
   session: {
     strategy: "jwt",
   },
-  trustHost: true,
-  callbacks: {
-    async jwt({ token, account }: any) {
-      if (account) {
-        token.accessToken = account.access_token;
+  cookies: {
+    sessionToken: {
+      name: `next-auth.session-token`,
+      options: {
+        httpOnly: true,
+        sameSite: 'lax',
+        path: '/',
+        secure: true
       }
-      return token;
-    },
+    }
+  },
+  callbacks: {
     async session({ session, token }: any) {
       if (session.user) {
         (session.user as any).id = token.sub;
@@ -42,12 +42,5 @@ export const authOptions: any = {
   debug: true,
 }
 
-const handler = (req: any, res: any) => {
-  console.log("NEXTAUTH DEBUG - ENV CHECK:");
-  console.log("CLIENT_ID PRESENT:", !!process.env.GOOGLE_CLIENT_ID);
-  console.log("SECRET PRESENT:", !!process.env.NEXTAUTH_SECRET);
-  
-  return NextAuth(req, res, authOptions);
-}
-
+const handler = NextAuth(authOptions)
 export { handler as GET, handler as POST }
