@@ -12,6 +12,17 @@ export const authOptions = {
     }),
   ],
   secret: process.env.NEXTAUTH_SECRET,
+  cookies: {
+    sessionToken: {
+      name: `__Secure-next-auth.session-token`,
+      options: {
+        httpOnly: true,
+        sameSite: 'lax',
+        path: '/',
+        secure: true
+      }
+    }
+  },
   callbacks: {
     async session({ session, user }: any) {
       if (session.user) {
@@ -21,9 +32,28 @@ export const authOptions = {
       return session;
     },
   },
-  debug: process.env.NODE_ENV === 'development',
+  debug: true,
+  logger: {
+    error(code, metadata) {
+      console.error("NEXTAUTH ERROR:", code, metadata);
+    },
+    warn(code) {
+      console.warn("NEXTAUTH WARN:", code);
+    },
+    debug(code, metadata) {
+      console.log("NEXTAUTH DEBUG:", code, metadata);
+    },
+  },
 }
 
-const handler = NextAuth(authOptions)
+const handler = (req: any, res: any) => {
+  if (!process.env.NEXTAUTH_SECRET) {
+    console.error("CRITICAL: NEXTAUTH_SECRET is not defined!");
+  }
+  if (!process.env.GOOGLE_CLIENT_ID) {
+    console.error("CRITICAL: GOOGLE_CLIENT_ID is not defined!");
+  }
+  return NextAuth(req, res, authOptions);
+}
 
 export { handler as GET, handler as POST }
