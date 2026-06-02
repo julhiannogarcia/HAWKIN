@@ -9,12 +9,24 @@ export const authOptions: NextAuthOptions = {
     GoogleProvider({
       clientId: (process.env.GOOGLE_CLIENT_ID || "").trim(),
       clientSecret: (process.env.GOOGLE_CLIENT_SECRET || "").trim(),
-      checks: ['none'],
+      checks: ['none'], 
     }),
   ],
   secret: (process.env.NEXTAUTH_SECRET || "").trim(),
   session: {
     strategy: "jwt",
+  },
+  // CONFIGURACIÓN DE COOKIES ALPHA - COMPATIBLE CON WWW Y NON-WWW
+  cookies: {
+    sessionToken: {
+      name: `next-auth.session-token`,
+      options: {
+        httpOnly: true,
+        sameSite: 'lax',
+        path: '/',
+        secure: true
+      }
+    }
   },
   callbacks: {
     async jwt({ token, user }: any) {
