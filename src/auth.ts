@@ -3,26 +3,23 @@ import Google from "next-auth/providers/google"
 import { PrismaAdapter } from "@auth/prisma-adapter"
 import { prisma } from "@/lib/prisma"
 
-// CONFIGURACIÓN v11.0 - TRIPLE BLINDAJE ALPHA
+// CONFIGURACIÓN v12.0 - MODO "ZERO-CONFIG" ALPHA
+// La versión más limpia y estable recomendada para Next.js 15
 export const { handlers, auth, signIn, signOut } = NextAuth({
   adapter: PrismaAdapter(prisma),
   providers: [
     Google({
-      clientId: (process.env.GOOGLE_CLIENT_ID || "").trim(),
-      clientSecret: (process.env.GOOGLE_CLIENT_SECRET || "").trim(),
-      // Bypass de seguridad para entornos de alta latencia
-      checks: ['none'],
+      // En v5, si las variables se llaman AUTH_GOOGLE_ID y AUTH_GOOGLE_SECRET,
+      // el sistema las detecta automáticamente. Pero las pasamos aquí para seguridad.
+      clientId: process.env.AUTH_GOOGLE_ID || process.env.GOOGLE_CLIENT_ID,
+      clientSecret: process.env.AUTH_GOOGLE_SECRET || process.env.GOOGLE_CLIENT_SECRET,
     }),
   ],
-  // LLAVE MAESTRA: Se usa AUTH_SECRET en Vercel, pero inyectamos este fallback
-  secret: process.env.AUTH_SECRET || "68db8613-74b7-4c3d-83b3-0505b3820261",
-  session: {
-    strategy: "jwt",
-  },
+  session: { strategy: "jwt" },
   trustHost: true,
+  debug: true,
   pages: {
     signIn: '/auth/signin',
     error: '/auth/signin',
-  },
-  debug: true,
+  }
 })
