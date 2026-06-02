@@ -1,39 +1,38 @@
 import NextAuth from "next-auth"
 import GoogleProvider from "next-auth/providers/google"
+import { PrismaAdapter } from "@auth/prisma-adapter"
+import { prisma } from "@/lib/prisma"
 
-// CONFIGURACIÓN v8.5 - CON ESCUDO ANTI-ESPACIOS (TRIM)
+// CONFIGURACIÓN v9.0 - SISTEMA DE SOCIOS ALPHA BLINDADO
 export const authOptions: any = {
+  adapter: PrismaAdapter(prisma),
   providers: [
     GoogleProvider({
-      // LIMPIAMOS LAS LLAVES POR SI HAY ESPACIOS INVISIBLES EN VERCEL
       clientId: (process.env.GOOGLE_CLIENT_ID || "").trim(),
       clientSecret: (process.env.GOOGLE_CLIENT_SECRET || "").trim(),
-      checks: ['none'],
+      allowDangerousEmailAccountLinking: true,
     }),
   ],
   secret: (process.env.NEXTAUTH_SECRET || "").trim(),
-  trustHost: true,
   session: {
-    strategy: "jwt",
-  },
-  cookies: {
-    sessionToken: {
-      name: `next-auth.session-token`,
-      options: {
-        httpOnly: true,
-        sameSite: 'lax',
-        path: '/',
-        secure: true
-      }
-    }
+    strategy: "database", // FORZAMOS DB PARA GUARDAR XP, NIK Y STATUS
   },
   callbacks: {
-    async session({ session, token }: any) {
+    async session({ session, user }: any) {
       if (session.user) {
-        (session.user as any).id = token.sub;
+        session.user.id = user.id;
+        session.user.role = user.role;
+        session.user.nickname = user.nickname;
+        session.user.xp = user.xp;
       }
       return session;
     },
+  },
+  events: {
+    async createUser({ user }: any) {
+      console.log("NUEVO SOCIO ALPHA DETECTADO:", user.email);
+      // Aquí se activará el envío de correo de bienvenida en la v9.1
+    }
   },
   pages: {
     signIn: '/auth/signin',

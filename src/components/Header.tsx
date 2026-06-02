@@ -55,7 +55,12 @@ export default function Header() {
         <div className="flex items-center gap-4">
            {session ? (
              <div className="flex items-center gap-4">
-               <span className="hidden md:block text-[9px] font-black text-gray-500 uppercase tracking-widest">Socio Alpha</span>
+               <div className="hidden md:flex flex-col items-end">
+                  <span className="text-[10px] font-black text-cyan-400 uppercase tracking-tighter italic">
+                    { (session.user as any).nickname || 'SOCIO_ALPHA' }
+                  </span>
+                  <span className="text-[7px] font-bold text-gray-600 uppercase tracking-widest">Nivel {Math.floor(((session.user as any).xp || 0) / 1000) + 1}</span>
+               </div>
                <button onClick={() => signOut()} className="px-6 py-2 bg-white/5 border border-white/10 rounded-full text-[9px] font-black uppercase hover:bg-red-500 transition-all">Salir</button>
              </div>
            ) : (
