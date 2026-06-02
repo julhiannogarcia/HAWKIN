@@ -1,43 +1,16 @@
 import NextAuth from "next-auth"
 import Google from "next-auth/providers/google"
 
-// CONFIGURACIÓN v31.0 - PROTOCOLO DE CONFIANZA TOTAL (SIN DB)
-// Esta versión elimina la base de datos del login para asegurar entrada 100% exitosa
+// CONFIGURACIÓN v32.0 - PROTOCOLO DE CONFIANZA TOTAL
+// Esta es la versión más estable para Next.js 15 en Vercel
 export const { handlers, auth, signIn, signOut } = NextAuth({
   providers: [
     Google({
-      clientId: (process.env.GOOGLE_CLIENT_ID || "").trim(),
-      clientSecret: (process.env.GOOGLE_CLIENT_SECRET || "").trim(),
-      // MODO ALPHA: Desactivamos las validaciones que Vercel bloquea
-      checks: ['none'],
+      clientId: process.env.GOOGLE_CLIENT_ID,
+      clientSecret: process.env.GOOGLE_CLIENT_SECRET,
     }),
   ],
-  // LLAVE MAESTRA SIN DEPENDER DE VARIABLES
-  secret: process.env.AUTH_SECRET || "68db8613-74b7-4c3d-83b3-0505b3820261",
+  // Dejamos que Auth.js lea AUTH_SECRET automáticamente del entorno de Vercel
   trustHost: true,
-  session: {
-    strategy: "jwt",
-  },
-  callbacks: {
-    async signIn() {
-      return true; // PUERTA ABIERTA TOTAL
-    },
-    async jwt({ token, user, account }: any) {
-      if (user) {
-        token.id = user.id;
-      }
-      return token;
-    },
-    async session({ session, token }: any) {
-      if (session.user) {
-        (session.user as any).id = token.id;
-      }
-      return session;
-    },
-  },
-  pages: {
-    signIn: '/auth/signin',
-    error: '/auth/signin',
-  },
   debug: true,
 })
