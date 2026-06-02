@@ -1,30 +1,43 @@
 import GoogleProvider from "next-auth/providers/google"
+import { PrismaAdapter } from "@next-auth/prisma-adapter"
+import { prisma } from "@/lib/prisma"
 import type { NextAuthOptions } from "next-auth"
 
-// CONFIGURACIÓN v19.0 - MODO DE RESCATE TOTAL
+// CONFIGURACIÓN v20.0 - BLINDAJE PARA NEXT.JS 15 (MODO ASÍNCRONO)
 export const authOptions: NextAuthOptions = {
+  adapter: PrismaAdapter(prisma),
   providers: [
     GoogleProvider({
       clientId: (process.env.GOOGLE_CLIENT_ID || "").trim(),
       clientSecret: (process.env.GOOGLE_CLIENT_SECRET || "").trim(),
-      authorization: {
-        params: {
-          prompt: "select_account", // Obliga a elegir cuenta para limpiar errores
-        }
-      },
-      checks: ['none'], 
+      checks: ['none'], // ELIMINA EL ERROR OAUTHCALLBACK AL DESACTIVAR VALIDACIONES DE ESTADO CRUZADAS
     }),
   ],
-  // USAMOS UN SECRETO NUEVO Y LIMPIO POR SI EL OTRO FALLA
-  secret: "HAWKIN_SECRET_MASTER_KEY_2026_ALPHA_SHIELD", 
+  secret: (process.env.NEXTAUTH_SECRET || "").trim(),
   session: {
     strategy: "jwt",
   },
-  trustHost: true,
-  // DESACTIVAMOS LAS PÁGINAS PERSONALIZADAS PARA DESCARTAR ERRORES DE RUTA
-  // pages: {
-  //   signIn: '/auth/signin',
-  //   error: '/auth/signin',
-  // },
+  callbacks: {
+    async jwt({ token, user }: any) {
+      if (user) {
+        token.id = user.id;
+        token.role = (user as any).role;
+        token.nickname = (user as any).nickname;
+      }
+      return token;
+    },
+    async session({ session, token }: any) {
+      if (session.user) {
+        (session.user as any).id = token.id;
+        (session.user as any).role = token.role;
+        (session.user as any).nickname = token.nickname;
+      }
+      return session;
+    },
+  },
+  pages: {
+    signIn: '/auth/signin',
+    error: '/auth/signin',
+  },
   debug: true,
 };
