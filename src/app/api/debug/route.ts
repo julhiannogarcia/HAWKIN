@@ -7,20 +7,22 @@ export async function GET() {
   const nextAuthSecret = process.env.NEXTAUTH_SECRET || "";
   
   return NextResponse.json({
+    status: "DIAGNÓSTICO ALPHA v5.1",
     google: {
       hasId: !!googleId,
-      idLength: googleId.trim().length,
+      idLengthRaw: googleId.length,
+      idLengthTrimmed: googleId.trim().length,
       hasSecret: !!googleSecret,
     },
     secrets: {
-      hasAuthSecret: !!authSecret,
-      hasNextAuthSecret: !!nextAuthSecret,
+      has_AUTH_SECRET: !!authSecret,
+      has_NEXTAUTH_SECRET: !!nextAuthSecret,
+      authSecretFirst6: authSecret.substring(0, 6) + "...",
     },
-    env: {
-      url: process.env.NEXTAUTH_URL || "NOT SET",
-      internalUrl: process.env.NEXTAUTH_URL_INTERNAL || "NOT SET",
-      authUrl: process.env.AUTH_URL || "NOT SET",
-    },
-    version: "AUTH_JS_V5_BETA"
+    vercel_env: {
+      NEXTAUTH_URL: process.env.NEXTAUTH_URL || "MISSING",
+      AUTH_URL: process.env.AUTH_URL || "MISSING",
+      VERCEL_URL: process.env.VERCEL_URL || "MISSING",
+    }
   });
 }
