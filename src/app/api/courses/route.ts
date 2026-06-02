@@ -1,53 +1,30 @@
-import { prisma } from "@/lib/prisma";
 import { NextResponse } from "next/server";
-import { getServerSession } from "next-auth";
-import { authOptions } from "@/lib/auth";
+import { auth } from "@/auth";
+import { prisma } from "@/lib/prisma";
 
-// Crear un nuevo curso (Solo ADMIN)
-export async function POST(req: Request) {
-  try {
-    const session = await getServerSession(authOptions);
-
-    if (!session?.user || (session.user as any).role !== "ADMIN") {
-      return new NextResponse("Unauthorized", { status: 401 });
-    }
-
-    const body = await req.json();
-    const { title, description, price, category, image } = body;
-
-    const course = await prisma.course.create({
-      data: {
-        title,
-        description,
-        price: parseFloat(price),
-        category,
-        image,
-      },
-    });
-
-    return NextResponse.json(course);
-  } catch (error) {
-    console.error("[COURSE_CREATE_ERROR]", error);
-    return new NextResponse("Internal Error", { status: 500 });
-  }
-}
-
-// Obtener todos los cursos publicados
 export async function GET() {
   try {
     const courses = await prisma.course.findMany({
-      where: { published: true },
-      include: {
-        _count: {
-          select: { modules: true }
-        }
-      },
-      orderBy: { createdAt: 'desc' }
+      include: { modules: { include: { lessons: true } } }
     });
-
     return NextResponse.json(courses);
   } catch (error) {
-    console.error("[COURSES_GET_ERROR]", error);
-    return new NextResponse("Internal Error", { status: 500 });
+    return NextResponse.json({ error: "Fallo al obtener cursos" }, { status: 500 });
+  }
+}
+
+export async function POST(req: Request) {
+  const session = await auth();
+
+  if (!session?.user?.email || session.user.email !== 'charliejulhianno@gmail.com') {
+    return NextResponse.json({ error: "No autorizado" }, { status: 401 });
+  }
+
+  try {
+    const data = await req.json();
+    const course = await prisma.course.create({ data });
+    return NextResponse.json(course);
+  } catch (error) {
+    return NextResponse.json({ error: "Fallo al crear curso" }, { status: 500 });
   }
 }

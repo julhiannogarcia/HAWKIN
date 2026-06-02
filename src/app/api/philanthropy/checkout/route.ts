@@ -1,51 +1,34 @@
-import { stripe } from "@/lib/stripe";
 import { NextResponse } from "next/server";
-import { getServerSession } from "next-auth";
-import { authOptions } from "@/lib/auth";
+import { auth } from "@/auth";
+import { prisma } from "@/lib/prisma";
 
 export async function POST(req: Request) {
+  const session = await auth();
+
+  if (!session?.user?.email) {
+    return NextResponse.json({ error: "No autorizado" }, { status: 401 });
+  }
+
   try {
-    const session = await getServerSession(authOptions);
+    const { amount, message } = await req.json();
 
-    // Permitimos donaciones de usuarios identificados o anónimos (si session es null)
-    // Para mayor seguridad en este prototipo, usaremos el ID del usuario si está logueado
-    
-    const body = await req.json();
-    const { amount, message, isAnonymous, type } = body;
-
-    if (!amount || amount < 1) {
-      return new NextResponse("Invalid amount", { status: 400 });
-    }
-
-    const checkoutSession = await stripe.checkout.sessions.create({
-      mode: 'payment', // Pago único, no suscripción
-      payment_method_types: ['card'],
-      line_items: [
-        {
-          price_data: {
-            currency: 'usd',
-            product_data: {
-              name: type === 'ECOSYSTEM' ? 'Aporte al Ecosistema HAWKIN' : 'Fondo de Impulso HAWKIN',
-              description: message || 'Gracias por tu generosidad.',
-            },
-            unit_amount: Math.round(amount * 100), // Stripe usa centavos
-          },
-          quantity: 1,
-        },
-      ],
-      success_url: `${process.env.NEXTAUTH_URL}/philanthropy/success?session_id={CHECKOUT_SESSION_ID}`,
-      cancel_url: `${process.env.NEXTAUTH_URL}/philanthropy?canceled=true`,
-      metadata: {
-        userId: (session?.user as any)?.id || "ANONYMOUS",
-        message: message || "",
-        isAnonymous: String(isAnonymous),
-        type: type,
-      },
+    const donation = await prisma.donation.create({
+      data: {
+        amount: parseFloat(amount),
+        message,
+        userId: (session.user as any).id,
+      }
     });
 
-    return NextResponse.json({ url: checkoutSession.url });
+    // Otorgar XP por donación
+    await prisma.user.update({
+      where: { email: session.user.email },
+      data: { xp: { increment: Math.floor(amount * 10) } }
+    });
+
+    return NextResponse.json(donation);
   } catch (error) {
-    console.error("[PHILANTHROPY_CHECKOUT_ERROR]", error);
-    return new NextResponse("Internal Error", { status: 500 });
+    console.error("Donation Error:", error);
+    return NextResponse.json({ error: "Fallo al procesar donación" }, { status: 500 });
   }
 }

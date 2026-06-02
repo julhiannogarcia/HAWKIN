@@ -1,10 +1,9 @@
 import { NextResponse } from "next/server";
-import { getServerSession } from "next-auth/next";
-import { authOptions } from "@/lib/auth";
+import { auth } from "@/auth";
 import { prisma } from "@/lib/prisma";
 
 export async function GET() {
-  const session = await getServerSession(authOptions);
+  const session = await auth();
 
   // Solo el admin puede ver la lista de socios
   if (!session?.user?.email || session.user.email !== 'charliejulhianno@gmail.com') {
@@ -20,6 +19,7 @@ export async function GET() {
         role: true,
         xp: true,
         image: true,
+        nickname: true,
       },
       orderBy: {
         xp: 'desc',
