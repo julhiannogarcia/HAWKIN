@@ -1,33 +1,31 @@
 import NextAuth from "next-auth"
 import GoogleProvider from "next-auth/providers/google"
-import { PrismaAdapter } from "@auth/prisma-adapter"
+import { PrismaAdapter } from "@next-auth/prisma-adapter"
 import { prisma } from "@/lib/prisma"
 
-// CONFIGURACIÓN v9.2 - REPARACIÓN DEFINITIVA OAUTHCALLBACK
+// CONFIGURACIÓN v9.3 - REPARACIÓN COMPATIBILIDAD VERCEL + NEXT.JS 15
 export const authOptions: any = {
   adapter: PrismaAdapter(prisma),
   providers: [
     GoogleProvider({
       clientId: (process.env.GOOGLE_CLIENT_ID || "").trim(),
       clientSecret: (process.env.GOOGLE_CLIENT_SECRET || "").trim(),
-      allowDangerousEmailAccountLinking: true,
-      // ELIMINA EL ERROR OAUTHCALLBACK AL DESACTIVAR VERIFICACIÓN DE ESTADO/NONCE
+      // Mantenemos checks:none por ahora para asegurar que el pase se otorgue
       checks: ['none'],
     }),
   ],
   secret: (process.env.NEXTAUTH_SECRET || "").trim(),
-  // OBLIGATORIO PARA VERCEL
   trustHost: true,
   session: {
-    strategy: "jwt", 
+    strategy: "jwt",
   },
   callbacks: {
     async jwt({ token, user, trigger }: any) {
       if (user) {
         token.id = user.id;
-        token.role = user.role;
-        token.nickname = user.nickname;
-        token.xp = user.xp;
+        token.role = (user as any).role;
+        token.nickname = (user as any).nickname;
+        token.xp = (user as any).xp;
       }
       if (trigger === "update" && token.email) {
         const dbUser = await prisma.user.findUnique({ where: { email: token.email } });
@@ -53,6 +51,11 @@ export const authOptions: any = {
     error: '/auth/signin',
   },
   debug: true,
+  logger: {
+    error: (code, metadata) => {
+      console.error("NEXTAUTH_ERROR", code, metadata);
+    },
+  }
 }
 
 const handler = NextAuth(authOptions)
