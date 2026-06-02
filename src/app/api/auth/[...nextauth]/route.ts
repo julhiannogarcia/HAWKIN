@@ -3,7 +3,7 @@ import { authOptions } from "@/lib/auth"
 
 const handler = NextAuth(authOptions)
 
-// WRAPPER DEFINITIVO PARA NEXT.JS 15 (MODO ASÍNCRONO)
+// FIX ASÍNCRONO DEFINITIVO PARA NEXT.JS 15 + VERCEL
 export async function GET(req: Request, { params }: { params: any }) {
   const resolvedParams = await params;
   // @ts-ignore
