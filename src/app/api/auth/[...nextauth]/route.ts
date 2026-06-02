@@ -3,7 +3,7 @@ import { authOptions } from "@/lib/auth"
 
 const handler = NextAuth(authOptions)
 
-// FIX NEXT.JS 15: Resolvemos los parámetros como promesas antes de pasar al motor
+// FIX PARA NEXT.JS 15: Resolvemos los parámetros manualmente antes de pasar al motor
 export async function GET(req: Request, { params }: { params: any }) {
   const resolvedParams = await params;
   // @ts-ignore
