@@ -31,9 +31,12 @@ function SignInContent() {
       </div>
 
       {error && (
-        <div className="mb-8 p-4 bg-red-500/10 border border-red-500/20 rounded-2xl flex items-center gap-4 text-red-500 text-xs font-bold uppercase tracking-widest animate-pulse">
-           <AlertCircle size={18} />
-           {error === 'OAuthSignin' ? 'Fallo en la conexión de Google' : 'Error de identificación Alpha'}
+        <div className="mb-8 p-4 bg-red-500/10 border border-red-500/20 rounded-2xl flex flex-col gap-2 text-red-500 text-xs font-bold uppercase tracking-widest animate-pulse">
+           <div className="flex items-center gap-4">
+              <AlertCircle size={18} />
+              <span>Error de Identificación Alpha</span>
+           </div>
+           <p className="text-[8px] opacity-50 border-t border-red-500/10 pt-2 mt-1">CÓDIGO TÉCNICO: {error}</p>
         </div>
       )}
 
