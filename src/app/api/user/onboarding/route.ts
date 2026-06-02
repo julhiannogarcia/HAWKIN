@@ -1,12 +1,12 @@
 import { NextResponse } from "next/server";
-import { auth } from "@/auth";
+import { getAlphaUser } from "@/lib/auth-alpha";
 import { prisma } from "@/lib/prisma";
 
 export async function POST(req: Request) {
-  const session = await auth();
+  const user = await getAlphaUser(req);
 
-  if (!session?.user) {
-    return NextResponse.json({ error: "No autorizado" }, { status: 401 });
+  if (!user) {
+    return NextResponse.json({ error: "Identidad no verificada" }, { status: 401 });
   }
 
   try {
@@ -16,25 +16,24 @@ export async function POST(req: Request) {
       return NextResponse.json({ error: "Nik demasiado corto" }, { status: 400 });
     }
 
-    // Verificar si el Nik ya existe
     const existing = await prisma.user.findUnique({
       where: { nickname }
     });
 
     if (existing) {
-      return NextResponse.json({ error: "Este Nik ya está tomado por otro socio" }, { status: 409 });
+      return NextResponse.json({ error: "Nik ya en uso" }, { status: 409 });
     }
 
     const updatedUser = await prisma.user.update({
-      where: { email: session.user.email as string },
+      where: { id: user.id },
       data: { 
         nickname,
-        xp: { increment: 100 } // Bonus por completar perfil
+        xp: { increment: 100 }
       }
     });
 
     return NextResponse.json({ success: true, nickname: updatedUser.nickname });
   } catch (error) {
-    return NextResponse.json({ error: "Fallo al guardar Nik" }, { status: 500 });
+    return NextResponse.json({ error: "Fallo al guardar identidad" }, { status: 500 });
   }
 }

@@ -1,6 +1,6 @@
 'use client';
 
-// HAWKIN GOLD v4.8 - REPARACIÓN DE ESTABILIDAD Y FECHAS
+// HAWKIN GOLD v4.9 - SISTEMA ALPHA ID
 import { motion, AnimatePresence } from 'framer-motion';
 import { useState, useEffect } from 'react';
 import dynamic from 'next/dynamic';
@@ -8,10 +8,14 @@ import Header from '@/components/Header';
 import Footer from '@/components/Footer';
 import GlobalTicker from '@/components/Ticker';
 import AdSpace from '@/components/AdSpace';
-import { Activity, ShieldCheck, Zap, Globe, Clock, Bell, BellRing, Loader2, ChartNoAxesColumn, TrendingUp, LayoutGrid, Radio, ExternalLink, Info } from 'lucide-react';
-import { useSession } from 'next-auth/react';
+import { useAlpha } from '@/context/AlphaContext';
+import { 
+  Activity, ShieldCheck, Zap, Globe, Clock, Bell, BellRing, 
+  Loader2, ChartNoAxesColumn, TrendingUp, LayoutGrid, Radio, 
+  ExternalLink, Info 
+} from 'lucide-react';
 
-// CARGA DINÁMICA DE WIDGETS PARA EVITAR CLIENT-SIDE EXCEPTIONS
+// CARGA DINÁMICA DE WIDGETS
 const TickerTapeWidget = dynamic(() => import('@/components/TickerTapeWidget'), { ssr: false });
 const TradingViewWidget = dynamic(() => import('@/components/TradingViewWidget'), { ssr: false });
 const TechnicalGaugeWidget = dynamic(() => import('@/components/TechnicalGaugeWidget'), { ssr: false });
@@ -20,7 +24,7 @@ const EconomicCalendarWidget = dynamic(() => import('@/components/EconomicCalend
 const CryptoHeatMapWidget = dynamic(() => import('@/components/CryptoHeatMapWidget'), { ssr: false });
 
 export default function GoldPage() {
-  const { data: session } = useSession();
+  const { user } = useAlpha();
   const [isMounted, setIsMounted] = useState(false);
   const [news, setNews] = useState<any[]>([]);
   const [insights, setInsights] = useState<any[]>([]);
@@ -63,16 +67,12 @@ export default function GoldPage() {
   };
 
   const formatTime = (dateStr: string) => {
-    try {
-      const d = new Date(dateStr);
-      return isNaN(d.getTime()) ? "Recién lanzado" : d.toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' });
-    } catch (e) {
-      return "En vivo";
-    }
+    const d = new Date(dateStr);
+    return d.toLocaleTimeString('es-PE', { hour: '2-digit', minute: '2-digit' });
   };
 
   return (
-    <main className="min-h-screen bg-black text-white selection:bg-[#FFD700] selection:text-black overflow-x-hidden">
+    <main className="min-h-screen bg-black text-white selection:bg-[#FFD700] selection:text-black">
       <Header />
       
       <div className="fixed top-[88px] left-0 w-full z-[900] bg-black/80 backdrop-blur-xl border-y border-white/5 h-12 flex items-center overflow-hidden">
@@ -81,15 +81,10 @@ export default function GoldPage() {
 
       <AnimatePresence>
         {showNotification && (
-          <motion.div initial={{ opacity: 0, y: -50 }} animate={{ opacity: 1, y: 0 }} exit={{ opacity: 0, y: -50 }}
-            className="fixed top-32 left-1/2 -translate-x-1/2 z-[2000] w-full max-w-md px-4">
-            <div className="bg-[#FFD700] text-black p-6 rounded-[30px] flex items-center gap-6 shadow-[0_20px_60px_rgba(255,215,0,0.4)] border-4 border-black">
-               <BellRing className="animate-bounce" size={24} />
-               <div>
-                  <h4 className="font-black uppercase text-sm italic tracking-tighter">ALPHA SINCRONIZADO</h4>
-                  <p className="text-[10px] font-bold uppercase opacity-80">Manual de inversión activo.</p>
-               </div>
-            </div>
+          <motion.div initial={{ y: -100, opacity: 0 }} animate={{ y: 20, opacity: 1 }} exit={{ y: -100, opacity: 0 }}
+            className="fixed top-24 left-1/2 -translate-x-1/2 z-[1100] px-8 py-4 bg-green-500 text-black rounded-full font-black uppercase text-[10px] tracking-widest flex items-center gap-3 shadow-[0_0_50px_rgba(34,197,94,0.4)]"
+          >
+            <ShieldCheck size={16} /> Conexión con Satélite Financiero Establecida
           </motion.div>
         )}
       </AnimatePresence>
@@ -98,85 +93,90 @@ export default function GoldPage() {
         
         {/* PUBLICIDAD DE ALTO IMPACTO GOLD */}
         <div className="mb-16">
-           <AdSpace isPremium={!!session} type="banner" />
+           <AdSpace isPremium={!!user} type="banner" />
         </div>
 
         <header className="flex flex-col xl:flex-row justify-between items-start xl:items-end mb-16 gap-12 border-l-4 border-[#FFD700] pl-8">
-          <div className="space-y-6">
-            <div className="flex items-center gap-4">
-               <div className="px-4 py-1.5 bg-red-500/10 border border-red-500/30 rounded-full flex items-center gap-3">
-                  <Radio className="text-red-500 animate-pulse" size={14} />
-                  <span className="text-[10px] font-black text-red-500 uppercase tracking-[0.4em]">Transmisión GOLD Live</span>
-               </div>
-            </div>
-            <h1 className="text-6xl md:text-9xl font-black tracking-tighter leading-[0.8] uppercase italic">
-              Donde <span className="bg-gradient-to-r from-[#FFD700] via-[#FDB931] to-[#FFD700] bg-clip-text text-transparent">Invertir.</span>
-            </h1>
-            <p className="text-gray-500 text-lg max-w-xl font-light italic">
-              "En HAWKIN GOLD no solo ves el precio, ves la estrategia. Los datos son el nuevo petróleo de la élite."
-            </p>
-          </div>
-          
-          <button onClick={handleActivateAlerts} disabled={isAlertActive || isConnecting}
-            className={`px-12 py-8 rounded-[40px] transition-all flex items-center gap-8 ${isAlertActive ? 'bg-green-500 text-black shadow-[0_0_50px_rgba(34,197,94,0.4)]' : 'bg-[#FFD700] text-black hover:scale-105 shadow-[0_20px_50px_rgba(255,215,0,0.2)]'}`}>
-             <div className="text-left">
-                <p className="text-[8px] font-black opacity-60 uppercase mb-1">Estatus del Terminal</p>
-                <p className="text-lg font-black uppercase tracking-widest">{isConnecting ? 'CONECTANDO...' : isAlertActive ? 'ESTRATEGIA ACTIVA' : 'ACTIVAR SEÑALES PRO'}</p>
-             </div>
-             {isConnecting ? <Loader2 className="animate-spin" size={32} /> : <Zap className={isAlertActive ? 'fill-black' : ''} size={32} />}
-          </button>
+           <div className="space-y-4">
+              <div className="flex items-center gap-3">
+                 <div className="w-3 h-3 bg-[#FFD700] rounded-full animate-pulse shadow-[0_0_15px_#FFD700]" />
+                 <span className="text-[10px] font-black text-[#FFD700] uppercase tracking-[0.6em]">Terminal Alpha Gold v4.9</span>
+              </div>
+              <h1 className="text-6xl md:text-9xl font-black tracking-tighter uppercase italic leading-none">Intelligence <span className="text-gray-700">Hub.</span></h1>
+           </div>
+           
+           <div className="flex flex-wrap gap-6">
+              <button 
+                onClick={handleActivateAlerts}
+                disabled={isAlertActive || isConnecting}
+                className={`px-10 py-5 rounded-full font-black text-[10px] uppercase tracking-[0.4em] transition-all flex items-center gap-4 border-2 ${isAlertActive ? 'bg-[#FFD700]/10 border-[#FFD700] text-[#FFD700]' : 'bg-white text-black hover:bg-[#FFD700] hover:border-[#FFD700]'}`}
+              >
+                {isConnecting ? <Loader2 className="animate-spin" size={16} /> : <BellRing size={16} />}
+                {isAlertActive ? 'Alertas Globales Activas' : 'Sincronizar Señales'}
+              </button>
+           </div>
         </header>
 
-        <div className="grid grid-cols-1 lg:grid-cols-12 gap-8 mb-8">
-           <div className="lg:col-span-8 glass-card bg-black border-white/10 rounded-[60px] overflow-hidden h-[850px] shadow-[0_60px_120px_rgba(0,0,0,1)] relative">
-              <TradingViewWidget />
+        <div className="grid grid-cols-1 lg:grid-cols-12 gap-8 mb-24">
+           {/* GRÁFICO MAESTRO */}
+           <div className="lg:col-span-8 glass-card bg-[#050505] border-white/5 rounded-[60px] overflow-hidden min-h-[700px] shadow-2xl relative group">
+              <div className="p-10 border-b border-white/5 flex items-center justify-between bg-white/[0.01]">
+                 <div className="flex items-center gap-4">
+                    <Activity className="text-cyan-500" size={20} />
+                    <h3 className="text-sm font-black uppercase tracking-[0.3em]">Monitor de Flujo de Capital (Nivel 10)</h3>
+                 </div>
+                 <div className="flex items-center gap-4">
+                    <span className="px-3 py-1 bg-green-500/10 text-green-500 rounded text-[8px] font-bold uppercase tracking-widest border border-green-500/20">Live Stream</span>
+                 </div>
+              </div>
+              <div className="h-[600px] w-full">
+                 <TradingViewWidget />
+              </div>
+              <div className="absolute bottom-6 right-10 flex items-center gap-6 opacity-30 group-hover:opacity-100 transition-opacity">
+                 <span className="text-[8px] font-bold text-gray-500 uppercase tracking-widest">Sincronización Satelital: Activa</span>
+              </div>
            </div>
 
+           {/* INSIGHTS Y CALENDARIO */}
            <div className="lg:col-span-4 space-y-8">
-              <div className="glass-card bg-white/[0.02] border-[#FFD700]/20 p-10 rounded-[60px] flex flex-col justify-between shadow-2xl relative overflow-hidden group">
-                 <div className="absolute top-0 right-0 p-4 opacity-5">
-                    <TrendingUp size={150} />
-                 </div>
-                 <div className="relative z-10">
-                    <h3 className="text-sm font-black uppercase tracking-[0.4em] text-[#FFD700] mb-8 flex items-center gap-3">
-                       <ShieldCheck size={18} className="fill-[#FFD700]" /> IA ALPHA INSIGHTS
-                    </h3>
-                    
-                    <div className="space-y-6">
-                       {insights.map((ins, i) => (
-                         <div key={i} className="p-5 bg-black/40 border border-white/5 rounded-3xl group hover:border-[#FFD700]/40 transition-all">
-                            <div className="flex justify-between items-center mb-2">
-                               <span className="text-xs font-black text-white">{ins.asset}</span>
-                               <span className={`text-[9px] font-black px-3 py-1 rounded-full ${ins.advice === 'ACUMULAR' ? 'bg-green-500/10 text-green-400' : 'bg-blue-500/10 text-blue-400'}`}>{ins.advice}</span>
-                            </div>
-                            <p className="text-[10px] text-gray-500 italic leading-relaxed">{ins.reason}</p>
+              <div className="glass-card bg-[#050505] border-white/5 rounded-[60px] p-10 h-[340px] shadow-xl hover:border-cyan-500/30 transition-all overflow-hidden relative group">
+                 <div className="absolute -top-10 -right-10 opacity-5 rotate-12 group-hover:scale-110 transition-transform"><TrendingUp size={200} /></div>
+                 <h3 className="text-[10px] font-black uppercase tracking-[0.5em] text-cyan-400 mb-8 flex items-center gap-3">
+                    <Zap size={14} /> Señales Alpha
+                 </h3>
+                 <div className="space-y-6">
+                    {insights.map((insight, i) => (
+                      <div key={i} className="flex gap-4 border-l-2 border-white/5 pl-6 py-1 hover:border-cyan-500 transition-all">
+                         <div className="space-y-1">
+                            <p className="text-[9px] font-bold text-gray-600 uppercase tracking-widest">{insight.type}</p>
+                            <p className="text-sm font-black text-white uppercase italic tracking-tighter leading-tight">{insight.text}</p>
                          </div>
-                       ))}
-                    </div>
+                      </div>
+                    ))}
                  </div>
-                 <button className="mt-8 w-full py-5 border border-[#FFD700]/30 text-[#FFD700] font-black uppercase tracking-widest text-[9px] rounded-2xl hover:bg-[#FFD700] hover:text-black transition-all">Ver Manual Completo</button>
               </div>
 
-              <div className="glass-card bg-gradient-to-br from-[#FFD700]/5 to-transparent border-white/5 p-10 rounded-[60px] h-[375px] overflow-hidden">
-                 <h3 className="text-[10px] font-black uppercase tracking-[0.4em] text-gray-500 mb-8 flex items-center gap-3">
-                    <Clock size={16} /> Próximos Eventos Críticos
-                 </h3>
-                 <div className="h-full overflow-y-auto no-scrollbar pb-10">
-                    <EconomicCalendarWidget />
+              <div className="glass-card bg-[#050505] border-white/5 rounded-[60px] p-4 h-[340px] shadow-xl relative overflow-hidden">
+                 <div className="p-6 border-b border-white/5 mb-2">
+                    <h3 className="text-[10px] font-black uppercase tracking-[0.5em] text-blue-500 flex items-center gap-3">
+                       <Clock size={14} /> Calendario de Eventos
+                    </h3>
                  </div>
+                 <EconomicCalendarWidget />
               </div>
            </div>
         </div>
 
-        <div className="space-y-8 mb-20">
+        {/* FEED DE NOTICIAS GOLD */}
+        <div className="mb-24 space-y-12">
            <div className="flex items-center gap-4">
-              <div className="w-4 h-4 bg-[#FFD700] rounded-full" />
-              <h2 className="text-4xl font-black uppercase italic tracking-tighter">Último Minuto: <span className="text-gray-500">Mundo Cripto y Financiero</span></h2>
+              <div className="w-12 h-[2px] bg-[#FFD700]" />
+              <h2 className="text-3xl font-black uppercase italic tracking-tighter">Últimos Movimientos Estratégicos</h2>
            </div>
 
            {loading ? (
-             <div className="grid grid-cols-1 md:grid-cols-3 gap-8">
-                {[1,2,3].map(i => <div key={i} className="h-64 bg-white/5 rounded-[50px] animate-pulse" />)}
+             <div className="py-20 text-center">
+                <Loader2 className="animate-spin text-[#FFD700] mx-auto" size={32} />
              </div>
            ) : (
              <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
@@ -202,7 +202,7 @@ export default function GoldPage() {
 
            {/* PUBLICIDAD DE IMPACTO GOLD */}
            <div className="pt-10">
-              <AdSpace isPremium={!!session} type="inline" />
+              <AdSpace isPremium={!!user} type="inline" />
            </div>
         </div>
 

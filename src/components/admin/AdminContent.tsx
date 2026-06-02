@@ -8,8 +8,10 @@ import {
   Mail, Star, ChevronRight
 } from 'lucide-react';
 import { motion, AnimatePresence } from 'framer-motion';
+import { useAlpha } from '@/context/AlphaContext';
 
 export default function AdminContent() {
+  const { fetchAlpha } = useAlpha();
   const [activeTab, setActiveTab] = useState('overview');
   const [isMounted, setIsMounted] = useState(false);
   const [statsData, setStatsData] = useState<any>(null);
@@ -23,7 +25,7 @@ export default function AdminContent() {
     
     const fetchStats = async () => {
       try {
-        const res = await fetch('/api/admin/stats');
+        const res = await fetchAlpha('/api/admin/stats');
         const data = await res.json();
         setStatsData(data);
       } catch (e) {
@@ -35,7 +37,7 @@ export default function AdminContent() {
 
     const fetchUsers = async () => {
       try {
-        const res = await fetch('/api/admin/users');
+        const res = await fetchAlpha('/api/admin/users');
         const data = await res.json();
         if (Array.isArray(data)) setUsers(data);
       } catch (e) {
@@ -52,14 +54,14 @@ export default function AdminContent() {
   if (!isMounted) return null;
 
   const filteredUsers = users.filter(u => 
-    u.name?.toLowerCase().includes(searchQuery.toLowerCase()) || 
+    u.nickname?.toLowerCase().includes(searchQuery.toLowerCase()) || 
     u.email?.toLowerCase().includes(searchQuery.toLowerCase())
   );
 
   const stats = [
     { label: 'Revenue Total', value: statsData?.revenue || 'S/ 48,250', icon: <DollarSign className="text-green-500" />, t: '+15%' },
     { label: 'Noticias Bomba', value: statsData?.newsCount || '142', icon: <Newspaper className="text-cyan-500" />, t: '+4 hoy' },
-    { label: 'Socios Activos', value: statsData?.totalUsers?.toString() || '3,842', icon: <Users className="text-purple-500" />, t: `+${statsData?.activeNow || 0} hoy` },
+    { label: 'Socios Activos', value: statsData?.totalUsers?.toString() || users.length.toString(), icon: <Users className="text-purple-500" />, t: `+${statsData?.activeNow || 0} hoy` },
     { label: 'Salud de Red', v: '99.9%', i: <Activity className="text-blue-500" />, t: 'Óptima' }
   ];
 
@@ -70,12 +72,12 @@ export default function AdminContent() {
          <div className="space-y-2 text-center md:text-left">
             <div className="flex items-center justify-center md:justify-start gap-3 mb-2">
                <div className="w-2 h-2 bg-blue-500 rounded-full animate-pulse shadow-[0_0_10px_#3b82f6]" />
-               <span className="text-[10px] font-black uppercase tracking-[0.4em] text-blue-400">Consola Maestro v5.5</span>
+               <span className="text-[10px] font-black uppercase tracking-[0.4em] text-blue-400">Consola Maestro v6.0 (ALPHA ID)</span>
             </div>
             <h1 className="text-5xl font-black tracking-tighter leading-none italic uppercase text-white">
               Control <span className="text-blue-500">Alpha.</span>
             </h1>
-            <p className="text-gray-500 text-sm font-light">Gestión en tiempo real del imperio y sus integrantes.</p>
+            <p className="text-gray-500 text-sm font-light">Gestión en tiempo real del imperio y sus llaves de acceso.</p>
          </div>
          
          <div className="flex items-center gap-6">
@@ -114,7 +116,7 @@ export default function AdminContent() {
          ))}
       </div>
 
-      {/* GESTIÓN DE SOCIOS ALPHA (NUEVA SECCIÓN) */}
+      {/* GESTIÓN DE SOCIOS ALPHA */}
       <section className="space-y-8">
          <div className="flex flex-col md:flex-row justify-between items-end gap-6">
             <h3 className="text-2xl font-black uppercase italic tracking-tighter text-purple-500 flex items-center gap-3">
@@ -126,7 +128,7 @@ export default function AdminContent() {
                   type="text"
                   value={searchQuery}
                   onChange={(e) => setSearchQuery(e.target.value)}
-                  placeholder="BUSCAR SOCIO POR NIK O MAIL..."
+                  placeholder="BUSCAR SOCIO POR NIK O LLAVE..."
                   className="w-full bg-white/[0.03] border border-white/10 p-4 pl-12 rounded-2xl text-[10px] font-bold uppercase tracking-widest outline-none focus:border-purple-500 transition-all"
                />
             </div>
@@ -137,7 +139,7 @@ export default function AdminContent() {
                <table className="w-full text-left border-collapse">
                   <thead>
                      <tr className="border-b border-white/5 bg-white/[0.01]">
-                        <th className="p-8 text-[9px] font-black text-gray-500 uppercase tracking-widest">Socio / Nik</th>
+                        <th className="p-8 text-[9px] font-black text-gray-500 uppercase tracking-widest">Socio / Nik / Llave</th>
                         <th className="p-8 text-[9px] font-black text-gray-500 uppercase tracking-widest">Contacto</th>
                         <th className="p-8 text-[9px] font-black text-gray-500 uppercase tracking-widest">Rango</th>
                         <th className="p-8 text-[9px] font-black text-gray-500 uppercase tracking-widest">Puntos XP</th>
@@ -160,15 +162,15 @@ export default function AdminContent() {
                                     {user.image ? <img src={user.image} alt="Avatar" className="w-full h-full object-cover" /> : <Users size={18} className="text-purple-400" />}
                                  </div>
                                  <div>
-                                    <p className="text-xs font-black text-white uppercase tracking-tighter">{user.name || 'Socio Anónimo'}</p>
-                                    <p className="text-[8px] font-bold text-gray-600 uppercase">NIK: {user.name?.split(' ')[0].toLowerCase() || 'alpha_user'}</p>
+                                    <p className="text-xs font-black text-white uppercase tracking-tighter">{user.nickname || 'Socio Anónimo'}</p>
+                                    <p className="text-[8px] font-mono text-gray-700 uppercase">KEY: {user.accessKey || 'SIN_LLAVE'}</p>
                                  </div>
                               </div>
                            </td>
                            <td className="p-8">
                               <div className="flex items-center gap-2 text-gray-400">
                                  <Mail size={12} className="text-purple-500" />
-                                 <span className="text-[10px] font-bold">{user.email}</span>
+                                 <span className="text-[10px] font-bold">{user.email || 'NO_MAIL'}</span>
                               </div>
                            </td>
                            <td className="p-8">
@@ -216,7 +218,7 @@ export default function AdminContent() {
             <div className="bg-black border border-red-900/30 rounded-[50px] p-10 font-mono text-[11px] leading-relaxed relative overflow-hidden shadow-2xl">
                <div className="absolute top-0 right-0 w-full h-1 bg-gradient-to-r from-transparent via-red-500/20 to-transparent" />
                <div className="space-y-3">
-                  <p className="text-gray-600">[{new Date().toISOString()}] INFO: Acceso Administrativo Detectado (Julhianno).</p>
+                  <p className="text-gray-600">[{new Date().toISOString()}] INFO: Acceso Administrativo (Sistema Alpha ID).</p>
                   <p className="text-gray-400">[{new Date().toISOString()}] SUCCESS: Red de socios sincronizada con éxito.</p>
                   <p className="text-blue-400 animate-pulse">{'>'} ESPERANDO COMANDOS ALPHA...</p>
                </div>

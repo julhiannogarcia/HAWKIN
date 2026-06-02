@@ -1,5 +1,5 @@
 import { NextResponse } from "next/server";
-import { auth } from "@/auth";
+import { getAlphaUser } from "@/lib/auth-alpha";
 import { prisma } from "@/lib/prisma";
 
 export async function GET(req: Request, { params }: { params: any }) {
@@ -19,10 +19,10 @@ export async function GET(req: Request, { params }: { params: any }) {
 
 export async function POST(req: Request, { params }: { params: any }) {
   const { courseId } = params;
-  const session = await auth();
+  const user = await getAlphaUser(req);
 
-  if (!session?.user?.email || session.user.email !== 'charliejulhianno@gmail.com') {
-    return NextResponse.json({ error: "No autorizado" }, { status: 401 });
+  if (!user || user.email !== 'charliejulhianno@gmail.com') {
+    return NextResponse.json({ error: "Acceso Administrativo Requerido" }, { status: 401 });
   }
 
   try {

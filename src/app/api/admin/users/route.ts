@@ -1,13 +1,13 @@
 import { NextResponse } from "next/server";
-import { auth } from "@/auth";
+import { getAlphaUser } from "@/lib/auth-alpha";
 import { prisma } from "@/lib/prisma";
 
-export async function GET() {
-  const session = await auth();
+export async function GET(req: Request) {
+  const user = await getAlphaUser(req);
 
-  // Solo el admin puede ver la lista de socios
-  if (!session?.user?.email || session.user.email !== 'charliejulhianno@gmail.com') {
-    return NextResponse.json({ error: "No autorizado" }, { status: 401 });
+  // Solo el admin real puede ver la lista de socios
+  if (!user || user.email !== 'charliejulhianno@gmail.com') {
+    return NextResponse.json({ error: "Acceso Maestro Denegado" }, { status: 401 });
   }
 
   try {
@@ -20,6 +20,7 @@ export async function GET() {
         xp: true,
         image: true,
         nickname: true,
+        accessKey: true,
       },
       orderBy: {
         xp: 'desc',

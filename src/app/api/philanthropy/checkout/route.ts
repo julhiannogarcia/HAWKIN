@@ -1,12 +1,12 @@
 import { NextResponse } from "next/server";
-import { auth } from "@/auth";
+import { getAlphaUser } from "@/lib/auth-alpha";
 import { prisma } from "@/lib/prisma";
 
 export async function POST(req: Request) {
-  const session = await auth();
+  const user = await getAlphaUser(req);
 
-  if (!session?.user?.email) {
-    return NextResponse.json({ error: "No autorizado" }, { status: 401 });
+  if (!user) {
+    return NextResponse.json({ error: "Socio no verificado" }, { status: 401 });
   }
 
   try {
@@ -16,13 +16,12 @@ export async function POST(req: Request) {
       data: {
         amount: parseFloat(amount),
         message,
-        userId: (session.user as any).id,
+        userId: user.id,
       }
     });
 
-    // Otorgar XP por donación
     await prisma.user.update({
-      where: { email: session.user.email },
+      where: { id: user.id },
       data: { xp: { increment: Math.floor(amount * 10) } }
     });
 

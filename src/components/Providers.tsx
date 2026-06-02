@@ -1,13 +1,11 @@
 'use client';
 
-import { SessionProvider } from "next-auth/react";
-import OnboardingModal from "./OnboardingModal";
+import { AlphaProvider } from "@/context/AlphaContext";
 
 export default function Providers({ children }: { children: React.ReactNode }) {
   return (
-    <SessionProvider>
+    <AlphaProvider>
       {children}
-      <OnboardingModal />
-    </SessionProvider>
+    </AlphaProvider>
   );
 }

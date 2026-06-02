@@ -4,13 +4,13 @@ import { useState, useEffect } from 'react';
 import Link from 'next/link';
 import { usePathname } from 'next/navigation';
 import { motion, AnimatePresence } from 'framer-motion';
-import { Menu, X, Shield, Globe, GraduationCap, Building2, Coins } from 'lucide-react';
-import { signIn, signOut, useSession } from 'next-auth/react';
+import { Menu, X, Shield, Globe, Terminal, User, Power } from 'lucide-react';
+import { useAlpha } from '@/context/AlphaContext';
 
 export default function Header() {
   const [isOpen, setIsOpen] = useState(false);
   const pathname = usePathname();
-  const { data: session } = useSession();
+  const { user, logout } = useAlpha();
 
   const navLinks = [
     { name: 'Inicio', href: '/' },
@@ -51,20 +51,29 @@ export default function Header() {
           ))}
         </div>
 
-        {/* AUTH / ACTIONS */}
+        {/* AUTH / ACTIONS - SISTEMA ALPHA ID */}
         <div className="flex items-center gap-4">
-           {session ? (
-             <div className="flex items-center gap-4">
+           {user ? (
+             <div className="flex items-center gap-4 border-l border-white/10 pl-6">
                <div className="hidden md:flex flex-col items-end">
                   <span className="text-[10px] font-black text-cyan-400 uppercase tracking-tighter italic">
-                    { (session.user as any).nickname || 'SOCIO_ALPHA' }
+                    { user.nickname || 'ALPHA_MEMBER' }
                   </span>
-                  <span className="text-[7px] font-bold text-gray-600 uppercase tracking-widest">Nivel {Math.floor(((session.user as any).xp || 0) / 1000) + 1}</span>
+                  <span className="text-[7px] font-bold text-gray-600 uppercase tracking-widest">Socio Nivel {Math.floor((user.xp || 0) / 1000) + 1}</span>
                </div>
-               <button onClick={() => signOut()} className="px-6 py-2 bg-white/5 border border-white/10 rounded-full text-[9px] font-black uppercase hover:bg-red-500 transition-all">Salir</button>
+               <button 
+                 onClick={logout}
+                 className="p-3 bg-red-600/10 text-red-500 rounded-full hover:bg-red-600 hover:text-white transition-all border border-red-600/20"
+               >
+                 <Power size={14} />
+               </button>
              </div>
            ) : (
-             <button onClick={() => signIn()} className="px-8 py-2 bg-white text-black rounded-full text-[10px] font-black uppercase tracking-widest hover:bg-cyan-400 transition-all">Entrar</button>
+             <Link href="/auth/signin">
+                <button className="px-8 py-3 bg-white text-black rounded-full text-[10px] font-black uppercase tracking-[0.2em] hover:bg-cyan-500 hover:text-white transition-all shadow-xl flex items-center gap-3 group">
+                  <Terminal size={14} className="group-hover:animate-pulse" /> ACCESO
+                </button>
+             </Link>
            )}
            <button onClick={() => setIsOpen(!isOpen)} className="lg:hidden text-white"><Menu size={24} /></button>
         </div>
