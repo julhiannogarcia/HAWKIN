@@ -4,7 +4,7 @@ import { useState, useEffect } from 'react';
 import Link from 'next/link';
 import { usePathname } from 'next/navigation';
 import { motion, AnimatePresence } from 'framer-motion';
-import { Menu, X, Shield, Globe, Terminal, User, Power } from 'lucide-react';
+import { Menu, X, Shield, Globe, Terminal, User, Power, Bookmark } from 'lucide-react';
 import { useAlpha } from '@/context/AlphaContext';
 
 export default function Header() {
@@ -56,9 +56,14 @@ export default function Header() {
            {user ? (
              <div className="flex items-center gap-4 border-l border-white/10 pl-6">
                <div className="hidden md:flex flex-col items-end">
-                  <span className="text-[10px] font-black text-cyan-400 uppercase tracking-tighter italic">
-                    { user.nickname || 'ALPHA_MEMBER' }
-                  </span>
+                  <div className="flex items-center gap-2">
+                    <Link href="/vault" className="p-2 bg-white/5 rounded-lg hover:bg-cyan-500/20 text-gray-500 hover:text-cyan-400 transition-all">
+                       <Bookmark size={12} />
+                    </Link>
+                    <span className="text-[10px] font-black text-cyan-400 uppercase tracking-tighter italic">
+                      { user.nickname || 'ALPHA_MEMBER' }
+                    </span>
+                  </div>
                   <span className="text-[7px] font-bold text-gray-600 uppercase tracking-widest">Socio Nivel {Math.floor((user.xp || 0) / 1000) + 1}</span>
                </div>
                <button 
@@ -99,6 +104,15 @@ export default function Header() {
                 {link.name}
               </Link>
             ))}
+            {user && (
+              <Link 
+                href="/vault" 
+                onClick={() => setIsOpen(false)}
+                className="text-3xl font-black uppercase italic text-cyan-400"
+              >
+                Bóveda
+              </Link>
+            )}
           </motion.div>
         )}
       </AnimatePresence>

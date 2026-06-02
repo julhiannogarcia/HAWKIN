@@ -18,7 +18,7 @@ export default function LiveFeed() {
     const fetchNews = async () => {
       setLoading(true);
       try {
-        const endpoint = activeTab === 'radar' ? '/api/news' : '/api/news/gold';
+        const endpoint = activeTab === 'radar' ? '/api/news/live' : '/api/news/gold';
         const res = await fetch(endpoint);
         const data = await res.json();
         setNews(Array.isArray(data) ? data : (data.news || []));

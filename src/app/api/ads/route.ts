@@ -9,57 +9,62 @@ export async function GET(req: Request) {
   try {
     const now = new Date();
     
-    // Buscar anuncios que:
-    // 1. Estén activos
-    // 2. Coincidan con la ubicación (si se pide)
-    // 3. Estén dentro del rango de fechas
-    // 4. Sean GLOBALES o coincidan con el PAÍS del usuario
+    // 1. INTENTO DE CARGA SEGMENTADA (PAÍS + PLACEMENT)
     const ads = await prisma.adCampaign.findMany({
       where: {
-        status: { in: ['ACTIVE', 'PAID'] }, // Permitir ambos estados para visibilidad
+        status: { in: ['ACTIVE', 'PAID'] },
         placement: placement || undefined,
         startDate: { lte: now },
         endDate: { gte: now },
         OR: [
           { isGlobal: true },
           { targetCountry: countryCode },
-          { targetCountry: null } // Si no tiene país, es global por defecto
+          { targetCountry: null }
         ]
       },
     });
 
-    // Fallback: Si no hay anuncios locales, traer globales para no dejar el espacio vacío
-    if (ads.length === 0) {
-      const globalFallback = await prisma.adCampaign.findMany({
-        where: {
-          status: 'ACTIVE',
-          startDate: { lte: now },
-          endDate: { gte: now },
-          isGlobal: true
-        },
-        take: 3
-      });
-      return NextResponse.json(globalFallback);
+    if (ads.length > 0) return NextResponse.json(ads);
+
+    // 2. FALLBACK ALPHA: Si no hay anuncios específicos, traer CUALQUIER anuncio activo
+    // para que la interfaz no se vea vacía ("Vibras de Imperio Activo")
+    const emergencyAds = await prisma.adCampaign.findMany({
+      where: {
+        status: { in: ['ACTIVE', 'PAID'] },
+        startDate: { lte: now },
+        endDate: { gte: now },
+      },
+      take: 3
+    });
+
+    // 3. FALLBACK FINAL: Si la base de datos está totalmente vacía de pautas vigentes,
+    // devolver una pauta interna de HAWKIN pre-programada.
+    if (emergencyAds.length === 0) {
+      return NextResponse.json([{
+        id: "hawkin-internal-01",
+        companyName: "HAWKIN ELITE",
+        bannerUrl: "https://images.unsplash.com/photo-1639762681485-074b7f938ba0?auto=format&fit=crop&q=80&w=2000",
+        targetUrl: "/shield",
+        placement: placement || "NEWS_FEED",
+        isInternal: true // Para que el componente sepa que es de la casa
+      }]);
     }
 
-    return NextResponse.json(ads);
+    return NextResponse.json(emergencyAds);
   } catch (error) {
     console.error("Ad Engine Error:", error);
     return NextResponse.json({ error: "Fallo al cargar publicidad" }, { status: 500 });
   }
 }
 
-// Registro de clics
 export async function POST(req: Request) {
   try {
     const { id } = await req.json();
-    if (!id) return NextResponse.json({ error: "ID requerido" }, { status: 400 });
+    if (!id || id.startsWith('hawkin-internal')) return NextResponse.json({ status: "skipped" });
 
     await prisma.adCampaign.update({
       where: { id },
-      data: {
-        clicks: { increment: 1 }
-      }
+      data: { clicks: { increment: 1 } }
     });
 
     return NextResponse.json({ status: "success" });

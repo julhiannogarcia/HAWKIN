@@ -2,6 +2,7 @@
 
 import dynamic from 'next/dynamic';
 import { Loader2 } from 'lucide-react';
+import { useParams } from 'next/navigation';
 
 const NewsDetailContent = dynamic(() => import('@/components/news/NewsDetailContent'), {
   ssr: false,
@@ -16,5 +17,8 @@ const NewsDetailContent = dynamic(() => import('@/components/news/NewsDetailCont
 });
 
 export default function NewsPage() {
-  return <NewsDetailContent />;
+  const params = useParams();
+  const id = params.id as string;
+  
+  return <NewsDetailContent newsId={id} />;
 }

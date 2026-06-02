@@ -74,7 +74,7 @@ export async function GET() {
         consequence: "Análisis estratégico verificado.",
         importance: n.isUrgent ? "CRITICO" : "ALTO",
         url: n.url || `/news/${n.id}`,
-        image: n.imageUrl,
+        image: n.image,
         timestamp: n.createdAt.toISOString()
       }));
     } catch (e) { console.error("DB ERR:", e); }
