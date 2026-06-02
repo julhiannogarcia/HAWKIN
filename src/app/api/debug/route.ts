@@ -1,19 +1,26 @@
 import { NextResponse } from "next/server";
 
 export async function GET() {
-  const rawId = process.env.GOOGLE_CLIENT_ID || "";
-  const trimmedId = rawId.trim();
+  const googleId = process.env.GOOGLE_CLIENT_ID || "";
+  const googleSecret = process.env.GOOGLE_CLIENT_SECRET || "";
+  const authSecret = process.env.AUTH_SECRET || "";
+  const nextAuthSecret = process.env.NEXTAUTH_SECRET || "";
   
   return NextResponse.json({
-    hasClientId: !!rawId,
-    clientIdLengthRaw: rawId.length,
-    clientIdLengthTrimmed: trimmedId.length,
-    isDirty: rawId.length !== trimmedId.length,
-    hasClientSecret: !!process.env.GOOGLE_CLIENT_SECRET,
-    hasSecret: !!process.env.NEXTAUTH_SECRET,
-    nextAuthUrl: process.env.NEXTAUTH_URL,
-    authUrl: process.env.AUTH_URL,
-    nodeEnv: process.env.NODE_ENV,
-    status: "ESCUDO ANTI-ESPACIOS ACTIVO"
+    google: {
+      hasId: !!googleId,
+      idLength: googleId.trim().length,
+      hasSecret: !!googleSecret,
+    },
+    secrets: {
+      hasAuthSecret: !!authSecret,
+      hasNextAuthSecret: !!nextAuthSecret,
+    },
+    env: {
+      url: process.env.NEXTAUTH_URL || "NOT SET",
+      internalUrl: process.env.NEXTAUTH_URL_INTERNAL || "NOT SET",
+      authUrl: process.env.AUTH_URL || "NOT SET",
+    },
+    version: "AUTH_JS_V5_BETA"
   });
 }
