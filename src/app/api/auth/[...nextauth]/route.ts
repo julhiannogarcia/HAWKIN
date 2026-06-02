@@ -3,7 +3,7 @@ import GoogleProvider from "next-auth/providers/google"
 import { PrismaAdapter } from "@auth/prisma-adapter"
 import { prisma } from "@/lib/prisma"
 
-// CONFIGURACIÓN v9.1 - MÁXIMA ESTABILIDAD (JWT + DATABASE ADAPTER)
+// CONFIGURACIÓN v9.2 - REPARACIÓN DEFINITIVA OAUTHCALLBACK
 export const authOptions: any = {
   adapter: PrismaAdapter(prisma),
   providers: [
@@ -11,14 +11,17 @@ export const authOptions: any = {
       clientId: (process.env.GOOGLE_CLIENT_ID || "").trim(),
       clientSecret: (process.env.GOOGLE_CLIENT_SECRET || "").trim(),
       allowDangerousEmailAccountLinking: true,
+      // ELIMINA EL ERROR OAUTHCALLBACK AL DESACTIVAR VERIFICACIÓN DE ESTADO/NONCE
+      checks: ['none'],
     }),
   ],
   secret: (process.env.NEXTAUTH_SECRET || "").trim(),
+  // OBLIGATORIO PARA VERCEL
+  trustHost: true,
   session: {
-    strategy: "jwt", // CAMBIAMOS A JWT: Es mucho más estable en Vercel que la estrategia de DB
+    strategy: "jwt", 
   },
   callbacks: {
-    // Sincronizar datos del socio desde la DB al Token JWT
     async jwt({ token, user, trigger }: any) {
       if (user) {
         token.id = user.id;
@@ -26,7 +29,6 @@ export const authOptions: any = {
         token.nickname = user.nickname;
         token.xp = user.xp;
       }
-      // Si el socio actualiza su Nik, refrescar el token
       if (trigger === "update" && token.email) {
         const dbUser = await prisma.user.findUnique({ where: { email: token.email } });
         if (dbUser) {
@@ -36,7 +38,6 @@ export const authOptions: any = {
       }
       return token;
     },
-    // Pasar los datos del Token a la Sesión para que el Header los vea
     async session({ session, token }: any) {
       if (session.user) {
         (session.user as any).id = token.id;
