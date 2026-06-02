@@ -16,8 +16,9 @@ export default function LiveFeed() {
 
   useEffect(() => {
     const fetchNews = async () => {
+      setLoading(true);
       try {
-        const endpoint = activeTab === 'radar' ? '/api/news/live' : '/api/news/gold';
+        const endpoint = activeTab === 'radar' ? '/api/news' : '/api/news/gold';
         const res = await fetch(endpoint);
         const data = await res.json();
         setNews(Array.isArray(data) ? data : (data.news || []));
@@ -37,16 +38,15 @@ export default function LiveFeed() {
 
   return (
     <div className="space-y-12">
-      {/* TABS TÁCTICOS */}
       <div className="flex bg-white/5 p-2 rounded-[30px] w-fit mx-auto md:mx-0 border border-white/5">
         <button 
-          onClick={() => { setActiveTab('radar'); setLoading(true); }}
+          onClick={() => setActiveTab('radar')}
           className={`px-8 py-4 rounded-[25px] text-[10px] font-black uppercase tracking-widest transition-all flex items-center gap-3 ${activeTab === 'radar' ? 'bg-cyan-500 text-black shadow-[0_0_20px_rgba(6,182,212,0.5)]' : 'text-gray-500 hover:text-white'}`}
         >
           <Globe size={14} /> Radar Global
         </button>
         <button 
-          onClick={() => { setActiveTab('gold'); setLoading(true); }}
+          onClick={() => setActiveTab('gold')}
           className={`px-8 py-4 rounded-[25px] text-[10px] font-black uppercase tracking-widest transition-all flex items-center gap-3 ${activeTab === 'gold' ? 'bg-[#FFD700] text-black shadow-[0_0_20px_rgba(255,215,0,0.5)]' : 'text-gray-500 hover:text-white'}`}
         >
           <Coins size={14} /> Gold Intel
@@ -87,7 +87,6 @@ export default function LiveFeed() {
         </div>
       )}
 
-      {/* ESTADO DE CONEXIÓN */}
       <div className="pt-20 border-t border-white/5">
          <div className="flex flex-col md:flex-row justify-between items-center gap-6">
             <div className="flex items-center gap-6">
