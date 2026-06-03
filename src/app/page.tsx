@@ -15,6 +15,7 @@ const Pricing = dynamic(() => import('@/components/Pricing'), { ssr: false });
 const LiveFeed = dynamic(() => import('@/components/LiveFeed'), { ssr: false });
 const VisionSection = dynamic(() => import('@/components/VisionSection'), { ssr: false });
 const AdSpace = dynamic(() => import('@/components/AdSpace'), { ssr: false });
+const GlobalAIIndex = dynamic(() => import('@/components/intelligence/GlobalAIIndex'), { ssr: false });
 
 export default function Home() {
   const [isMounted, setIsMounted] = useState(false);
@@ -44,6 +45,9 @@ export default function Home() {
         </div>
 
         <Hero />
+
+        {/* --- GLOBAL AI INDEX DASHBOARD (V4 NUCLEUS) --- */}
+        <GlobalAIIndex />
 
         {/* Feed de Noticias / Live Engine - MOVIDO HACIA ARRIBA PARA ENFOQUE TOTAL EN NOTICIAS */}
         <section id="news" className="max-w-6xl mx-auto px-4 py-20 w-full">
