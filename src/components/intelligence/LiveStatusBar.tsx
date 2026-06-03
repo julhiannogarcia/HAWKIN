@@ -4,7 +4,7 @@ import React, { useState, useEffect } from 'react';
 import { motion } from 'framer-motion';
 import { 
   Activity, Clock, Globe, Zap, 
-  TrendingUp, BarChart3, ShieldCheck, 
+  TrendingUp, ChartBar, ShieldCheck, 
   Flame, Cpu, Target
 } from 'lucide-react';
 

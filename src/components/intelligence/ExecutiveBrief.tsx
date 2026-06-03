@@ -4,7 +4,7 @@ import React from 'react';
 import { motion } from 'framer-motion';
 import { 
   ShieldAlert, TrendingUp, TrendingDown, Zap, 
-  Target, User, ArrowUpRight, BarChart3, Clock
+  Target, User, ArrowUpRight, ChartBar, Clock
 } from 'lucide-react';
 
 const SIGNALS = [
@@ -46,7 +46,7 @@ export default function ExecutiveBrief() {
           <div className="space-y-8">
             <div className="space-y-6">
                <h3 className="text-xs font-black uppercase tracking-[0.4em] text-gray-500 flex items-center gap-3">
-                 <BarChart3 size={14} className="text-cyan-500" /> Empresas & CEOs
+                 <ChartBar size={14} className="text-cyan-500" /> Empresas & CEOs
                </h3>
                <div className="grid grid-cols-2 gap-4">
                   <div className="p-5 bg-cyan-500/5 border border-cyan-500/10 rounded-3xl space-y-3">

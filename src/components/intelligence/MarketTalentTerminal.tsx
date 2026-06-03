@@ -3,7 +3,7 @@
 import React from 'react';
 import { motion } from 'framer-motion';
 import { 
-  DollarSign, Users, Briefcase, BarChart3, 
+  DollarSign, Users, Briefcase, ChartBar, 
   TrendingUp, Globe, Rocket, Landmark
 } from 'lucide-react';
 

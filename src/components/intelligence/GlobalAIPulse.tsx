@@ -3,13 +3,20 @@
 import React, { useState, useEffect } from 'react';
 import { motion } from 'framer-motion';
 import { 
-  Flame, Zap, TrendingUp, BarChart3, 
+  Flame, Zap, TrendingUp, ChartBar, 
   Target, Activity, Globe, Clock, ShieldCheck,
   Landmark, Cpu, Search, Info
 } from 'lucide-react';
 
 export default function GlobalAIPulse() {
   const [pulse, setPulse] = useState(92);
+  const [currentTime, setCurrentTime] = useState('');
+
+  useEffect(() => {
+    setCurrentTime(new Date().toLocaleTimeString());
+    const timer = setInterval(() => setCurrentTime(new Date().toLocaleTimeString()), 1000);
+    return () => clearInterval(timer);
+  }, []);
 
   return (
     <section className="w-full bg-[#050505] py-20 border-b border-white/5 relative overflow-hidden">
