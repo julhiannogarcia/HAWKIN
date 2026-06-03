@@ -90,11 +90,55 @@ export async function GET() {
     ];
 
     const feedResults = await Promise.all(FEEDS.map(url => parser.parseURL(url).catch(() => ({ items: [] }))));
-    const allRawItems = feedResults.flatMap(f => f.items).sort((a, b) => 
-      new Date(b.pubDate || 0).getTime() - new Date(a.pubDate || 0).getTime()
-    ).slice(0, 15);
+    const allRawItems = feedResults.flatMap(f => f.items);
 
-    const processedNews = await Promise.all(allRawItems.slice(0, 10).map(async (item) => {
+    // --- LÓGICA DE RANKING DE INTELIGENCIA ESTRATÉGICA ---
+    
+    // 1. Deduplicación por Título (limpieza de ruidos)
+    const seenTitles = new Set();
+    const uniqueItems = allRawItems.filter(item => {
+      const titleClean = item.title?.toLowerCase().trim();
+      if (!titleClean || seenTitles.has(titleClean)) return false;
+      seenTitles.add(titleClean);
+      return true;
+    });
+
+    // 2. Sistema de Scoring TITAN
+    const KEY_COMPANIES = ['openai', 'nvidia', 'anthropic', 'deepmind', 'microsoft', 'meta', 'xai'];
+    const KEY_CEOS = ['altman', 'musk', 'huang', 'hassabis', 'amodei', 'nadella', 'zuckerberg'];
+    const HIGH_IMPACT = ['agi', 'gpt', 'gemini', 'claude', 'blackwell', 'robótica', 'robot', 'humanoides', 'data center', 'chips', 'adquisición', 'funding', 'inversión', '100m', 'multimillonaria'];
+    const ELITE_SOURCES = ['openai', 'nvidia', 'deepmind', 'reuters'];
+
+    const scoredItems = uniqueItems.map(item => {
+      let score = 0;
+      const text = (item.title + " " + (item.contentSnippet || "")).toLowerCase();
+      const source = (item.source?.name || "").toLowerCase();
+
+      // +10: Empresas Clave
+      KEY_COMPANIES.forEach(c => { if (text.includes(c)) score += 10; });
+      // +15: CEOs Importantes
+      KEY_CEOS.forEach(p => { if (text.includes(p)) score += 15; });
+      // +20: Hitos Tecnológicos / Negocio
+      HIGH_IMPACT.forEach(w => { if (text.includes(w)) score += 20; });
+      // +5: Fuentes Élite
+      ELITE_SOURCES.forEach(s => { if (source.includes(s)) score += 5; });
+
+      return { ...item, titanScore: score };
+    });
+
+    // 3. Selección Final (Priorización + Diversidad)
+    const sourceCount: Record<string, number> = {};
+    const finalSelection = scoredItems
+      .sort((a, b) => b.titanScore - a.titanScore) // Primero los de mayor puntuación estratégica
+      .filter(item => {
+        const srcName = item.source?.name || 'Unknown';
+        if ((sourceCount[srcName] || 0) >= 2) return false; // Máximo 2 noticias por fuente para mantener diversidad
+        sourceCount[srcName] = (sourceCount[srcName] || 0) + 1;
+        return true;
+      })
+      .slice(0, 10); // Tomamos el Top 10 estratégico para procesar
+
+    const processedNews = await Promise.all(finalSelection.map(async (item) => {
       const uniqueId = generateShortId(item.link || item.title || "");
       
       let titanData = {
