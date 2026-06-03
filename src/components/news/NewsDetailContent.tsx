@@ -1,6 +1,6 @@
 'use client';
 
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useRef } from 'react';
 import Header from '@/components/Header';
 import Footer from '@/components/Footer';
 import GlobalTicker from '@/components/Ticker';
@@ -19,7 +19,7 @@ interface NewsDetailContentProps {
 }
 
 export default function NewsDetailContent({ newsId }: NewsDetailContentProps) {
-  const { user } = useAlpha(); // Detectamos al socio autenticado
+  const { user } = useAlpha();
   const [news, setNews] = useState<any>(null);
   const [loading, setLoading] = useState(true);
   const [likes, setLikes] = useState(0);
@@ -27,8 +27,8 @@ export default function NewsDetailContent({ newsId }: NewsDetailContentProps) {
   const [hasLiked, setHasLiked] = useState(false);
   const [hasDisliked, setHasDisliked] = useState(false);
   const [userNick, setUserNick] = useState('');
+  const nickInputRef = useRef<HTMLInputElement>(null);
 
-  // Efecto para asignar automáticamente el nick si el usuario ya es socio
   useEffect(() => {
     if (user?.name) {
       setUserNick(user.name.toUpperCase());
@@ -38,7 +38,6 @@ export default function NewsDetailContent({ newsId }: NewsDetailContentProps) {
   useEffect(() => {
     const fetchNewsDetail = async () => {
       try {
-        // Intentar buscar en la API de live news primero (ya que genera IDs dinámicos para RSS)
         const res = await fetch('/api/news/live');
         const data = await res.json();
         
@@ -50,15 +49,14 @@ export default function NewsDetailContent({ newsId }: NewsDetailContentProps) {
 
         let found = allItems.find((n: any) => n.id === newsId);
 
-        // Si no está en los feeds vivos, buscar por ID específico (noticias de DB)
         if (!found) {
           const resDb = await fetch(`/api/news?id=${newsId}`);
-          found = await resDb.json();
+          const dbData = await resDb.json();
+          if (!dbData.error) found = dbData;
         }
 
         if (found) {
           setNews(found);
-          // Simulación de métricas para la estética "Imperio"
           setLikes(Math.floor(Math.random() * 500) + 100);
           setDislikes(Math.floor(Math.random() * 20));
         }
@@ -72,6 +70,12 @@ export default function NewsDetailContent({ newsId }: NewsDetailContentProps) {
     fetchNewsDetail();
     window.scrollTo(0, 0);
   }, [newsId]);
+
+  const handleEnterNick = () => {
+    if (nickInputRef.current?.value) {
+      setUserNick(nickInputRef.current.value.toUpperCase());
+    }
+  };
 
   if (loading) {
     return (
@@ -102,7 +106,6 @@ export default function NewsDetailContent({ newsId }: NewsDetailContentProps) {
 
       <div className="max-w-7xl mx-auto px-6 pt-40 pb-20">
         
-        {/* ENCABEZADO DE LA NOTICIA (FULL WIDTH) */}
         <div className="mb-16 space-y-8">
            <Link href="/" className="flex items-center gap-2 text-[10px] font-black uppercase tracking-widest text-gray-500 hover:text-cyan-400 transition-colors group w-fit">
               <ChevronLeft size={16} className="group-hover:-translate-x-1 transition-transform" /> Volver al Radar
@@ -123,7 +126,6 @@ export default function NewsDetailContent({ newsId }: NewsDetailContentProps) {
 
         <div className="grid grid-cols-1 lg:grid-cols-12 gap-16">
           
-          {/* COLUMNA IZQUIERDA: CONTENIDO PRINCIPAL */}
           <div className="lg:col-span-8 space-y-12">
             <div className="relative aspect-video w-full rounded-[40px] overflow-hidden border border-white/5 bg-gray-900 shadow-2xl">
                <img 
@@ -134,7 +136,6 @@ export default function NewsDetailContent({ newsId }: NewsDetailContentProps) {
                <div className="absolute inset-0 bg-gradient-to-t from-black/80 via-transparent to-transparent" />
             </div>
 
-            {/* METADATOS RÁPIDOS */}
             <div className="flex flex-wrap items-center gap-8 py-8 border-y border-white/5 text-gray-500">
                <div className="flex items-center gap-3">
                   <Calendar size={16} className="text-cyan-500" />
@@ -150,7 +151,6 @@ export default function NewsDetailContent({ newsId }: NewsDetailContentProps) {
                </div>
             </div>
 
-            {/* RESUMEN ESTRATÉGICO */}
             <div className="space-y-8">
                <div className="flex items-center gap-4 text-cyan-400">
                   <Zap size={20} />
@@ -161,9 +161,8 @@ export default function NewsDetailContent({ newsId }: NewsDetailContentProps) {
                      {news.excerpt}
                   </p>
                   <div className="mt-12 text-lg text-gray-400 font-light leading-loose space-y-6">
-                    {/* El contenido real de la noticia o el resumen extendido */}
                     {news.content ? (
-                      news.content.split('\n').map((para: string, i: number) => (
+                      String(news.content).split('\n').map((para: string, i: number) => (
                         <p key={i}>{para}</p>
                       ))
                     ) : (
@@ -173,7 +172,6 @@ export default function NewsDetailContent({ newsId }: NewsDetailContentProps) {
                </div>
             </div>
 
-            {/* SECCIÓN DE COMENTARIOS (SISTEMA CON NICK) */}
             <div className="pt-20 border-t border-white/5 space-y-12">
                <h3 className="text-2xl font-black uppercase italic tracking-tighter flex items-center gap-4">
                   <MessageSquare className="text-cyan-500" /> Transmisiones del Gremio
@@ -185,16 +183,14 @@ export default function NewsDetailContent({ newsId }: NewsDetailContentProps) {
                        <p className="text-[10px] font-black uppercase tracking-[0.4em] text-gray-500">Ingresa tu Nick para Transmitir</p>
                        <div className="flex max-w-sm mx-auto bg-black border border-white/10 rounded-full p-2">
                           <input 
+                            ref={nickInputRef}
                             type="text" 
                             placeholder="TU_NICK_ALPHA" 
                             className="flex-1 bg-transparent px-6 py-2 text-xs font-black uppercase outline-none text-cyan-400"
-                            onKeyDown={(e) => { if(e.key === 'Enter') setUserNick((e.target as HTMLInputElement).value.toUpperCase()); }}
+                            onKeyDown={(e) => { if(e.key === 'Enter') handleEnterNick(); }}
                           />
                           <button 
-                            onClick={(e) => { 
-                              const input = (e.currentTarget.previousSibling as HTMLInputElement);
-                              if(input.value) setUserNick(input.value.toUpperCase()); 
-                            }}
+                            onClick={handleEnterNick}
                             className="bg-cyan-600 text-black px-6 py-2 rounded-full text-[9px] font-black uppercase"
                           >
                             Entrar
@@ -213,7 +209,7 @@ export default function NewsDetailContent({ newsId }: NewsDetailContentProps) {
                        
                        <div className="flex gap-6 items-start">
                           <div className="w-12 h-12 rounded-full bg-gradient-to-br from-cyan-500 to-purple-600 flex-shrink-0 flex items-center justify-center text-black font-black text-xl italic">
-                             {userNick[0]}
+                             {userNick ? userNick[0] : '?'}
                           </div>
                           <div className="flex-1 space-y-4">
                              <textarea 
@@ -228,7 +224,6 @@ export default function NewsDetailContent({ newsId }: NewsDetailContentProps) {
                     </div>
                   )}
 
-                  {/* COMENTARIOS DE MUESTRA PARA DAR VIDA */}
                   <div className="space-y-8 pt-8">
                      <div className="flex gap-6 opacity-40">
                         <div className="w-10 h-10 rounded-full bg-white/5 flex items-center justify-center text-[10px] font-black">V</div>
@@ -242,19 +237,14 @@ export default function NewsDetailContent({ newsId }: NewsDetailContentProps) {
             </div>
           </div>
 
-          {/* COLUMNA DERECHA: ACCIONES Y ENLACE EXTERNO */}
           <div className="lg:col-span-4 space-y-12">
-            
-            {/* PANEL DE ACCIÓN ESTRATÉGICA */}
             <div className="sticky top-40 space-y-8">
-              
               <div className="p-10 bg-white/[0.02] border border-white/10 rounded-[40px] space-y-10">
                 <div className="space-y-4">
                    <h3 className="text-[10px] font-black uppercase tracking-[0.4em] text-gray-500">Acción Requerida</h3>
                    <div className="h-px bg-white/5" />
                 </div>
 
-                {/* BOTÓN AL ENLACE REAL */}
                 {news.url && (
                    <a 
                      href={news.url} 
@@ -267,7 +257,6 @@ export default function NewsDetailContent({ newsId }: NewsDetailContentProps) {
                    </a>
                 )}
 
-                {/* INTERACCIONES */}
                 <div className="grid grid-cols-2 gap-4">
                    <button 
                     onClick={() => { setLikes(l => hasLiked ? l - 1 : l + 1); setHasLiked(!hasLiked); setHasDisliked(false); }}
@@ -287,9 +276,9 @@ export default function NewsDetailContent({ newsId }: NewsDetailContentProps) {
 
                 <button 
                   onClick={() => {
-                    if (navigator.share) {
-                      navigator.share({ title: news.title, url: window.location.href });
-                    } else {
+                    if (typeof navigator !== 'undefined' && navigator.share) {
+                      navigator.share({ title: news.title, url: window.location.href }).catch(() => {});
+                    } else if (typeof navigator !== 'undefined') {
                       navigator.clipboard.writeText(window.location.href);
                       alert("Link copiado al portapapeles del imperio.");
                     }
@@ -300,7 +289,6 @@ export default function NewsDetailContent({ newsId }: NewsDetailContentProps) {
                 </button>
               </div>
 
-              {/* INDICADOR DE VERACIDAD */}
               <div className="p-8 bg-green-500/5 border border-green-500/20 rounded-[30px] flex items-center gap-6">
                  <div className="w-12 h-12 rounded-full bg-green-500/10 flex items-center justify-center text-green-500">
                     <ShieldCheck size={24} />
@@ -310,13 +298,10 @@ export default function NewsDetailContent({ newsId }: NewsDetailContentProps) {
                     <p className="text-[8px] text-gray-500 font-bold uppercase tracking-widest mt-1">HAWKIN ALPHA-SAFE</p>
                  </div>
               </div>
-
             </div>
           </div>
-
         </div>
 
-        {/* ESPACIO PUBLICITARIO INFERIOR (ADMAN) */}
         <div className="mt-32 pt-20 border-t border-white/5">
            <div className="flex flex-col items-center gap-8">
               <div className="text-center space-y-2">
@@ -334,13 +319,5 @@ export default function NewsDetailContent({ newsId }: NewsDetailContentProps) {
       <Footer />
       <GlobalTicker />
     </main>
-  );
-}
-
-function Loader2({ size, className }: { size: number, className?: string }) {
-  return (
-    <svg xmlns="http://www.w3.org/2000/svg" width={size} height={size} viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="3" strokeLinecap="round" strokeLinejoin="round" className={className}>
-      <path d="M21 12a9 9 0 1 1-6.219-8.56"/>
-    </svg>
   );
 }
