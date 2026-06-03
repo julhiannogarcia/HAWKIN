@@ -18,6 +18,7 @@ interface NewsDetailContentProps {
 }
 
 export default function NewsDetailContent({ newsId }: NewsDetailContentProps) {
+  const { user } = useAlpha(); // Detectamos al socio autenticado
   const [news, setNews] = useState<any>(null);
   const [loading, setLoading] = useState(true);
   const [likes, setLikes] = useState(0);
@@ -25,6 +26,13 @@ export default function NewsDetailContent({ newsId }: NewsDetailContentProps) {
   const [hasLiked, setHasLiked] = useState(false);
   const [hasDisliked, setHasDisliked] = useState(false);
   const [userNick, setUserNick] = useState('');
+
+  // Efecto para asignar automáticamente el nick si el usuario ya es socio
+  useEffect(() => {
+    if (user?.name) {
+      setUserNick(user.name.toUpperCase());
+    }
+  }, [user]);
 
   useEffect(() => {
     const fetchNewsDetail = async () => {
