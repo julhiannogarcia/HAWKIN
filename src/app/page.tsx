@@ -19,6 +19,9 @@ const GlobalAIIndex = dynamic(() => import('@/components/intelligence/GlobalAIIn
 const ExecutiveBrief = dynamic(() => import('@/components/intelligence/ExecutiveBrief'), { ssr: false });
 const AIWarRoom = dynamic(() => import('@/components/intelligence/AIWarRoom'), { ssr: false });
 const MarketTalentTerminal = dynamic(() => import('@/components/intelligence/MarketTalentTerminal'), { ssr: false });
+const LiveStatusBar = dynamic(() => import('@/components/intelligence/LiveStatusBar'), { ssr: false });
+const GlobalAIPulse = dynamic(() => import('@/components/intelligence/GlobalAIPulse'), { ssr: false });
+const HISRanking = dynamic(() => import('@/components/intelligence/HISRanking'), { ssr: false });
 
 export default function Home() {
   const [isMounted, setIsMounted] = useState(false);
@@ -36,24 +39,30 @@ export default function Home() {
   }
 
   return (
-    <main className="relative min-h-screen">
+    <main className="relative min-h-screen bg-[#020202]">
+      <LiveStatusBar />
       <Header />
 
       <div className="flex flex-col">
         <Intro />
         
         {/* Espacio Publicitario Premium */}
-        <div className="w-full">
+        <div className="w-full mt-10">
           <AdSpace isPremium={false} type="banner" />
         </div>
 
         <Hero />
 
-        {/* --- NÚCLEO DE INTELIGENCIA HAWKIN V5 --- */}
+        {/* --- GLOBAL AI PULSE (INDICADOR MAESTRO 1) --- */}
+        <GlobalAIPulse />
+
+        {/* --- EXECUTIVE SUMMARY --- */}
         <ExecutiveBrief />
         
-        <GlobalAIIndex />
+        {/* --- HAWKIN INTELLIGENCE SCORE (INDICADOR MAESTRO 2) --- */}
+        <HISRanking />
 
+        {/* --- WAR ROOM & MARKET TERMINAL --- */}
         <AIWarRoom />
 
         <MarketTalentTerminal />
