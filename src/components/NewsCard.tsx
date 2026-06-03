@@ -29,8 +29,6 @@ export default function NewsCard({
   source,
   url
 }: NewsCardProps) {
-  // Si tenemos URL externa y no es una noticia interna bloqueada, usamos la URL externa
-  const isExternal = url && !url.startsWith('/') && category !== 'HAWKIN';
   
   const CardContent = (
     <motion.div 
@@ -84,10 +82,6 @@ export default function NewsCard({
       )}
     </motion.div>
   );
-
-  if (isExternal) {
-    return <a href={url} target="_blank" rel="noopener noreferrer">{CardContent}</a>;
-  }
 
   return (
     <Link href={`/news/${id}`}>
