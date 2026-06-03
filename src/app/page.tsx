@@ -13,9 +13,7 @@ const GlobalTicker = dynamic(() => import('@/components/Ticker'), { ssr: false }
 const FounderZone = dynamic(() => import('@/components/FounderZone'), { ssr: false });
 const Pricing = dynamic(() => import('@/components/Pricing'), { ssr: false });
 const LiveFeed = dynamic(() => import('@/components/LiveFeed'), { ssr: false });
-const VisionSection = dynamic(() => import('@/components/VisionSection'), { ssr: false });
 const AdSpace = dynamic(() => import('@/components/AdSpace'), { ssr: false });
-const GlobalAIIndex = dynamic(() => import('@/components/intelligence/GlobalAIIndex'), { ssr: false });
 const ExecutiveBrief = dynamic(() => import('@/components/intelligence/ExecutiveBrief'), { ssr: false });
 const AIWarRoom = dynamic(() => import('@/components/intelligence/AIWarRoom'), { ssr: false });
 const MarketTalentTerminal = dynamic(() => import('@/components/intelligence/MarketTalentTerminal'), { ssr: false });

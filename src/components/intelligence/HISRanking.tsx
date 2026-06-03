@@ -136,6 +136,7 @@ export default function HISRanking() {
                 <AnimatePresence>
                    {showFormula === company.id && (
                      <motion.div 
+                       key="his-formula-details"
                        initial={{ height: 0, opacity: 0 }}
                        animate={{ height: 'auto', opacity: 1 }}
                        exit={{ height: 0, opacity: 0 }}
