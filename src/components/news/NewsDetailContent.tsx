@@ -12,6 +12,7 @@ import {
 } from 'lucide-react';
 import Link from 'next/link';
 import AdSpace from '@/components/AdSpace';
+import { useAlpha } from '@/context/AlphaContext';
 
 interface NewsDetailContentProps {
   newsId: string;
