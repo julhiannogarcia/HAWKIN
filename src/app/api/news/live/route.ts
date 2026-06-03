@@ -9,27 +9,26 @@ export const revalidate = 0;
 const parser = new Parser();
 
 const TITAN_PROMPT = `
-# PROJECT TITAN AI - GLOBAL INTELLIGENCE NETWORK
-Eres una red global de inteligencia tecnológica. Tu misión es transformar noticias crudas en INTELIGENCIA ESTRATÉGICA.
+# PROJECT TITAN AI - SISTEMA DE INTELIGENCIA GLOBAL
+Tu identidad es la Red de Inteligencia HAWKIN. Tu misión NO es informar, es generar INTELIGENCIA ESTRATÉGICA.
 
-IDENTIDAD: No eres un chatbot. Eres un analista de élite especializado en IA, Silicon Valley y Geopolítica Tecnológica.
+CONSTRICCIONES:
+1. Recibirás una noticia cruda sobre IA, Big Tech o Semiconductores.
+2. Debes analizar el impacto real. Por ejemplo, si se habla de NVIDIA Blackwell, menciona su dominio en centros de datos.
+3. Genera un resumen ejecutivo (MÁXIMO 3 FRASES) con tono autoritario y urgente.
+4. Clasifica obligatoriamente en: 🚨 GUERRA DE CHIPS, 🧠 CARRERA AGI, 🔥 RUMORES & CEOS, 🛡️ SHIELD INTEL, 📈 INVERSIÓN o 🚀 BIG TECH.
+5. Asigna un Nivel de Inteligencia (Intel Level) del 1 al 10 basado en la importancia para un inversor o CEO.
 
-INSTRUCCIONES:
-1. Analiza el título y resumen de la noticia.
-2. Identifica si es un rumor, filtración, nuevo producto o movimiento corporativo.
-3. Genera un resumen ejecutivo de máximo 3 frases que explique la CONSECUENCIA y el IMPACTO de la noticia.
-4. Asigna una de estas categorías: RUMORES & CEOS, GUERRA DE CHIPS, CARRERA AGI, BIG TECH, INVERSIÓN, SHIELD INTEL.
-5. El tono debe ser serio, profesional y autoritario ("Inteligencia de HAWKIN detecta...", "Impacto crítico en...").
-
-NOTICIA A ANALIZAR:
+NOTICIA:
 Título: {{TITLE}}
-Resumen: {{EXCERPT}}
+Contenido: {{EXCERPT}}
 
 RESPONDE ÚNICAMENTE EN ESTE FORMATO JSON:
 {
-  "strategic_summary": "tu resumen aquí",
+  "title": "Título estratégico corto e impactante",
+  "strategic_summary": "resumen de inteligencia aquí",
   "category": "CATEGORIA_ELEGIDA",
-  "intel_level": "Nivel de importancia 1-10"
+  "intel_level": "Nivel 1-10"
 }
 `;
 
@@ -45,107 +44,89 @@ function generateShortId(text: string) {
 
 export async function GET() {
   try {
-    // Inicialización segura de OpenAI (solo si existe la clave)
     let openai: any = null;
     if (process.env.OPENAI_API_KEY) {
       openai = new OpenAI({ apiKey: process.env.OPENAI_API_KEY });
     }
 
-    // 1. OBTENER NOTICIAS MANUALES DE LA BASE DE DATOS (Filtrando noticias personales)
+    // 1. FUENTES DE ALTA FIDELIDAD (Múltiples para evitar vacíos)
+    const FEEDS = [
+      'https://news.google.com/rss/search?q=NVIDIA+Blackwell+RTX+OpenAI+GPT-5+Sam+Altman+Anthropic+Claude+Silicon+Valley+latest+news&hl=es-419&gl=US&ceid=US:es-419',
+      'https://www.theverge.com/ai-artificial-intelligence/rss/index.xml',
+      'https://techcrunch.com/category/artificial-intelligence/feed/'
+    ];
 
-    const dbNews = await prisma.news.findMany({
-      where: { 
-        published: true,
-        NOT: { title: { contains: 'Julhianno', mode: 'insensitive' } }
-      },
-      orderBy: { createdAt: 'desc' },
-      take: 5
-    });
+    // Carga paralela de feeds
+    const feedResults = await Promise.all(FEEDS.map(url => parser.parseURL(url).catch(() => ({ items: [] }))));
+    const allRawItems = feedResults.flatMap(f => f.items).sort((a, b) => 
+      new Date(b.pubDate || 0).getTime() - new Date(a.pubDate || 0).getTime()
+    ).slice(0, 15);
 
-    // 2. RADAR GLOBAL RSS
-    const AI_MASTER_FEED = 'https://news.google.com/rss/search?q=OpenAI+GPT-5+Sam+Altman+rumor+Elon+Musk+xAI+Jensen+Huang+NVIDIA+Blackwell+DeepMind+Anthropic+Claude+scoop+breaking&hl=es-419&gl=US&ceid=US:es-419';
-    
-    const feed = await parser.parseURL(AI_MASTER_FEED);
-    const topItems = feed.items.slice(0, 10);
-
-    // 3. PROCESAMIENTO CON CHATGPT (TITAN AI ENGINE)
-    // Solo procesamos si hay API Key de OpenAI, si no, usamos fallback manual
-    const processedNews = await Promise.all(topItems.map(async (item) => {
+    // 2. PROCESAMIENTO TITAN AI (Limitado a los 8 más recientes para velocidad)
+    const processedNews = await Promise.all(allRawItems.slice(0, 8).map(async (item) => {
       const uniqueId = generateShortId(item.link || item.title || "");
-      let titanIntel = {
-        strategic_summary: item.contentSnippet || "Analizando impacto en el ecosistema global...",
-        category: "RUMORES & CEOS",
+      
+      let titanData = {
+        title: item.title?.split(' - ')[0] || "Señal de Inteligencia Detectada",
+        strategic_summary: item.contentSnippet?.substring(0, 160) + "..." || "Analizando flujo de datos...",
+        category: "INTEL",
         intel_level: "7"
       };
 
-      if (process.env.OPENAI_API_KEY) {
+      if (openai) {
         try {
           const completion = await openai.chat.completions.create({
-            model: "gpt-4o-mini", // Rápido y económico para noticias al segundo
+            model: "gpt-4o-mini",
             messages: [
-              { role: "system", content: "Eres el motor PROJECT TITAN AI de HAWKIN." },
+              { role: "system", content: "Eres PROJECT TITAN AI. Transforma datos en inteligencia." },
               { role: "user", content: TITAN_PROMPT.replace('{{TITLE}}', item.title || '').replace('{{EXCERPT}}', item.contentSnippet || '') }
             ],
             response_format: { type: "json_object" }
           });
           
-          const content = completion.choices[0].message.content;
-          if (content) {
-            const parsed = JSON.parse(content);
-            titanIntel = {
-              strategic_summary: parsed.strategic_summary,
-              category: parsed.category,
-              intel_level: parsed.intel_level
-            };
-          }
+          const content = JSON.parse(completion.choices[0].message.content || '{}');
+          titanData = {
+            title: content.title || titanData.title,
+            strategic_summary: content.strategic_summary || titanData.strategic_summary,
+            category: content.category || titanData.category,
+            intel_level: content.intel_level || titanData.intel_level
+          };
         } catch (e) {
-          console.error("OpenAI Titan Engine Error:", e);
+          console.error("Titan AI Processing Error:", e);
         }
       }
 
       const getRealImage = (title: string) => {
         const t = title.toLowerCase();
         const base = "https://images.unsplash.com/";
-        if (t.includes("musk") || t.includes("tesla") || t.includes("xai")) return `${base}photo-1541562232579-512a21360020?auto=format&fit=crop&q=80&w=1000&sig=${uniqueId}`;
-        if (t.includes("altman") || t.includes("openai") || t.includes("gpt")) return `${base}photo-1677442136019-21780ecad995?auto=format&fit=crop&q=80&w=1000&sig=${uniqueId}`;
-        if (t.includes("nvidia") || t.includes("chip") || t.includes("gpu")) return `${base}photo-1591405351990-4726e331f141?auto=format&fit=crop&q=80&w=1000&sig=${uniqueId}`;
+        if (t.includes("nvidia") || t.includes("blackwell") || t.includes("chip") || t.includes("gpu")) 
+          return `${base}photo-1591405351990-4726e331f141?auto=format&fit=crop&q=80&w=1000&sig=${uniqueId}`;
+        if (t.includes("openai") || t.includes("gpt") || t.includes("altman")) 
+          return `${base}photo-1677442136019-21780ecad995?auto=format&fit=crop&q=80&w=1000&sig=${uniqueId}`;
         return `${base}photo-1451187580459-43490279c0fa?auto=format&fit=crop&q=80&w=1000&sig=${uniqueId}`;
       };
 
       return {
         id: uniqueId,
-        title: item.title?.split(' - ')[0],
-        category: titanIntel.category,
-        excerpt: titanIntel.strategic_summary,
+        title: titanData.title,
+        category: titanData.category,
+        excerpt: titanData.strategic_summary,
         author: "HAWKIN Intelligence",
         date: "Sincronizado Hoy",
         timestamp: new Date(item.pubDate || Date.now()).getTime(),
         image: getRealImage(item.title || ""),
         url: item.link,
         source: item.source?.name || "Radar Global",
-        intelLevel: titanIntel.intel_level
+        intelLevel: titanData.intel_level
       };
     }));
 
-    const formattedDbNews = dbNews.map(n => ({
-      id: n.id,
-      title: n.title,
-      category: n.category,
-      excerpt: n.excerpt || n.content.substring(0, 250) + "...",
-      author: "HAWKIN Intelligence",
-      date: "Reporte Interno",
-      timestamp: new Date(n.createdAt).getTime(),
-      image: n.image,
-      url: n.url,
-      source: "HAWKIN Elite"
-    }));
-
     return NextResponse.json({
-      news: [...formattedDbNews, ...processedNews],
-      status: "Titan Engine Active"
+      news: processedNews,
+      status: "Titan Engine Live"
     });
   } catch (error) {
-    console.error("Radar Motor Error:", error);
-    return new NextResponse("Error en el Motor TITAN AI", { status: 500 });
+    console.error("Titan Engine Critical Failure:", error);
+    return new NextResponse("Error en el Motor de Inteligencia", { status: 500 });
   }
 }
