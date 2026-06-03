@@ -16,6 +16,9 @@ const LiveFeed = dynamic(() => import('@/components/LiveFeed'), { ssr: false });
 const VisionSection = dynamic(() => import('@/components/VisionSection'), { ssr: false });
 const AdSpace = dynamic(() => import('@/components/AdSpace'), { ssr: false });
 const GlobalAIIndex = dynamic(() => import('@/components/intelligence/GlobalAIIndex'), { ssr: false });
+const ExecutiveBrief = dynamic(() => import('@/components/intelligence/ExecutiveBrief'), { ssr: false });
+const AIWarRoom = dynamic(() => import('@/components/intelligence/AIWarRoom'), { ssr: false });
+const MarketTalentTerminal = dynamic(() => import('@/components/intelligence/MarketTalentTerminal'), { ssr: false });
 
 export default function Home() {
   const [isMounted, setIsMounted] = useState(false);
@@ -39,17 +42,23 @@ export default function Home() {
       <div className="flex flex-col">
         <Intro />
         
-        {/* Espacio Publicitario Premium - FORMATO GIGANTE */}
+        {/* Espacio Publicitario Premium */}
         <div className="w-full">
           <AdSpace isPremium={false} type="banner" />
         </div>
 
         <Hero />
 
-        {/* --- GLOBAL AI INDEX DASHBOARD (V4 NUCLEUS) --- */}
+        {/* --- NÚCLEO DE INTELIGENCIA HAWKIN V5 --- */}
+        <ExecutiveBrief />
+        
         <GlobalAIIndex />
 
-        {/* Feed de Noticias / Live Engine - MOVIDO HACIA ARRIBA PARA ENFOQUE TOTAL EN NOTICIAS */}
+        <AIWarRoom />
+
+        <MarketTalentTerminal />
+
+        {/* Feed de Noticias (EVIDENCIA SECUNDARIA) */}
         <section id="news" className="max-w-6xl mx-auto px-4 py-20 w-full">
           <div className="flex flex-col md:flex-row justify-between items-end mb-16 gap-4 border-l-4 border-cyan-500 pl-8">
             <div>

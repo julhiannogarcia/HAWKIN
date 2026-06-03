@@ -171,12 +171,16 @@ export default function GlobalAIIndex() {
                             </div>
                             <div>
                                <h3 className="text-3xl font-black uppercase italic tracking-tighter text-white">{company.name}</h3>
-                               <div className="flex items-center gap-4 mt-2">
-                                  <div className="flex items-center gap-1 text-[9px] font-black text-cyan-500 bg-cyan-500/10 px-2 py-0.5 rounded">
+                               <div className="flex flex-wrap items-center gap-4 mt-2">
+                                  <div className="flex items-center gap-1 text-[9px] font-black text-cyan-500 bg-cyan-500/10 px-2 py-0.5 rounded border border-cyan-500/20">
                                      <Gauge size={10} />
                                      POWER: {company.score}
                                   </div>
-                                  <div className="flex items-center gap-1 text-[9px] font-black text-green-500 bg-green-500/10 px-2 py-0.5 rounded">
+                                  <div className="flex items-center gap-1 text-[9px] font-black text-purple-400 bg-purple-500/10 px-2 py-0.5 rounded border border-purple-500/20">
+                                     <Zap size={10} />
+                                     FUTURE: {(company.score * 0.95).toFixed(1)}
+                                  </div>
+                                  <div className="flex items-center gap-1 text-[9px] font-black text-green-500 bg-green-500/10 px-2 py-0.5 rounded border border-green-500/20">
                                      <Shield size={10} />
                                      CONFIDENCE: {company.confidence}%
                                   </div>
