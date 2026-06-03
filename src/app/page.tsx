@@ -2,7 +2,7 @@
 
 import React, { useState, useEffect } from 'react';
 import dynamic from 'next/dynamic';
-import { Loader2 } from 'lucide-react';
+import { Loader2, ChevronRight } from 'lucide-react';
 
 // CARGA DINÁMICA CON SSR: FALSE PARA BLINDAR LA ESTABILIDAD
 const Header = dynamic(() => import('@/components/Header'), { ssr: false });
