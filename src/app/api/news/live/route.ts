@@ -11,22 +11,43 @@ const parser = new Parser();
 // FULL PROJECT TITAN AI PROMPT
 const TITAN_SYSTEM_PROMPT = `
 # PROJECT TITAN AI - GLOBAL AI INTELLIGENCE NETWORK
-TU IDENTIDAD: No eres un chatbot. Eres una red global de inteligencia tecnológica. Tu misión es generar INTELIGENCIA ESTRATÉGICA, no solo informar.
+TU IDENTIDAD: Eres un Analista de Inteligencia Tecnológica Global de élite. Tu misión es generar INTELIGENCIA ESTRATÉGICA de alto nivel.
 
-MISIÓN:
-- Detectar patrones ocultos, consecuencias y riesgos.
-- Identificar rumores creíbles y filtraciones de Silicon Valley.
-- Analizar la "War Room": OpenAI vs Google, NVIDIA vs AMD, EEUU vs China.
+REGLAS DE OPERACIÓN:
+1. No inventar datos.
+2. No presentar rumores como hechos.
+3. Si la información es insuficiente, indícalo claramente.
+4. Priorizar IA, OpenAI, Anthropic, Gemini, NVIDIA, xAI, Meta, Microsoft, Google DeepMind, Apple, Amazon, Tesla, robótica, AGI, chips, agentes IA, startups e inversiones.
+5. Escribir como una firma profesional de inteligencia tecnológica.
 
-FORMATO DE SALIDA (JSON):
-Debes analizar la noticia y responder con este esquema:
+OBJETIVO:
+Para cada noticia debes identificar:
+- Qué ocurrió.
+- Por qué es importante.
+- Quién gana.
+- Quién pierde.
+- Qué empresas están involucradas.
+- Qué CEOs/Personas están involucradas.
+- Qué consecuencias podría tener.
+- Qué oportunidades genera.
+- Qué riesgos genera.
+- Qué podría pasar en los próximos 30 días.
+
+FORMATO DE SALIDA OBLIGATORIO (JSON):
 {
-  "title": "Título corto y autoritario",
-  "strategic_summary": "Resumen ejecutivo de 3 frases: Impacto, Consecuencia y Oportunidad.",
-  "category": "🚨 GUERRA DE CHIPS | 🧠 CARRERA AGI | 🔥 RUMORES & CEOS | 🛡️ SHIELD INTEL | 📈 INVERSIÓN | 🚀 BIG TECH",
-  "intel_level": "Nivel de importancia 1-10",
-  "prediction_30d": "Qué pasará en los próximos 30 días",
-  "risk_factor": "Bajo/Medio/Alto/Crítico"
+  "title": "Título estratégico, corto y autoritario",
+  "executive_summary": "Resumen ejecutivo de máximo 3 frases",
+  "what_happened": "Descripción objetiva de los hechos",
+  "why_it_matters": "Análisis de impacto e importancia",
+  "companies": ["Empresa 1"],
+  "people": ["Persona 1"],
+  "winners": ["Ganador 1"],
+  "losers": ["Perdedor 1"],
+  "innovation_score": 8.5,
+  "importance_score": 9.0,
+  "risk_factor": "Bajo/Medio/Alto/Crítico",
+  "prediction_30d": "Proyección a 30 días",
+  "market_impact": "Impacto en el mercado"
 }
 `;
 
@@ -49,10 +70,23 @@ export async function GET() {
 
     // FUENTES PRIORITARIAS MUNDIALES
     const FEEDS = [
-      'https://news.google.com/rss/search?q=NVIDIA+Blackwell+RTX+5090+OpenAI+GPT-5+Sora+Apple+Intelligence+Sam+Altman+latest&hl=es-419&gl=US&ceid=US:es-419',
-      'https://www.theverge.com/ai-artificial-intelligence/rss/index.xml',
+      // Oficiales
+      'https://openai.com/news/rss.xml',
+      'https://nvidianews.nvidia.com/releases.xml',
+      'https://deepmind.google/blog/rss.xml',
+
+      // IA y Big Tech
       'https://techcrunch.com/category/artificial-intelligence/feed/',
-      'https://www.wired.com/feed/category/ai/latest/rss'
+      'https://www.theverge.com/ai-artificial-intelligence/rss/index.xml',
+      'https://www.wired.com/feed/category/ai/latest/rss',
+      'https://venturebeat.com/category/ai/feed/',
+
+      // Investigación
+      'http://export.arxiv.org/rss/cs.AI',
+      'https://www.sciencedaily.com/rss/computers_math/artificial_intelligence.xml',
+
+      // Mercados y tecnología
+      'https://www.reutersagency.com/feed/?best-topics=technology&post_type=best'
     ];
 
     const feedResults = await Promise.all(FEEDS.map(url => parser.parseURL(url).catch(() => ({ items: [] }))));
@@ -67,9 +101,10 @@ export async function GET() {
         title: item.title?.split(' - ')[0] || "Señal de Inteligencia Detectada",
         strategic_summary: item.contentSnippet?.substring(0, 160) + "..." || "Analizando flujo de datos...",
         category: "🚀 BIG TECH",
-        intel_level: "7",
+        intel_level: "7.0",
         prediction_30d: "Monitoreo en curso.",
-        risk_factor: "Medio"
+        risk_factor: "Medio",
+        content: ""
       };
 
       if (openai) {
@@ -84,7 +119,28 @@ export async function GET() {
           });
           
           const content = JSON.parse(completion.choices[0].message.content || '{}');
-          titanData = { ...titanData, ...content };
+          
+          // Mapeo seguro del nuevo JSON avanzado al modelo de la UI
+          const richContent = [
+            content.what_happened ? `QUÉ OCURRIÓ: ${content.what_happened}` : '',
+            content.why_it_matters ? `POR QUÉ ES IMPORTANTE: ${content.why_it_matters}` : '',
+            content.market_impact ? `IMPACTO DE MERCADO: ${content.market_impact}` : '',
+            content.winners?.length ? `GANADORES: ${content.winners.join(', ')}` : '',
+            content.losers?.length ? `PERDEDORES: ${content.losers.join(', ')}` : '',
+            content.companies?.length ? `EMPRESAS INVOLUCRADAS: ${content.companies.join(', ')}` : '',
+            content.people?.length ? `FIGURAS CLAVE: ${content.people.join(', ')}` : '',
+            content.prediction_30d ? `PROYECCIÓN A 30 DÍAS: ${content.prediction_30d}` : ''
+          ].filter(Boolean).join('\\n\\n');
+
+          titanData = {
+            title: content.title || titanData.title,
+            strategic_summary: content.executive_summary || titanData.strategic_summary,
+            category: content.companies?.length ? content.companies[0].toUpperCase() : "INTEL HUB",
+            intel_level: content.importance_score ? String(content.importance_score) : titanData.intel_level,
+            prediction_30d: content.prediction_30d || titanData.prediction_30d,
+            risk_factor: content.risk_factor || titanData.risk_factor,
+            content: richContent
+          };
         } catch (e) {
           console.error("Titan AI Processing Error:", e);
         }
