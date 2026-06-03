@@ -228,6 +228,22 @@ export default function B2BPage() {
                </div>
 
                <div className="lg:col-span-8 space-y-8">
+                  {/* SOPORTE B2B DIRECTO */}
+                  <div className="p-8 bg-blue-600/5 border border-blue-600/20 rounded-[40px] flex flex-col md:flex-row items-center justify-between gap-8 mb-4">
+                     <div className="flex items-center gap-6">
+                        <div className="w-12 h-12 rounded-full bg-blue-600/10 flex items-center justify-center text-blue-500">
+                           <Mail size={24} />
+                        </div>
+                        <div>
+                           <p className="text-[10px] font-black uppercase tracking-widest text-blue-500">Soporte Comercial Directo</p>
+                           <p className="text-xs text-gray-500 font-bold uppercase mt-1">¿Problemas al ingresar o dudas técnicas?</p>
+                        </div>
+                     </div>
+                     <a href="mailto:julhiannogarcia@gmail.com" className="px-8 py-3 bg-white/5 hover:bg-white/10 border border-white/10 rounded-full text-[10px] font-black uppercase tracking-widest transition-all">
+                        julhiannogarcia@gmail.com
+                     </a>
+                  </div>
+
                   <div className="glass-card p-12 space-y-12 border-white/5 shadow-2xl">
                      <h3 className="text-xl font-black uppercase italic tracking-tighter flex items-center gap-3 border-b border-white/5 pb-6"><Radio className="text-cyan-400" size={20} /> 2. Detalles</h3>
                      <div className="grid grid-cols-1 md:grid-cols-2 gap-10">

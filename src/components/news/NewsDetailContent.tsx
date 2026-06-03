@@ -24,6 +24,7 @@ export default function NewsDetailContent({ newsId }: NewsDetailContentProps) {
   const [dislikes, setDislikes] = useState(0);
   const [hasLiked, setHasLiked] = useState(false);
   const [hasDisliked, setHasDisliked] = useState(false);
+  const [userNick, setUserNick] = useState('');
 
   useEffect(() => {
     const fetchNewsDetail = async () => {
@@ -163,21 +164,69 @@ export default function NewsDetailContent({ newsId }: NewsDetailContentProps) {
                </div>
             </div>
 
-            {/* SECCIÓN DE COMENTARIOS (SIMULADA) */}
+            {/* SECCIÓN DE COMENTARIOS (SISTEMA CON NICK) */}
             <div className="pt-20 border-t border-white/5 space-y-12">
                <h3 className="text-2xl font-black uppercase italic tracking-tighter flex items-center gap-4">
                   <MessageSquare className="text-cyan-500" /> Transmisiones del Gremio
                </h3>
-               <div className="bg-white/[0.02] border border-white/5 rounded-[30px] p-8">
-                  <div className="flex gap-6 items-start">
-                     <div className="w-12 h-12 rounded-full bg-gradient-to-br from-cyan-500 to-purple-600 flex-shrink-0" />
-                     <div className="flex-1 space-y-4">
-                        <div className="w-full bg-black border border-white/10 rounded-2xl p-4 text-sm text-gray-500 italic">
-                           "Iniciando sesión para comentar..."
+               
+               <div className="bg-white/[0.02] border border-white/5 rounded-[30px] p-10 space-y-8">
+                  {!userNick ? (
+                    <div className="space-y-6 text-center py-4">
+                       <p className="text-[10px] font-black uppercase tracking-[0.4em] text-gray-500">Ingresa tu Nick para Transmitir</p>
+                       <div className="flex max-w-sm mx-auto bg-black border border-white/10 rounded-full p-2">
+                          <input 
+                            type="text" 
+                            placeholder="TU_NICK_ALPHA" 
+                            className="flex-1 bg-transparent px-6 py-2 text-xs font-black uppercase outline-none text-cyan-400"
+                            onKeyDown={(e) => { if(e.key === 'Enter') setUserNick((e.target as HTMLInputElement).value.toUpperCase()); }}
+                          />
+                          <button 
+                            onClick={(e) => { 
+                              const input = (e.currentTarget.previousSibling as HTMLInputElement);
+                              if(input.value) setUserNick(input.value.toUpperCase()); 
+                            }}
+                            className="bg-cyan-600 text-black px-6 py-2 rounded-full text-[9px] font-black uppercase"
+                          >
+                            Entrar
+                          </button>
+                       </div>
+                    </div>
+                  ) : (
+                    <div className="space-y-8">
+                       <div className="flex justify-between items-center">
+                          <div className="flex items-center gap-3">
+                             <div className="w-2 h-2 bg-green-500 rounded-full animate-pulse" />
+                             <span className="text-[9px] font-black uppercase tracking-widest text-green-500">Conectado como {userNick}</span>
+                          </div>
+                          <button onClick={() => setUserNick('')} className="text-[8px] font-bold text-gray-600 uppercase hover:text-white transition-colors underline">Cambiar Nick</button>
+                       </div>
+                       
+                       <div className="flex gap-6 items-start">
+                          <div className="w-12 h-12 rounded-full bg-gradient-to-br from-cyan-500 to-purple-600 flex-shrink-0 flex items-center justify-center text-black font-black text-xl italic">
+                             {userNick[0]}
+                          </div>
+                          <div className="flex-1 space-y-4">
+                             <textarea 
+                               placeholder="Escribe tu análisis estratégico..." 
+                               className="w-full bg-black border border-white/10 rounded-3xl p-6 text-sm text-gray-300 outline-none focus:border-cyan-500/50 transition-all min-h-[120px] resize-none"
+                             />
+                             <button className="px-8 py-3 bg-cyan-600 text-black text-[10px] font-black uppercase tracking-widest rounded-full hover:bg-white transition-all shadow-xl">
+                                Enviar Reporte
+                             </button>
+                          </div>
+                       </div>
+                    </div>
+                  )}
+
+                  {/* COMENTARIOS DE MUESTRA PARA DAR VIDA */}
+                  <div className="space-y-8 pt-8">
+                     <div className="flex gap-6 opacity-40">
+                        <div className="w-10 h-10 rounded-full bg-white/5 flex items-center justify-center text-[10px] font-black">V</div>
+                        <div className="space-y-2">
+                           <p className="text-[9px] font-black uppercase text-cyan-500">Visionary_88 <span className="text-gray-700 ml-2">• HACE 1H</span></p>
+                           <p className="text-xs text-gray-400 font-light">Este movimiento de NVIDIA cambiará las reglas del juego en Q3.</p>
                         </div>
-                        <button className="px-6 py-3 bg-cyan-600 text-white text-[9px] font-black uppercase tracking-widest rounded-full opacity-50 cursor-not-allowed">
-                           Enviar Reporte
-                        </button>
                      </div>
                   </div>
                </div>
@@ -227,7 +276,17 @@ export default function NewsDetailContent({ newsId }: NewsDetailContentProps) {
                    </button>
                 </div>
 
-                <button className="w-full flex items-center justify-center gap-4 py-5 rounded-3xl bg-white/5 border border-white/5 text-gray-400 hover:bg-white/10 hover:text-white transition-all text-[10px] font-black uppercase tracking-widest">
+                <button 
+                  onClick={() => {
+                    if (navigator.share) {
+                      navigator.share({ title: news.title, url: window.location.href });
+                    } else {
+                      navigator.clipboard.writeText(window.location.href);
+                      alert("Link copiado al portapapeles del imperio.");
+                    }
+                  }}
+                  className="w-full flex items-center justify-center gap-4 py-5 rounded-3xl bg-white/5 border border-white/5 text-gray-400 hover:bg-white/10 hover:text-white transition-all text-[10px] font-black uppercase tracking-widest"
+                >
                    <Share2 size={16} /> Compartir Inteligencia
                 </button>
               </div>
