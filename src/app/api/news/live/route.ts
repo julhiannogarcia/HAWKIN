@@ -1,11 +1,42 @@
 import { NextResponse } from "next/server";
 import Parser from 'rss-parser';
 import { prisma } from "@/lib/prisma";
+import OpenAI from "openai";
 
-export const dynamic = 'force-dynamic'; // FORZAR DATOS EN VIVO AL SEGUNDO
+export const dynamic = 'force-dynamic';
 export const revalidate = 0;
 
 const parser = new Parser();
+
+// Configuración de OpenAI
+const openai = new OpenAI({
+  apiKey: process.env.OPENAI_API_KEY,
+});
+
+const TITAN_PROMPT = `
+# PROJECT TITAN AI - GLOBAL INTELLIGENCE NETWORK
+Eres una red global de inteligencia tecnológica. Tu misión es transformar noticias crudas en INTELIGENCIA ESTRATÉGICA.
+
+IDENTIDAD: No eres un chatbot. Eres un analista de élite especializado en IA, Silicon Valley y Geopolítica Tecnológica.
+
+INSTRUCCIONES:
+1. Analiza el título y resumen de la noticia.
+2. Identifica si es un rumor, filtración, nuevo producto o movimiento corporativo.
+3. Genera un resumen ejecutivo de máximo 3 frases que explique la CONSECUENCIA y el IMPACTO de la noticia.
+4. Asigna una de estas categorías: RUMORES & CEOS, GUERRA DE CHIPS, CARRERA AGI, BIG TECH, INVERSIÓN, SHIELD INTEL.
+5. El tono debe ser serio, profesional y autoritario ("Inteligencia de HAWKIN detecta...", "Impacto crítico en...").
+
+NOTICIA A ANALIZAR:
+Título: {{TITLE}}
+Resumen: {{EXCERPT}}
+
+RESPONDE ÚNICAMENTE EN ESTE FORMATO JSON:
+{
+  "strategic_summary": "tu resumen aquí",
+  "category": "CATEGORIA_ELEGIDA",
+  "intel_level": "Nivel de importancia 1-10"
+}
+`;
 
 function generateShortId(text: string) {
   let hash = 0;
@@ -19,17 +50,80 @@ function generateShortId(text: string) {
 
 export async function GET() {
   try {
-    // 1. OBTENER NOTICIAS MANUALES DE LA BASE DE DATOS (Filtrando noticias personales)
+    // 1. OBTENER NOTICIAS MANUALES DE LA BASE DE DATOS
     const dbNews = await prisma.news.findMany({
       where: { 
         published: true,
-        NOT: {
-          title: { contains: 'Julhianno', mode: 'insensitive' }
-        }
+        NOT: { title: { contains: 'Julhianno', mode: 'insensitive' } }
       },
       orderBy: { createdAt: 'desc' },
-      take: 10
+      take: 5
     });
+
+    // 2. RADAR GLOBAL RSS
+    const AI_MASTER_FEED = 'https://news.google.com/rss/search?q=OpenAI+GPT-5+Sam+Altman+rumor+Elon+Musk+xAI+Jensen+Huang+NVIDIA+Blackwell+DeepMind+Anthropic+Claude+scoop+breaking&hl=es-419&gl=US&ceid=US:es-419';
+    
+    const feed = await parser.parseURL(AI_MASTER_FEED);
+    const topItems = feed.items.slice(0, 10);
+
+    // 3. PROCESAMIENTO CON CHATGPT (TITAN AI ENGINE)
+    // Solo procesamos si hay API Key de OpenAI, si no, usamos fallback manual
+    const processedNews = await Promise.all(topItems.map(async (item) => {
+      const uniqueId = generateShortId(item.link || item.title || "");
+      let titanIntel = {
+        strategic_summary: item.contentSnippet || "Analizando impacto en el ecosistema global...",
+        category: "RUMORES & CEOS",
+        intel_level: "7"
+      };
+
+      if (process.env.OPENAI_API_KEY) {
+        try {
+          const completion = await openai.chat.completions.create({
+            model: "gpt-4o-mini", // Rápido y económico para noticias al segundo
+            messages: [
+              { role: "system", content: "Eres el motor PROJECT TITAN AI de HAWKIN." },
+              { role: "user", content: TITAN_PROMPT.replace('{{TITLE}}', item.title || '').replace('{{EXCERPT}}', item.contentSnippet || '') }
+            ],
+            response_format: { type: "json_object" }
+          });
+          
+          const content = completion.choices[0].message.content;
+          if (content) {
+            const parsed = JSON.parse(content);
+            titanIntel = {
+              strategic_summary: parsed.strategic_summary,
+              category: parsed.category,
+              intel_level: parsed.intel_level
+            };
+          }
+        } catch (e) {
+          console.error("OpenAI Titan Engine Error:", e);
+        }
+      }
+
+      const getRealImage = (title: string) => {
+        const t = title.toLowerCase();
+        const base = "https://images.unsplash.com/";
+        if (t.includes("musk") || t.includes("tesla") || t.includes("xai")) return `${base}photo-1541562232579-512a21360020?auto=format&fit=crop&q=80&w=1000&sig=${uniqueId}`;
+        if (t.includes("altman") || t.includes("openai") || t.includes("gpt")) return `${base}photo-1677442136019-21780ecad995?auto=format&fit=crop&q=80&w=1000&sig=${uniqueId}`;
+        if (t.includes("nvidia") || t.includes("chip") || t.includes("gpu")) return `${base}photo-1591405351990-4726e331f141?auto=format&fit=crop&q=80&w=1000&sig=${uniqueId}`;
+        return `${base}photo-1451187580459-43490279c0fa?auto=format&fit=crop&q=80&w=1000&sig=${uniqueId}`;
+      };
+
+      return {
+        id: uniqueId,
+        title: item.title?.split(' - ')[0],
+        category: titanIntel.category,
+        excerpt: titanIntel.strategic_summary,
+        author: "HAWKIN Intelligence",
+        date: "Sincronizado Hoy",
+        timestamp: new Date(item.pubDate || Date.now()).getTime(),
+        image: getRealImage(item.title || ""),
+        url: item.link,
+        source: item.source?.name || "Radar Global",
+        intelLevel: titanIntel.intel_level
+      };
+    }));
 
     const formattedDbNews = dbNews.map(n => ({
       id: n.id,
@@ -37,73 +131,19 @@ export async function GET() {
       category: n.category,
       excerpt: n.excerpt || n.content.substring(0, 250) + "...",
       author: "HAWKIN Intelligence",
-      date: `Hace un momento (${new Date(n.createdAt).toLocaleTimeString('es-PE', { hour: '2-digit', minute: '2-digit' })})`,
+      date: "Reporte Interno",
       timestamp: new Date(n.createdAt).getTime(),
       image: n.image,
       url: n.url,
       source: "HAWKIN Elite"
     }));
 
-    // 2. RADAR GLOBAL RSS
-    const AI_MASTER_FEED = 'https://news.google.com/rss/search?q=OpenAI+GPT-5+Sam+Altman+rumor+Elon+Musk+xAI+Jensen+Huang+NVIDIA+Blackwell+DeepMind+Anthropic+Claude+scoop+breaking&hl=es-419&gl=US&ceid=US:es-419';
-    const SHIELD_INTEL_FEED = 'https://news.google.com/rss/search?q=cybersecurity+zero-day+exploit+AI+vulnerability+threat+intelligence+breaking&hl=es-419&gl=US&ceid=US:es-419';
-    const CREATIONS_FEED = 'https://news.google.com/rss/search?q=new+AI+startup+founder+exit+investment+funding+round+Silicon+Valley+latest&hl=es-419&gl=US&ceid=US:es-419';
-
-    const [aiFeed, shieldFeed, creationsFeed] = await Promise.all([
-      parser.parseURL(AI_MASTER_FEED),
-      parser.parseURL(SHIELD_INTEL_FEED),
-      parser.parseURL(CREATIONS_FEED)
-    ]);
-
-    const getTimeAgo = (dateStr: string) => {
-      const seconds = Math.floor((new Date().getTime() - new Date(dateStr).getTime()) / 1000);
-      if (seconds < 60) return "¡RECIÉN LANZADO!";
-      const minutes = Math.floor(seconds / 60);
-      if (minutes < 60) return `Hace ${minutes} min`;
-      if (minutes < 1440) return `Hace ${Math.floor(minutes / 60)} h`;
-      return "Dato Reciente";
-    };
-
-    const formatItems = (items: any[], category: string) => items.slice(0, 12).map((item) => {
-      const uniqueId = generateShortId(item.link);
-      const pubDate = new Date(item.pubDate);
-      const specificTime = pubDate.toLocaleTimeString('es-PE', { hour: '2-digit', minute: '2-digit' });
-      
-      const getRealImage = (title: string, cat: string) => {
-        const t = title.toLowerCase();
-        const base = "https://images.unsplash.com/";
-        if (cat === "SHIELD") return `${base}photo-1633265486232-442b85c74e5f?auto=format&fit=crop&q=80&w=1000&sig=${uniqueId}`;
-        if (t.includes("musk") || t.includes("tesla") || t.includes("xai")) return `${base}photo-1541562232579-512a21360020?auto=format&fit=crop&q=80&w=1000&sig=${uniqueId}`;
-        if (t.includes("altman") || t.includes("openai") || t.includes("gpt")) return `${base}photo-1677442136019-21780ecad995?auto=format&fit=crop&q=80&w=1000&sig=${uniqueId}`;
-        if (t.includes("nvidia") || t.includes("chip") || t.includes("gpu")) return `${base}photo-1591405351990-4726e331f141?auto=format&fit=crop&q=80&w=1000&sig=${uniqueId}`;
-        if (t.includes("google") || t.includes("deepmind")) return `${base}photo-1573804633927-bfcbcd909acd?auto=format&fit=crop&q=80&w=1000&sig=${uniqueId}`;
-        return `${base}photo-1451187580459-43490279c0fa?auto=format&fit=crop&q=80&w=1000&sig=${uniqueId}`;
-      };
-
-      return {
-        id: uniqueId,
-        title: item.title.split(' - ')[0],
-        category: category,
-        excerpt: (item.contentSnippet || "Analizando el impacto de esta creación en el ecosistema global...").substring(0, 250) + "...",
-        author: item.source?.name || "HAWKIN Intelligence",
-        date: item.pubDate ? `${getTimeAgo(item.pubDate)} (${specificTime})` : "En Vivo",
-        timestamp: item.pubDate ? pubDate.getTime() : Date.now(),
-        image: getRealImage(item.title, category),
-        url: item.link,
-        source: item.source?.name || "Fuente Global"
-      };
-    });
-
-    // Combinar noticias de DB con las de RSS en la categoría principal
-    const allNews = [...formattedDbNews, ...formatItems(aiFeed.items, "RUMORES & CEOS")];
-
     return NextResponse.json({
-      news: allNews,
-      shield: formatItems(shieldFeed.items, "SHIELD INTEL"),
-      hardware: formatItems(creationsFeed.items, "CREACIONES IA")
+      news: [...formattedDbNews, ...processedNews],
+      status: "Titan Engine Active"
     });
   } catch (error) {
     console.error("Radar Motor Error:", error);
-    return new NextResponse("Error en el Motor HAWKIN", { status: 500 });
+    return new NextResponse("Error en el Motor TITAN AI", { status: 500 });
   }
 }
