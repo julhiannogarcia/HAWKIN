@@ -76,14 +76,21 @@ export default function ShieldPage() {
                     className="p-10 bg-gradient-to-br from-white/[0.02] to-transparent border border-white/5 rounded-[50px] space-y-8 relative overflow-hidden group hover:border-red-600/30 transition-all"
                   >
                     <div className="flex justify-between items-start">
-                       <span className={`text-[8px] font-black px-4 py-1.5 rounded-full border ${threat.level === 'ALTO' ? 'bg-red-600/10 text-red-500 border-red-600/20' : 'bg-yellow-600/10 text-yellow-500 border-yellow-600/20'} uppercase tracking-widest`}>Riesgo {threat.level}</span>
+                       <span className={`text-[8px] font-black px-4 py-1.5 rounded-full border ${threat.severity === 'CRÍTICA' || threat.severity === 'ALTO' ? 'bg-red-600/10 text-red-500 border-red-600/20' : 'bg-yellow-600/10 text-yellow-500 border-yellow-600/20'} uppercase tracking-widest`}>Riesgo {threat.severity}</span>
                        <div className="w-8 h-8 rounded-full bg-white/5 flex items-center justify-center text-gray-600 group-hover:text-red-500 transition-colors"><Zap size={14} /></div>
                     </div>
                     <h3 className="text-2xl font-black uppercase italic leading-none">{threat.title}</h3>
-                    <p className="text-gray-500 text-sm font-light leading-relaxed">{threat.description}</p>
+                    <p className="text-gray-500 text-sm font-light leading-relaxed">{threat.content}</p>
                     <div className="pt-6 border-t border-white/5 flex items-center justify-between">
                        <span className="text-[9px] font-bold text-gray-700 uppercase tracking-widest">{threat.source}</span>
-                       <button className="text-[9px] font-black text-red-500 uppercase flex items-center gap-2 hover:text-white transition-colors">Ver Detalles <ExternalLink size={10} /></button>
+                       <a 
+                         href={threat.link} 
+                         target="_blank" 
+                         rel="noopener noreferrer"
+                         className="text-[9px] font-black text-red-500 uppercase flex items-center gap-2 hover:text-white transition-colors"
+                       >
+                         Ver Detalles <ExternalLink size={10} />
+                       </a>
                     </div>
                   </motion.div>
                 ))}

@@ -19,9 +19,14 @@ function generateShortId(text: string) {
 
 export async function GET() {
   try {
-    // 1. OBTENER NOTICIAS MANUALES DE LA BASE DE DATOS
+    // 1. OBTENER NOTICIAS MANUALES DE LA BASE DE DATOS (Filtrando noticias personales)
     const dbNews = await prisma.news.findMany({
-      where: { published: true },
+      where: { 
+        published: true,
+        NOT: {
+          title: { contains: 'Julhianno', mode: 'insensitive' }
+        }
+      },
       orderBy: { createdAt: 'desc' },
       take: 10
     });
@@ -31,7 +36,7 @@ export async function GET() {
       title: n.title,
       category: n.category,
       excerpt: n.excerpt || n.content.substring(0, 250) + "...",
-      author: "Julhianno Garcia",
+      author: "HAWKIN Intelligence",
       date: `Hace un momento (${new Date(n.createdAt).toLocaleTimeString('es-PE', { hour: '2-digit', minute: '2-digit' })})`,
       timestamp: new Date(n.createdAt).getTime(),
       image: n.image,

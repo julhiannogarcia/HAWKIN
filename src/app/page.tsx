@@ -33,10 +33,6 @@ export default function Home() {
 
   return (
     <main className="relative min-h-screen">
-      {/* DEBUG BANNER - ELIMINAR DESPUÉS DE VERIFICAR DESPLIEGUE */}
-      <div className="bg-red-600 text-white text-[10px] font-black uppercase tracking-widest text-center py-2 z-[9999] relative">
-        Sincronización Radar Alpha Activa v2.0
-      </div>
       <Header />
 
       <div className="flex flex-col">
@@ -59,6 +55,16 @@ export default function Home() {
               </div>
               <h2 className="text-4xl md:text-7xl font-black tracking-tighter uppercase italic">Radar <span className="text-cyan-400">Global.</span></h2>
               <p className="text-gray-500 mt-4 text-xs font-black uppercase tracking-[0.4em]">Últimas filtraciones y noticias de IA a nivel mundial</p>
+            </div>
+            
+            {/* BOTÓN DE ACCESO AL TOP 10 / ARCHIVO */}
+            <div className="pb-2">
+              <a href="/news" className="group flex items-center gap-3 bg-white/5 hover:bg-cyan-500/10 border border-white/10 hover:border-cyan-500/30 px-6 py-3 rounded-full transition-all duration-500">
+                <span className="text-[10px] font-black tracking-widest text-gray-400 group-hover:text-cyan-400 uppercase">Ver Top 10 e Histórico</span>
+                <div className="w-6 h-6 rounded-full bg-cyan-500/20 flex items-center justify-center group-hover:bg-cyan-500 transition-colors">
+                  <ChevronRight size={14} className="text-cyan-400 group-hover:text-black" />
+                </div>
+              </a>
             </div>
           </div>
 
