@@ -33,6 +33,10 @@ export default function Home() {
 
   return (
     <main className="relative min-h-screen">
+      {/* DEBUG BANNER - ELIMINAR DESPUÉS DE VERIFICAR DESPLIEGUE */}
+      <div className="bg-red-600 text-white text-[10px] font-black uppercase tracking-widest text-center py-2 z-[9999] relative">
+        Sincronización Radar Alpha Activa v2.0
+      </div>
       <Header />
 
       <div className="flex flex-col">
