@@ -45,31 +45,32 @@ export default function Home() {
 
         <Hero />
 
-        {/* Feed de Noticias / Live Engine */}
-        <section id="news" className="max-w-6xl mx-auto px-4 py-32 w-full">
-          <div className="flex flex-col md:flex-row justify-between items-end mb-16 gap-4">
+        {/* Feed de Noticias / Live Engine - MOVIDO HACIA ARRIBA PARA ENFOQUE TOTAL EN NOTICIAS */}
+        <section id="news" className="max-w-6xl mx-auto px-4 py-20 w-full">
+          <div className="flex flex-col md:flex-row justify-between items-end mb-16 gap-4 border-l-4 border-cyan-500 pl-8">
             <div>
               <div className="flex items-center gap-3 mb-2">
                 <div className="w-2 h-2 bg-red-500 rounded-full animate-pulse shadow-[0_0_10px_rgba(239,68,68,1)]" />
-                <span className="text-[10px] font-black text-red-500 uppercase tracking-widest">Live Intelligence</span>
+                <span className="text-[10px] font-black text-red-500 uppercase tracking-widest">Radar en Vivo</span>
               </div>
-              <h2 className="text-4xl md:text-6xl font-black tracking-tighter">Radar Global.</h2>
-              <p className="text-gray-500 mt-4 text-xs font-black uppercase tracking-[0.4em]">Noticias de élite actualizándose cada minuto</p>
+              <h2 className="text-4xl md:text-7xl font-black tracking-tighter uppercase italic">Radar <span className="text-cyan-400">Global.</span></h2>
+              <p className="text-gray-500 mt-4 text-xs font-black uppercase tracking-[0.4em]">Últimas filtraciones y noticias de IA a nivel mundial</p>
             </div>
-            <a href="/news" className="text-[10px] font-black tracking-widest text-cyan-400 hover:text-white transition-colors uppercase border-b border-cyan-400/30 pb-1">Ver Archivo Histórico →</a>
           </div>
 
           <LiveFeed />
         </section>
 
-        <VisionSection />
-
-        {/* Espacio Publicitario de Cierre */}
-        <div className="max-w-6xl mx-auto w-full px-4 py-20">
+        {/* Espacio Publicitario entre noticias */}
+        <div className="max-w-6xl mx-auto w-full px-4 py-10">
            <AdSpace isPremium={false} type="inline" />
         </div>
 
-        <FounderZone />
+        {/* Secciones informativas reducidas/eliminadas por petición del usuario */}
+        {/* <VisionSection /> */}
+
+        {/* <FounderZone /> */}
+        
         <Pricing />
         <Footer />
         <GlobalTicker />

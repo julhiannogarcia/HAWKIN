@@ -45,13 +45,13 @@ export default function Hero() {
           </div>
 
           <h1 className="text-7xl md:text-[120px] font-black tracking-tighter leading-[0.8] uppercase italic">
-            Descubre la IA que <br />
-            <span className="bg-gradient-to-r from-cyan-400 via-purple-500 to-pink-500 bg-clip-text text-transparent drop-shadow-[0_0_30px_rgba(34,211,238,0.3)]">otros no ven.</span>
+            Radar Alpha: <br />
+            <span className="bg-gradient-to-r from-cyan-400 via-purple-500 to-pink-500 bg-clip-text text-transparent drop-shadow-[0_0_30px_rgba(34,211,238,0.3)]">IA en Tiempo Real.</span>
           </h1>
 
           <p className="text-gray-400 text-xl max-w-2xl mx-auto font-light leading-relaxed">
-            El primer centro de inteligencia global. 
-            Rumores de CEOs, Academia de Élite y Blindaje SHIELD en un solo lugar.
+            Interceptando los flujos de datos más críticos del planeta. 
+            Filtraciones de OpenAI, NVIDIA y el pulso de Silicon Valley al segundo.
           </p>
 
           <div className="flex flex-col md:flex-row items-center justify-center gap-6 pt-10">

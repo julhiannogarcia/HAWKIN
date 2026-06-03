@@ -15,7 +15,7 @@ export async function GET(req: Request) {
         status: { in: ['ACTIVE', 'PAID'] },
         placement: placement || undefined,
         startDate: { lte: now },
-        endDate: { gte: now },
+        endDate: { gte: new Date(now.setHours(0, 0, 0, 0)) }, // Incluimos todo el día de hoy
         OR: [
           { isGlobal: true },
           { targetCountry: countryCode },
@@ -27,26 +27,25 @@ export async function GET(req: Request) {
     if (ads.length > 0) return NextResponse.json(ads);
 
     // 2. FALLBACK ALPHA: Si no hay anuncios específicos, traer CUALQUIER anuncio activo
-    // para que la interfaz no se vea vacía ("Vibras de Imperio Activo")
     const emergencyAds = await prisma.adCampaign.findMany({
       where: {
         status: { in: ['ACTIVE', 'PAID'] },
-        startDate: { lte: now },
-        endDate: { gte: now },
+        startDate: { lte: new Date() },
+        endDate: { gte: new Date(new Date().setHours(0, 0, 0, 0)) },
       },
       take: 3
     });
 
     // 3. FALLBACK FINAL: Si la base de datos está totalmente vacía de pautas vigentes,
-    // devolver una pauta interna de HAWKIN pre-programada.
+    // devolver una pauta interna de HAWKIN pre-programada de alta calidad.
     if (emergencyAds.length === 0) {
       return NextResponse.json([{
         id: "hawkin-internal-01",
-        companyName: "HAWKIN ELITE",
+        companyName: "HAWKIN ACADEMY",
         bannerUrl: "https://images.unsplash.com/photo-1639762681485-074b7f938ba0?auto=format&fit=crop&q=80&w=2000",
-        targetUrl: "/shield",
+        targetUrl: "/courses",
         placement: placement || "NEWS_FEED",
-        isInternal: true // Para que el componente sepa que es de la casa
+        isInternal: true
       }]);
     }
 

@@ -1,14 +1,32 @@
 'use client';
 
 import Link from 'next/link';
+import { useState, useEffect } from 'react';
 
 export default function Ticker() {
-  const news = [
-    { label: 'OPENAI', text: 'Sam Altman anuncia nueva actualización de GPT-5...' },
-    { label: 'TESLA', text: 'Elon Musk revela avances en Optimus Gen 3...' },
-    { label: 'GOOGLE', text: 'DeepMind logra hito en medicina con IA...' },
-    { label: 'NVIDIA', text: 'Jensen Huang presenta la nueva era de GPUs...' },
-    { label: 'HAWKIN', text: 'Julhianno Garcia lanza curso maestro de IA...' },
+  const [news, setNews] = useState<any[]>([]);
+
+  useEffect(() => {
+    const fetchNews = async () => {
+      try {
+        const res = await fetch('/api/news/live');
+        const data = await res.json();
+        const items = data.news || [];
+        setNews(items.slice(0, 10).map((n: any) => ({
+          label: n.category || 'INTEL',
+          text: n.title,
+          url: n.url || `/news/${n.id}`
+        })));
+      } catch (e) {
+        console.error("Ticker Error:", e);
+      }
+    };
+    fetchNews();
+  }, []);
+
+  const displayNews = news.length > 0 ? news : [
+    { label: 'HAWKIN', text: 'Sincronizando flujos de inteligencia global...', url: '/news' },
+    { label: 'ALERTA', text: 'Radar Global operativo y analizando datos...', url: '/news' }
   ];
 
   return (
@@ -17,11 +35,11 @@ export default function Ticker() {
         Live Radar
       </div>
       <div className="flex whitespace-nowrap animate-ticker-scroll">
-        {[...news, ...news, ...news].map((item, index) => (
-          <Link key={index} href="/news" className="px-12 text-sm text-gray-300 hover:text-cyan-400 transition-colors cursor-pointer">
+        {[...displayNews, ...displayNews, ...displayNews].map((item, index) => (
+          <a key={index} href={item.url} target={item.url.startsWith('http') ? "_blank" : "_self"} className="px-12 text-sm text-gray-300 hover:text-cyan-400 transition-colors cursor-pointer">
             <span className="text-cyan-400 font-bold mr-2">{item.label}:</span>
             {item.text}
-          </Link>
+          </a>
         ))}
       </div>
       
