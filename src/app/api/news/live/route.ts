@@ -8,11 +8,6 @@ export const revalidate = 0;
 
 const parser = new Parser();
 
-// Configuración de OpenAI
-const openai = new OpenAI({
-  apiKey: process.env.OPENAI_API_KEY,
-});
-
 const TITAN_PROMPT = `
 # PROJECT TITAN AI - GLOBAL INTELLIGENCE NETWORK
 Eres una red global de inteligencia tecnológica. Tu misión es transformar noticias crudas en INTELIGENCIA ESTRATÉGICA.
@@ -50,7 +45,14 @@ function generateShortId(text: string) {
 
 export async function GET() {
   try {
-    // 1. OBTENER NOTICIAS MANUALES DE LA BASE DE DATOS
+    // Inicialización segura de OpenAI (solo si existe la clave)
+    let openai: any = null;
+    if (process.env.OPENAI_API_KEY) {
+      openai = new OpenAI({ apiKey: process.env.OPENAI_API_KEY });
+    }
+
+    // 1. OBTENER NOTICIAS MANUALES DE LA BASE DE DATOS (Filtrando noticias personales)
+
     const dbNews = await prisma.news.findMany({
       where: { 
         published: true,
