@@ -4,7 +4,7 @@ import { prisma } from "@/lib/prisma";
 import OpenAI from "openai";
 
 export const dynamic = 'force-dynamic';
-export const revalidate = 0;
+export const revalidate = 300; // 5 minutos de caché inteligente (Cerebro Frío)
 
 const parser = new Parser();
 
@@ -192,13 +192,17 @@ export async function GET() {
         url: item.link,
         source: item.source?.name || "Radar Global",
         intelLevel: titanData.intel_level,
-        content: titanData.content
+        content: titanData.content,
+        // --- V7.5 TRUST SCORE ENGINE ---
+        trustScore: score > 30 ? 98 : score > 15 ? 85 : 70, // Base algorítmica temporal antes de mover a DB
+        lastVerified: new Date().toISOString()
       };
     }));
 
     return NextResponse.json({
       news: processedNews,
-      status: "Titan Analyst Agent v6.1 Live"
+      status: "Titan Analyst Agent v7.5 Live",
+      cacheTTL: "300s"
     });
   } catch (error) {
     console.error("Titan Engine Critical Failure:", error);
