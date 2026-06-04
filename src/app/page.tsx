@@ -17,8 +17,11 @@ const GlobalAIPulse = dynamic(() => import('@/components/intelligence/GlobalAIPu
 const HISRanking = dynamic(() => import('@/components/intelligence/HISRanking'), { ssr: false });
 const CEORadar = dynamic(() => import('@/components/intelligence/CEORadar'), { ssr: false });
 const AIWarRoom = dynamic(() => import('@/components/intelligence/AIWarRoom'), { ssr: false });
-const ExecutiveBrief = dynamic(() => import('@/components/intelligence/ExecutiveBrief'), { ssr: false });
+const SecurityShield = dynamic(() => import('@/components/intelligence/SecurityShield'), { ssr: false });
+const TradingIntelligence = dynamic(() => import('@/components/intelligence/TradingIntelligence'), { ssr: false });
+const CommandCenterTop10 = dynamic(() => import('@/components/intelligence/CommandCenterTop10'), { ssr: false });
 const MarketTalentTerminal = dynamic(() => import('@/components/intelligence/MarketTalentTerminal'), { ssr: false });
+const ExecutiveBrief = dynamic(() => import('@/components/intelligence/ExecutiveBrief'), { ssr: false });
 const LiveStatusBar = dynamic(() => import('@/components/intelligence/LiveStatusBar'), { ssr: false });
 
 export default function Home() {
@@ -57,6 +60,12 @@ export default function Home() {
         <CEORadar />
 
         <AIWarRoom />
+        
+        <SecurityShield />
+        
+        <TradingIntelligence />
+        
+        <CommandCenterTop10 />
 
         <ExecutiveBrief />
 
