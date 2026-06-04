@@ -304,7 +304,7 @@ export default function B2BPage() {
 
           {step === 'success' && (
             <motion.div key="success" initial={{ opacity: 0, scale: 0.9 }} animate={{ opacity: 1, scale: 1 }} className="flex flex-col items-center justify-center py-40 gap-10 text-center">
-               <div className="w-40 h-40 bg-green-500 rounded-[60px] flex items-center justify-center text-black shadow-[0_0_100px_rgba(34,197,94,0.4)] animate-bounce"><CheckCircle2 size={80} /></div>
+               <div className="w-40 h-40 bg-green-500 rounded-[60px] flex items-center justify-center text-black shadow-[0_0_100px_rgba(34,197,94,0.4)] animate-bounce"><CircleCheck size={80} /></div>
                <div className="space-y-4">
                   <h2 className="text-7xl font-black uppercase italic tracking-tighter text-white leading-none">Misión Éxito.</h2>
                   <p className="text-green-500 text-xl font-bold uppercase tracking-[0.5em]">Tu pauta ID {paypalOrderId} está activa en el imperio.</p>
@@ -318,3 +318,4 @@ export default function B2BPage() {
     </div>
   );
 }
+

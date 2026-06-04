@@ -287,7 +287,7 @@ export default function ManageAds() {
                          <img src={bannerUrl} className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-700" alt="Preview" />
                       ) : (
                          <div className="text-center space-y-3">
-                            <UploadCloud className="text-gray-800 mx-auto" size={40} />
+                            <CloudUpload className="text-gray-800 mx-auto" size={40} />
                             <p className="text-[9px] font-black text-gray-700 uppercase tracking-widest">Vista previa del anuncio</p>
                          </div>
                       )}

@@ -91,7 +91,7 @@ export default function InstructorDashboard() {
         <div className="grid grid-cols-1 lg:grid-cols-3 gap-12">
           <div className="lg:col-span-2 space-y-8">
             <h3 className="text-sm font-black uppercase tracking-[0.4em] text-gray-600 flex items-center gap-3">
-              <CheckCircle size={16} className="text-cyan-400" /> Mis Programas en HAWKIN
+              <CircleCheck size={16} className="text-cyan-400" /> Mis Programas en HAWKIN
             </h3>
             <div className="space-y-4">
               {myCourses.map((course) => (
