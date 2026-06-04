@@ -7,7 +7,7 @@ import {
   Activity, Users, Rocket, Globe, Clock, 
   ChartBar, Target, ChevronRight, CircleAlert,
   ShieldCheck, ArrowUpRight, ArrowDownRight, Info,
-  Search, Eye, Gauge, Compass
+  Search, Eye, CircleGauge, Compass
 } from 'lucide-react';
 
 // --- DATA ENGINE V4.5 ---
@@ -48,7 +48,7 @@ const COMPANIES = [
   { 
     id: 'google', 
     name: 'DeepMind', 
-    logo: 'https://upload.wikimedia.org/wikipedia/commons/5/53/Google_\"G\"_Logo.svg', 
+    logo: 'https://upload.wikimedia.org/wikipedia/commons/5/53/Google_G_Logo.svg', 
     score: 90.5, 
     confidence: 92,
     change: +1.8, 
@@ -87,25 +87,24 @@ const EMERGING = [
 ];
 
 export default function GlobalAIIndex() {
-  const [time, setTime] = useState(new Date());
+  const [currentTime, setCurrentTime] = useState('');
 
   useEffect(() => {
-    const timer = setInterval(() => setTime(new Date()), 1000);
+    setCurrentTime(new Date().toLocaleTimeString());
+    const timer = setInterval(() => setCurrentTime(new Date().toLocaleTimeString()), 1000);
     return () => clearInterval(timer);
   }, []);
 
   return (
     <section className="w-full bg-[#020202] border-y border-white/5 py-24 relative overflow-hidden font-sans">
-      {/* TERMINAL BACKGROUND GRID */}
       <div className="absolute inset-0 opacity-[0.02] pointer-events-none">
         <div className="grid grid-cols-12 h-full w-full border-l border-white/20">
           {Array.from({length: 12}).map((_, i) => <div key={i} className="border-r border-white/20" />)}
         </div>
       </div>
 
-      <div className="max-w-7xl mx-auto px-6 relative z-10">
+      <div className="max-w-7xl mx-auto px-6 relative z-10 text-left">
         
-        {/* TOP STATUS BAR */}
         <div className="flex flex-wrap items-center justify-between mb-12 py-4 border-b border-white/5 gap-6">
            <div className="flex items-center gap-6">
               <div className="flex items-center gap-2">
@@ -115,7 +114,7 @@ export default function GlobalAIIndex() {
               <div className="h-4 w-px bg-white/10" />
               <div className="flex items-center gap-2 text-gray-500">
                  <Clock size={12} />
-                 <span className="text-[9px] font-black uppercase tracking-widest">{time.toLocaleTimeString()} UTC-5</span>
+                 <span className="text-[9px] font-black uppercase tracking-widest">{currentTime} UTC-5</span>
               </div>
            </div>
            <div className="flex items-center gap-8">
@@ -130,9 +129,7 @@ export default function GlobalAIIndex() {
            </div>
         </div>
 
-        <div className="grid grid-cols-1 lg:grid-cols-12 gap-10">
-           
-           {/* MAIN RANKING COLUMN (JERARQUÍA VISUAL DOMINANTE) */}
+        <div className="grid grid-cols-1 lg:grid-cols-12 gap-10 text-left">
            <div className="lg:col-span-8 space-y-10">
               <div className="flex items-end justify-between border-l-4 border-cyan-500 pl-8 mb-10">
                  <div>
@@ -160,10 +157,9 @@ export default function GlobalAIIndex() {
                     initial={{ opacity: 0, y: 20 }}
                     whileInView={{ opacity: 1, y: 0 }}
                     transition={{ delay: index * 0.05 }}
-                    className="group bg-white/[0.01] hover:bg-white/[0.03] border border-white/5 hover:border-cyan-500/40 p-8 rounded-[40px] transition-all duration-500 relative overflow-hidden"
+                    className="group bg-white/[0.01] hover:bg-white/[0.03] border border-white/5 hover:border-cyan-500/40 p-8 rounded-[40px] transition-all duration-500 relative overflow-hidden text-left"
                    >
                       <div className="flex flex-col md:flex-row md:items-center justify-between gap-8">
-                         {/* LOGO & NAME (ELEMENTO DOMINANTE) */}
                          <div className="flex items-center gap-10">
                             <div className="text-3xl font-black text-gray-800 italic group-hover:text-cyan-500/20 transition-colors">#{index + 1}</div>
                             <div className="w-24 h-24 bg-white/5 rounded-3xl flex items-center justify-center p-5 group-hover:bg-white/10 transition-all border border-white/5 shadow-2xl">
@@ -173,7 +169,7 @@ export default function GlobalAIIndex() {
                                <h3 className="text-3xl font-black uppercase italic tracking-tighter text-white">{company.name}</h3>
                                <div className="flex flex-wrap items-center gap-4 mt-2">
                                   <div className="flex items-center gap-1 text-[9px] font-black text-cyan-500 bg-cyan-500/10 px-2 py-0.5 rounded border border-cyan-500/20">
-                                     <Gauge size={10} />
+                                     <CircleGauge size={10} />
                                      POWER: {company.score}
                                   </div>
                                   <div className="flex items-center gap-1 text-[9px] font-black text-purple-400 bg-purple-500/10 px-2 py-0.5 rounded border border-purple-500/20">
@@ -188,13 +184,11 @@ export default function GlobalAIIndex() {
                             </div>
                          </div>
 
-                         {/* ANALYSIS & TRENDS */}
                          <div className="flex flex-col items-end gap-4 min-w-[200px]">
                             <div className={`flex items-center gap-2 text-2xl font-black italic ${company.change > 0 ? 'text-cyan-400' : 'text-red-500'}`}>
                                {company.change > 0 ? <ArrowUpRight size={24} /> : <ArrowDownRight size={24} />}
                                {company.change > 0 ? '+' : ''}{company.change}%
                             </div>
-                            {/* MINI HISTORY CHIP */}
                             <div className="flex gap-2 bg-black/40 p-2 rounded-xl border border-white/5">
                                <div className="flex flex-col items-center px-2">
                                   <span className="text-[6px] font-black text-gray-600 uppercase">7D</span>
@@ -214,8 +208,7 @@ export default function GlobalAIIndex() {
                          </div>
                       </div>
 
-                      {/* WHY IT MATTERS (NUEVA CAPA DE INTELIGENCIA) */}
-                      <div className="mt-8 pt-6 border-t border-white/5 flex gap-6">
+                      <div className="mt-8 pt-6 border-t border-white/5 flex gap-6 text-left">
                          <div className="p-2 bg-cyan-500/10 rounded-lg text-cyan-400 h-fit"><Info size={14} /></div>
                          <div>
                             <p className="text-[8px] font-black text-gray-500 uppercase tracking-widest mb-1">Why It Matters</p>
@@ -227,11 +220,8 @@ export default function GlobalAIIndex() {
               </div>
            </div>
 
-           {/* SIDEBAR: STRATEGIC SIGNALS & CEO MOMENTUM */}
            <div className="lg:col-span-4 space-y-10">
-              
-              {/* STRATEGIC SIGNALS */}
-              <div className="space-y-6">
+              <div className="space-y-6 text-left">
                  <div className="flex items-center gap-4">
                     <div className="w-8 h-8 rounded-lg bg-red-500/10 flex items-center justify-center text-red-500 border border-red-500/20">
                        <Activity size={16} />
@@ -240,7 +230,7 @@ export default function GlobalAIIndex() {
                  </div>
                  <div className="space-y-3">
                     {SIGNALS.map((sig, i) => (
-                      <div key={i} className="p-6 bg-white/[0.02] border border-white/5 rounded-3xl space-y-4 hover:border-white/10 transition-all">
+                      <div key={i} className="p-6 bg-white/[0.02] border border-white/5 rounded-3xl space-y-4 hover:border-white/10 transition-all text-left">
                          <div className="flex justify-between items-center">
                             <span className={`text-[8px] font-black px-2 py-0.5 rounded ${sig.type === 'CRITICAL' ? 'bg-red-500 text-white' : 'bg-orange-500/20 text-orange-500'} uppercase tracking-widest`}>
                                {sig.type}
@@ -250,7 +240,7 @@ export default function GlobalAIIndex() {
                          <h4 className="text-lg font-black uppercase italic leading-none text-white">{sig.company}</h4>
                          <p className="text-[10px] text-gray-500 font-light leading-snug">{sig.desc}</p>
                          <div className="flex items-center justify-between pt-2 border-t border-white/5">
-                            <div className="flex flex-col">
+                            <div className="flex flex-col text-left">
                                <span className="text-[6px] font-black text-gray-700 uppercase">Impacto</span>
                                <span className="text-[9px] font-black text-cyan-400">{sig.impact}</span>
                             </div>
@@ -264,8 +254,7 @@ export default function GlobalAIIndex() {
                  </div>
               </div>
 
-              {/* CEO MOMENTUM ENGINE */}
-              <div className="space-y-6">
+              <div className="space-y-6 text-left">
                  <div className="flex items-center gap-4">
                     <div className="w-8 h-8 rounded-lg bg-cyan-500/10 flex items-center justify-center text-cyan-500 border border-cyan-500/20">
                        <Compass size={16} />
@@ -274,7 +263,7 @@ export default function GlobalAIIndex() {
                  </div>
                  <div className="space-y-4">
                     {CEOS.map((ceo, index) => (
-                      <div key={index} className="p-6 bg-white/[0.02] border border-white/5 rounded-[40px] flex items-start gap-6 group hover:bg-white/[0.04] transition-all">
+                      <div key={index} className="p-6 bg-white/[0.02] border border-white/5 rounded-[40px] flex items-start gap-6 group hover:bg-white/[0.04] transition-all text-left">
                          <div className="relative flex-shrink-0">
                             <div className="w-20 h-20 rounded-full overflow-hidden border-2 border-white/10 group-hover:border-cyan-500/40 transition-all shadow-2xl">
                                <img src={ceo.photo} alt={ceo.name} className="w-full h-full object-cover grayscale group-hover:grayscale-0 transition-all duration-700" />
@@ -289,7 +278,7 @@ export default function GlobalAIIndex() {
                                <p className="text-[7px] font-black text-gray-600 uppercase tracking-widest mt-1">CEO @ {ceo.company}</p>
                             </div>
                             <div className="flex items-center justify-between bg-black/40 p-3 rounded-2xl border border-white/5">
-                               <div className="flex flex-col">
+                               <div className="flex flex-col text-left">
                                   <span className="text-[6px] font-black text-gray-700 uppercase">Influencia</span>
                                   <span className="text-xs font-black text-white tabular-nums">{ceo.influence}</span>
                                </div>
@@ -300,7 +289,7 @@ export default function GlobalAIIndex() {
                             </div>
                             <div>
                                <span className="text-[6px] font-black text-gray-700 uppercase tracking-widest block mb-1">Motivo Estratégico</span>
-                               <p className="text-[10px] text-gray-400 font-light italic leading-tight">"{ceo.motive}"</p>
+                               <p className="text-[10px] text-gray-400 font-light italic leading-tight text-left">"{ceo.motive}"</p>
                             </div>
                          </div>
                       </div>
@@ -308,18 +297,17 @@ export default function GlobalAIIndex() {
                  </div>
               </div>
 
-              {/* EMERGING GIANTS */}
-              <div className="p-10 bg-gradient-to-br from-purple-600/10 to-transparent border border-purple-500/20 rounded-[50px] space-y-8">
+              <div className="p-10 bg-gradient-to-br from-purple-600/10 to-transparent border border-purple-500/20 rounded-[50px] space-y-8 text-left">
                  <div className="flex items-center gap-4">
                     <Rocket className="text-purple-500" size={24} />
                     <h3 className="text-xs font-black uppercase tracking-[0.4em] text-purple-400">Emerging Giants</h3>
                  </div>
                  <div className="space-y-6">
                     {EMERGING.map((start, i) => (
-                      <div key={i} className="flex items-center justify-between">
+                      <div key={i} className="flex items-center justify-between text-left">
                          <div className="flex items-center gap-4">
                             <div className="text-2xl">{start.logo}</div>
-                            <div>
+                            <div className="text-left">
                                <h4 className="text-sm font-black uppercase text-white">{start.name}</h4>
                                <span className="text-[8px] font-black text-purple-500/60 uppercase">Potencial: {start.potential}%</span>
                             </div>
@@ -337,22 +325,21 @@ export default function GlobalAIIndex() {
            </div>
         </div>
 
-        {/* MARKET INTELLIGENCE FOOTER */}
-        <div className="mt-20 pt-10 border-t border-white/5">
+        <div className="mt-20 pt-10 border-t border-white/5 text-left">
            <div className="grid grid-cols-1 md:grid-cols-4 gap-8">
-              <div className="p-6 bg-white/[0.01] border border-white/5 rounded-3xl space-y-2">
+              <div className="p-6 bg-white/[0.01] border border-white/5 rounded-3xl space-y-2 text-left">
                  <div className="flex justify-between items-center">
-                    <span className="text-[9px] font-black text-gray-600 uppercase">Bitcoin (BTC)</span>
-                    <span className="text-xs font-black text-green-500 tabular-nums">↑ +4.2%</span>
+                    <span className="text-[9px] font-black text-gray-600 uppercase text-left">Bitcoin (BTC)</span>
+                    <span className="text-xs font-black text-green-500 tabular-nums text-right">↑ +4.2%</span>
                  </div>
-                 <p className="text-[9px] text-gray-500 font-light italic leading-snug">Significado: Mayor apetito por riesgo tecnológico. Impacto positivo en startups de IA.</p>
+                 <p className="text-[9px] text-gray-500 font-light italic leading-snug text-left">Significado: Mayor apetito por riesgo tecnológico. Impacto positivo en startups de IA.</p>
               </div>
-              <div className="p-6 bg-white/[0.01] border border-white/5 rounded-3xl space-y-2">
+              <div className="p-6 bg-white/[0.01] border border-white/5 rounded-3xl space-y-2 text-left">
                  <div className="flex justify-between items-center">
-                    <span className="text-[9px] font-black text-gray-600 uppercase">Nasdaq 100</span>
-                    <span className="text-xs font-black text-cyan-500 tabular-nums">↑ +1.8%</span>
+                    <span className="text-[9px] font-black text-gray-600 uppercase text-left">Nasdaq 100</span>
+                    <span className="text-xs font-black text-cyan-500 tabular-nums text-right">↑ +1.8%</span>
                  </div>
-                 <p className="text-[9px] text-gray-500 font-light italic leading-snug">Consolidación del sector semiconductores liderada por NVIDIA.</p>
+                 <p className="text-[9px] text-gray-500 font-light italic leading-snug text-left">Consolidación del sector semiconductores liderada por NVIDIA.</p>
               </div>
            </div>
         </div>

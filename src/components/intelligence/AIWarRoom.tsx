@@ -12,7 +12,7 @@ const BATTLES = [
     id: 'openai-google',
     title: 'CARRERA AGI',
     sideA: { name: 'OpenAI', logo: 'https://upload.wikimedia.org/wikipedia/commons/4/4d/OpenAI_Logo.svg', score: 96 },
-    sideB: { name: 'DeepMind', logo: 'https://upload.wikimedia.org/wikipedia/commons/5/53/Google_\"G\"_Logo.svg', score: 92 },
+    sideB: { name: 'DeepMind', logo: 'https://upload.wikimedia.org/wikipedia/commons/5/53/Google_G_Logo.svg', score: 92 },
     metrics: [
       { label: 'Innovation', a: 98, b: 89 },
       { label: 'Talent', a: 94, b: 96 },
@@ -39,7 +39,7 @@ export default function AIWarRoom() {
     <section className="w-full bg-[#020202] py-24 border-b border-white/5 relative overflow-hidden">
       <div className="max-w-7xl mx-auto px-6">
         
-        <div className="flex flex-col md:flex-row justify-between items-end mb-16 gap-8 border-l-4 border-red-600 pl-8">
+        <div className="flex flex-col md:flex-row justify-between items-end mb-16 gap-8 border-l-4 border-red-600 pl-8 text-left">
            <div>
               <div className="flex items-center gap-3 mb-2">
                 <Sword size={16} className="text-red-500" />
@@ -52,7 +52,7 @@ export default function AIWarRoom() {
            </div>
         </div>
 
-        <div className="grid grid-cols-1 md:grid-cols-2 gap-12">
+        <div className="grid grid-cols-1 md:grid-cols-2 gap-12 text-left">
           {BATTLES.map((battle) => (
             <motion.div 
               key={battle.id}
@@ -67,7 +67,6 @@ export default function AIWarRoom() {
                  </div>
               </div>
 
-              {/* BATTLE HEAD-TO-HEAD */}
               <div className="flex items-center justify-between gap-6 relative">
                  <div className="flex flex-col items-center gap-4 text-center">
                     <div className="w-20 h-20 bg-white/5 rounded-3xl flex items-center justify-center p-4 border border-white/10 group-hover:border-cyan-500/30 transition-all">
@@ -89,7 +88,6 @@ export default function AIWarRoom() {
                  </div>
               </div>
 
-              {/* DYNAMIC BARS */}
               <div className="space-y-6">
                  {battle.metrics.map((m, i) => (
                    <div key={i} className="space-y-2">
@@ -115,7 +113,6 @@ export default function AIWarRoom() {
                  ))}
               </div>
 
-              {/* PREDICCIÓN ESTRATÉGICA */}
               <div className="p-6 bg-black/40 border border-white/5 rounded-3xl space-y-4">
                  <div className="flex items-center gap-3 text-cyan-400">
                     <Zap size={14} />

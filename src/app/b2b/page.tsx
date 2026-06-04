@@ -8,8 +8,8 @@ import { motion, AnimatePresence } from 'framer-motion';
 import { 
   ShieldCheck, LoaderCircle, MessageCircle, Radio, 
   LayoutDashboard, ShoppingBag, Target, Tv, Eye, ExternalLink, Play,
-  Sparkles, Calendar, Globe, MapPin, Zap, ChevronRight, Mail, UploadCloud, 
-  UserCheck, CreditCard, Info, AlertTriangle, CheckCircle2, Lock
+  Sparkles, Calendar, Globe, MapPin, Zap, ChevronRight, Mail, CloudUpload, 
+  UserCheck, CreditCard, Info, TriangleAlert, CircleCheck, Lock
 } from 'lucide-react';
 
 // =====================================================================
@@ -267,7 +267,7 @@ export default function B2BPage() {
                         </div>
                         <div className="space-y-6">
                            <div className="w-full aspect-video bg-black rounded-[40px] border-2 border-dashed border-white/10 flex items-center justify-center overflow-hidden relative group">
-                              {bannerUrl ? <img src={bannerUrl} className="w-full h-full object-cover" alt="" /> : <div className="text-center opacity-20"><UploadCloud size={60} className="mx-auto" /><p className="text-[10px] font-black uppercase">Vista previa</p></div>}
+                              {bannerUrl ? <img src={bannerUrl} className="w-full h-full object-cover" alt="" /> : <div className="text-center opacity-20"><CloudUpload size={60} className="mx-auto" /><p className="text-[10px] font-black uppercase">Vista previa</p></div>}
                               <div className="absolute inset-0 bg-gradient-to-t from-black/80 via-transparent to-transparent z-10" />
                               <div className="absolute bottom-6 left-8 z-20"><p className="text-lg font-black uppercase italic text-white">{companyName || 'TU MARCA'}</p><p className="text-[8px] font-black text-blue-500 uppercase tracking-[0.4em]">Socio Patrocinador</p></div>
                            </div>

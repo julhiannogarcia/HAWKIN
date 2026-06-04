@@ -1,9 +1,9 @@
 'use client';
 
 import React, { useState } from 'react';
-import { motion } from 'framer-motion';
+import { motion, AnimatePresence } from 'framer-motion';
 import { 
-  TrendingUp, TrendingDown, Shield, Gauge, 
+  TrendingUp, TrendingDown, ShieldCheck, CircleGauge, 
   Info, ChevronRight, Zap, Target
 } from 'lucide-react';
 
@@ -43,7 +43,7 @@ export default function HISRanking() {
     <section className="w-full bg-[#020202] py-24 border-b border-white/5 relative">
       <div className="max-w-7xl mx-auto px-6">
         
-        <div className="flex flex-col md:flex-row justify-between items-end mb-16 gap-8 border-l-4 border-cyan-500 pl-8">
+        <div className="flex flex-col md:flex-row justify-between items-end mb-16 gap-8 border-l-4 border-cyan-500 pl-8 text-left">
            <div>
               <div className="flex items-center gap-3 mb-2">
                 <div className="px-2 py-0.5 bg-cyan-500 text-black text-[8px] font-black uppercase rounded">Proprietary Metric</div>
@@ -62,11 +62,10 @@ export default function HISRanking() {
                key={company.id}
                initial={{ opacity: 0, x: -20 }}
                whileInView={{ opacity: 1, x: 0 }}
-               className="bg-white/[0.01] hover:bg-white/[0.03] border border-white/5 hover:border-cyan-500/30 rounded-[50px] p-10 transition-all duration-500 group relative"
+               className="bg-white/[0.01] hover:bg-white/[0.03] border border-white/5 hover:border-cyan-500/30 rounded-[50px] p-10 transition-all duration-500 group relative text-left"
              >
                 <div className="flex flex-col lg:flex-row justify-between gap-12">
                    
-                   {/* SECCIÓN 1: IDENTIDAD DOMINANTE */}
                    <div className="flex items-center gap-12 min-w-[350px]">
                       <div className="text-4xl font-black text-gray-800 italic w-12">#{index + 1}</div>
                       <div className="w-32 h-32 bg-white/5 rounded-[40px] flex items-center justify-center p-8 border border-white/5 group-hover:bg-white/10 transition-all shadow-3xl relative overflow-hidden">
@@ -87,7 +86,6 @@ export default function HISRanking() {
                       </div>
                    </div>
 
-                   {/* SECCIÓN 2: MÉTRICA HIS & TENDENCIA */}
                    <div className="flex flex-col justify-center items-center lg:items-end gap-4 min-w-[200px]">
                       <div className="text-[10px] font-black text-gray-600 uppercase tracking-[0.4em] mb-1 text-right w-full">HIS Score</div>
                       <div className="flex items-baseline gap-4">
@@ -98,12 +96,11 @@ export default function HISRanking() {
                          </div>
                       </div>
                       <div className="flex items-center gap-3 bg-green-500/10 border border-green-500/20 px-4 py-1.5 rounded-full mt-2">
-                         <Shield size={10} className="text-green-500" />
+                         <ShieldCheck size={10} className="text-green-500" />
                          <span className="text-[8px] font-black uppercase text-green-500">Confidence: {company.confidence}%</span>
                       </div>
                    </div>
 
-                   {/* SECCIÓN 3: INTELIGENCIA ESTRATÉGICA */}
                    <div className="flex-1 space-y-8 bg-black/40 p-8 rounded-[40px] border border-white/5">
                       <div className="space-y-3">
                          <span className="text-[8px] font-black text-gray-600 uppercase tracking-widest flex items-center gap-2"><Zap size={10} className="text-cyan-500" /> Why It Matters</span>
@@ -117,7 +114,6 @@ export default function HISRanking() {
 
                 </div>
 
-                {/* HISTORIAL TÁCTICO */}
                 <div className="mt-10 pt-8 border-t border-white/5 grid grid-cols-2 md:grid-cols-4 gap-8">
                    {[
                      { label: 'Hoy', val: company.his },
@@ -132,7 +128,6 @@ export default function HISRanking() {
                    ))}
                 </div>
 
-                {/* DESGLOSE DE FÓRMULA (CONDICIONAL) */}
                 <AnimatePresence>
                    {showFormula === company.id && (
                      <motion.div 

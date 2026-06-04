@@ -23,16 +23,15 @@ export default function MarketTalentTerminal() {
   return (
     <section className="w-full bg-[#050505] py-24 border-b border-white/5 relative">
       <div className="max-w-7xl mx-auto px-6">
-        <div className="grid grid-cols-1 lg:grid-cols-2 gap-16">
+        <div className="grid grid-cols-1 lg:grid-cols-2 gap-16 text-left">
           
-          {/* AI CAPITAL TRACKER */}
           <div className="space-y-10">
             <div className="flex items-center gap-4 border-l-4 border-cyan-500 pl-6">
                <div className="w-10 h-10 rounded-xl bg-cyan-500/10 flex items-center justify-center text-cyan-500 border border-cyan-500/20">
                   <Landmark size={20} />
                </div>
-               <div>
-                  <h3 className="text-lg font-black uppercase italic italic text-white tracking-tighter">AI Capital Tracker</h3>
+               <div className="text-left">
+                  <h3 className="text-lg font-black uppercase italic text-white tracking-tighter">AI Capital Tracker</h3>
                   <p className="text-[8px] font-black text-gray-600 uppercase tracking-[0.4em]">Inyecciones de Liquidez Global</p>
                </div>
             </div>
@@ -77,14 +76,13 @@ export default function MarketTalentTerminal() {
             </div>
           </div>
 
-          {/* AI TALENT RADAR */}
           <div className="space-y-10">
             <div className="flex items-center gap-4 border-l-4 border-purple-600 pl-6">
                <div className="w-10 h-10 rounded-xl bg-purple-600/10 flex items-center justify-center text-purple-500 border border-purple-500/20">
                   <Users size={20} />
                </div>
-               <div>
-                  <h3 className="text-lg font-black uppercase italic italic text-white tracking-tighter">AI Talent Radar</h3>
+               <div className="text-left">
+                  <h3 className="text-lg font-black uppercase italic text-white tracking-tighter">AI Talent Radar</h3>
                   <p className="text-[8px] font-black text-gray-600 uppercase tracking-[0.4em]">Movimiento Estratégico de Mentes</p>
                </div>
             </div>
@@ -96,10 +94,10 @@ export default function MarketTalentTerminal() {
                        <div className="w-12 h-12 rounded-full bg-gradient-to-br from-purple-500/20 to-transparent border border-white/5 flex items-center justify-center text-purple-400 font-black italic">
                           {move.name[0]}
                        </div>
-                       <div>
+                       <div className="text-left">
                           <h4 className="text-sm font-black uppercase text-white">{move.name}</h4>
                           <p className="text-[8px] font-bold text-gray-500 uppercase tracking-widest">
-                             {move.from} <ArrowRightLeft size={8} className="inline mx-1" /> {move.to}
+                             {move.from} → {move.to}
                           </p>
                        </div>
                     </div>
@@ -112,7 +110,7 @@ export default function MarketTalentTerminal() {
                  </div>
                ))}
                <div className="p-8 bg-purple-600/5 border border-purple-500/20 rounded-[40px] flex justify-between items-center">
-                  <div>
+                  <div className="text-left">
                     <p className="text-[10px] font-black uppercase text-purple-400">Hiring Velocity</p>
                     <p className="text-[8px] text-gray-600 font-bold uppercase mt-1">NVIDIA & xAI Liderando Reclutamiento</p>
                   </div>
@@ -126,13 +124,5 @@ export default function MarketTalentTerminal() {
         </div>
       </div>
     </section>
-  );
-}
-
-function ArrowRightLeft({ size, className }: { size: number, className?: string }) {
-  return (
-    <svg xmlns="http://www.w3.org/2000/svg" width={size} height={size} viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="3" strokeLinecap="round" strokeLinejoin="round" className={className}>
-      <path d="m16 3 4 4-4 4"/><path d="M20 7H4"/><path d="m8 21-4-4 4-4"/><path d="M4 17h16"/>
-    </svg>
   );
 }

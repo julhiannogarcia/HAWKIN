@@ -5,7 +5,7 @@ import { useState, useEffect, useRef } from 'react';
 import Header from '@/components/Header';
 import Footer from '@/components/Footer';
 import GlobalTicker from '@/components/Ticker';
-import { CloudUpload, DollarSign, Users, BookOpen, CircleCheck, Clock, ChartNoAxesColumn, PlusCircle, FileCheck, LoaderCircle } from 'lucide-react';
+import { CloudUpload, DollarSign, Users, BookOpen, CircleCheck, Clock, ChartNoAxesColumn, CirclePlus, FileCheck, LoaderCircle } from 'lucide-react';
 
 export default function InstructorDashboard() {
   const [isUploading, setIsUploading] = useState(false);
@@ -71,7 +71,7 @@ export default function InstructorDashboard() {
             <h1 className="text-5xl md:text-7xl font-black tracking-tighter mt-4 leading-none italic">Instructor <span className="text-gray-500">Dashboard</span></h1>
           </div>
           <button onClick={handleFileSelect} className="btn-glow flex items-center gap-3 text-[10px] py-5 px-10">
-            <PlusCircle size={16} /> SUBIR NUEVO CURSO
+            <CirclePlus size={16} /> SUBIR NUEVO CURSO
           </button>
         </header>
 

@@ -27,8 +27,7 @@ export default function ExecutiveBrief() {
 
         <div className="grid grid-cols-1 lg:grid-cols-3 gap-12">
           
-          {/* COL 1: SEÑALES CRÍTICAS */}
-          <div className="space-y-6">
+          <div className="space-y-6 text-left">
             <h3 className="text-xs font-black uppercase tracking-[0.4em] text-gray-500 flex items-center gap-3">
               <ShieldAlert size={14} className="text-red-500" /> 5 Señales Críticas
             </h3>
@@ -42,8 +41,7 @@ export default function ExecutiveBrief() {
             </div>
           </div>
 
-          {/* COL 2: MOVIMIENTO DE PODER */}
-          <div className="space-y-8">
+          <div className="space-y-8 text-left">
             <div className="space-y-6">
                <h3 className="text-xs font-black uppercase tracking-[0.4em] text-gray-500 flex items-center gap-3">
                  <ChartBar size={14} className="text-cyan-500" /> Empresas & CEOs
@@ -85,8 +83,7 @@ export default function ExecutiveBrief() {
             </div>
           </div>
 
-          {/* COL 3: PREDICCIÓN DESTACADA */}
-          <div className="bg-gradient-to-br from-cyan-600/10 to-transparent border border-cyan-500/20 rounded-[40px] p-8 space-y-8 relative overflow-hidden">
+          <div className="bg-gradient-to-br from-cyan-600/10 to-transparent border border-cyan-500/20 rounded-[40px] p-8 space-y-8 relative overflow-hidden text-left">
              <div className="absolute -top-10 -right-10 opacity-5">
                 <Target size={200} />
              </div>
