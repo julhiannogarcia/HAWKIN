@@ -38,6 +38,7 @@ export default function Home() {
 
   return (
     <main className="relative min-h-screen bg-[#020202]">
+      {/* VERCEL DEPLOY TRIGGER - SESSION SYNC v5.6.1 */}
       <LiveStatusBar />
       <Header />
 
