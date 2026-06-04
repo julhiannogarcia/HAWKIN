@@ -14,12 +14,12 @@ const FounderZone = dynamic(() => import('@/components/FounderZone'), { ssr: fal
 const Pricing = dynamic(() => import('@/components/Pricing'), { ssr: false });
 const LiveFeed = dynamic(() => import('@/components/LiveFeed'), { ssr: false });
 const AdSpace = dynamic(() => import('@/components/AdSpace'), { ssr: false });
-const ExecutiveBrief = dynamic(() => import('@/components/intelligence/ExecutiveBrief'), { ssr: false });
-const AIWarRoom = dynamic(() => import('@/components/intelligence/AIWarRoom'), { ssr: false });
-const MarketTalentTerminal = dynamic(() => import('@/components/intelligence/MarketTalentTerminal'), { ssr: false });
-const LiveStatusBar = dynamic(() => import('@/components/intelligence/LiveStatusBar'), { ssr: false });
 const GlobalAIPulse = dynamic(() => import('@/components/intelligence/GlobalAIPulse'), { ssr: false });
 const HISRanking = dynamic(() => import('@/components/intelligence/HISRanking'), { ssr: false });
+const CEORadar = dynamic(() => import('@/components/intelligence/CEORadar'), { ssr: false });
+const AIWarRoom = dynamic(() => import('@/components/intelligence/AIWarRoom'), { ssr: false });
+const ExecutiveBrief = dynamic(() => import('@/components/intelligence/ExecutiveBrief'), { ssr: false });
+const MarketTalentTerminal = dynamic(() => import('@/components/intelligence/MarketTalentTerminal'), { ssr: false });
 
 export default function Home() {
   const [isMounted, setIsMounted] = useState(false);
@@ -38,7 +38,7 @@ export default function Home() {
 
   return (
     <main className="relative min-h-screen bg-[#020202]">
-      {/* VERCEL DEPLOY TRIGGER - SESSION SYNC v5.6.1 */}
+      {/* VERCEL DEPLOY TRIGGER - SESSION SYNC v6.1 */}
       <LiveStatusBar />
       <Header />
 
@@ -55,15 +55,19 @@ export default function Home() {
         {/* --- GLOBAL AI PULSE (INDICADOR MAESTRO 1) --- */}
         <GlobalAIPulse />
 
-        {/* --- EXECUTIVE SUMMARY --- */}
-        <ExecutiveBrief />
-        
         {/* --- HAWKIN INTELLIGENCE SCORE (INDICADOR MAESTRO 2) --- */}
         <HISRanking />
 
-        {/* --- WAR ROOM & MARKET TERMINAL --- */}
+        {/* --- CEO INTELLIGENCE RADAR --- */}
+        <CEORadar />
+
+        {/* --- WAR ROOM --- */}
         <AIWarRoom />
 
+        {/* --- WINNERS & LOSERS / STRATEGIC SIGNALS --- */}
+        <ExecutiveBrief />
+
+        {/* --- CAPITAL, TALENT & EMERGING GIANTS --- */}
         <MarketTalentTerminal />
 
         {/* Feed de Noticias (EVIDENCIA SECUNDARIA) */}

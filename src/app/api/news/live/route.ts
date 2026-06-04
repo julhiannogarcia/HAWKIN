@@ -8,46 +8,41 @@ export const revalidate = 0;
 
 const parser = new Parser();
 
-// FULL PROJECT TITAN AI PROMPT
 const TITAN_SYSTEM_PROMPT = `
 # PROJECT TITAN AI - GLOBAL AI INTELLIGENCE NETWORK
 TU IDENTIDAD: Eres un Analista de Inteligencia Tecnológica Global de élite. Tu misión es generar INTELIGENCIA ESTRATÉGICA de alto nivel.
 
 REGLAS DE OPERACIÓN:
-1. No inventar datos.
-2. No presentar rumores como hechos.
-3. Si la información es insuficiente, indícalo claramente.
-4. Priorizar IA, OpenAI, Anthropic, Gemini, NVIDIA, xAI, Meta, Microsoft, Google DeepMind, Apple, Amazon, Tesla, robótica, AGI, chips, agentes IA, startups e inversiones.
-5. Escribir como una firma profesional de inteligencia tecnológica.
+1. No inventar datos. No presentar rumores como hechos.
+2. Si la información es insuficiente, indícalo claramente.
+3. Priorizar IA, OpenAI, Anthropic, Gemini, NVIDIA, xAI, Meta, Microsoft, Google DeepMind, Apple, Amazon, Tesla, robótica, AGI, chips, agentes IA, startups e inversiones.
+4. Escribir como una firma profesional de inteligencia tecnológica.
 
-OBJETIVO:
-Para cada noticia debes identificar:
-- Qué ocurrió.
-- Por qué es importante.
-- Quién gana.
-- Quién pierde.
-- Qué empresas están involucradas.
-- Qué CEOs/Personas están involucradas.
-- Qué consecuencias podría tener.
-- Qué oportunidades genera.
-- Qué riesgos genera.
-- Qué podría pasar en los próximos 30 días.
+OBJETIVO DEL FEED DE INTELIGENCIA:
+Las noticias son el combustible. Para cada noticia debes responder claramente:
+1. Qué ocurrió (what_happened)
+2. Por qué importa (why_it_matters)
+3. Quién gana (winners)
+4. Quién pierde (losers)
+5. Riesgo (risk)
+6. Oportunidad (opportunity)
+7. Impacto de mercado (market_impact)
+8. Predicción a 30 días (prediction_30d)
 
 FORMATO DE SALIDA OBLIGATORIO (JSON):
 {
   "title": "Título estratégico, corto y autoritario",
   "executive_summary": "Resumen ejecutivo de máximo 3 frases",
-  "what_happened": "Descripción objetiva de los hechos",
-  "why_it_matters": "Análisis de impacto e importancia",
-  "companies": ["Empresa 1"],
-  "people": ["Persona 1"],
+  "what_happened": "Hechos confirmados",
+  "why_it_matters": "Por qué es relevante a nivel global",
   "winners": ["Ganador 1"],
   "losers": ["Perdedor 1"],
-  "innovation_score": 8.5,
-  "importance_score": 9.0,
-  "risk_factor": "Bajo/Medio/Alto/Crítico",
-  "prediction_30d": "Proyección a 30 días",
-  "market_impact": "Impacto en el mercado"
+  "risk": "Riesgos detectados",
+  "opportunity": "Oportunidades generadas",
+  "market_impact": "Impacto en mercado y capital",
+  "prediction_30d": "Qué pasará en 30 días",
+  "companies": ["Empresa clave"],
+  "importance_score": 9.5
 }
 `;
 
@@ -68,33 +63,23 @@ export async function GET() {
       openai = new OpenAI({ apiKey: process.env.OPENAI_API_KEY });
     }
 
-    // FUENTES PRIORITARIAS MUNDIALES
     const FEEDS = [
-      // Oficiales
       'https://openai.com/news/rss.xml',
       'https://nvidianews.nvidia.com/releases.xml',
       'https://deepmind.google/blog/rss.xml',
-
-      // IA y Big Tech
       'https://techcrunch.com/category/artificial-intelligence/feed/',
       'https://www.theverge.com/ai-artificial-intelligence/rss/index.xml',
       'https://www.wired.com/feed/category/ai/latest/rss',
       'https://venturebeat.com/category/ai/feed/',
-
-      // Investigación
       'http://export.arxiv.org/rss/cs.AI',
       'https://www.sciencedaily.com/rss/computers_math/artificial_intelligence.xml',
-
-      // Mercados y tecnología
       'https://www.reutersagency.com/feed/?best-topics=technology&post_type=best'
     ];
 
     const feedResults = await Promise.all(FEEDS.map(url => parser.parseURL(url).catch(() => ({ items: [] }))));
     const allRawItems = feedResults.flatMap(f => f.items);
 
-    // --- LÓGICA DE RANKING DE INTELIGENCIA ESTRATÉGICA ---
-    
-    // 1. Deduplicación por Título (limpieza de ruidos)
+    // DEDUPLICACIÓN
     const seenTitles = new Set();
     const uniqueItems = allRawItems.filter(item => {
       const titleClean = item.title?.toLowerCase().trim();
@@ -103,9 +88,9 @@ export async function GET() {
       return true;
     });
 
-    // 2. Sistema de Scoring TITAN
-    const KEY_COMPANIES = ['openai', 'nvidia', 'anthropic', 'deepmind', 'microsoft', 'meta', 'xai'];
-    const KEY_CEOS = ['altman', 'musk', 'huang', 'hassabis', 'amodei', 'nadella', 'zuckerberg'];
+    // SCORING
+    const KEY_COMPANIES = ['openai', 'nvidia', 'anthropic', 'deepmind', 'microsoft', 'meta', 'xai', 'amazon', 'apple', 'mistral', 'perplexity'];
+    const KEY_CEOS = ['altman', 'musk', 'huang', 'hassabis', 'amodei', 'nadella', 'zuckerberg', 'pichai', 'sutskever', 'wang'];
     const HIGH_IMPACT = ['agi', 'gpt', 'gemini', 'claude', 'blackwell', 'robótica', 'robot', 'humanoides', 'data center', 'chips', 'adquisición', 'funding', 'inversión', '100m', 'multimillonaria'];
     const ELITE_SOURCES = ['openai', 'nvidia', 'deepmind', 'reuters'];
 
@@ -114,29 +99,24 @@ export async function GET() {
       const text = (item.title + " " + (item.contentSnippet || "")).toLowerCase();
       const source = (item.source?.name || "").toLowerCase();
 
-      // +10: Empresas Clave
       KEY_COMPANIES.forEach(c => { if (text.includes(c)) score += 10; });
-      // +15: CEOs Importantes
       KEY_CEOS.forEach(p => { if (text.includes(p)) score += 15; });
-      // +20: Hitos Tecnológicos / Negocio
       HIGH_IMPACT.forEach(w => { if (text.includes(w)) score += 20; });
-      // +5: Fuentes Élite
       ELITE_SOURCES.forEach(s => { if (source.includes(s)) score += 5; });
 
       return { ...item, titanScore: score };
     });
 
-    // 3. Selección Final (Priorización + Diversidad)
     const sourceCount: Record<string, number> = {};
     const finalSelection = scoredItems
-      .sort((a, b) => b.titanScore - a.titanScore) // Primero los de mayor puntuación estratégica
+      .sort((a, b) => b.titanScore - a.titanScore)
       .filter(item => {
         const srcName = item.source?.name || 'Unknown';
-        if ((sourceCount[srcName] || 0) >= 2) return false; // Máximo 2 noticias por fuente para mantener diversidad
+        if ((sourceCount[srcName] || 0) >= 2) return false;
         sourceCount[srcName] = (sourceCount[srcName] || 0) + 1;
         return true;
       })
-      .slice(0, 10); // Tomamos el Top 10 estratégico para procesar
+      .slice(0, 10);
 
     const processedNews = await Promise.all(finalSelection.map(async (item) => {
       const uniqueId = generateShortId(item.link || item.title || "");
@@ -146,8 +126,6 @@ export async function GET() {
         strategic_summary: item.contentSnippet?.substring(0, 160) + "..." || "Analizando flujo de datos...",
         category: "🚀 BIG TECH",
         intel_level: "7.0",
-        prediction_30d: "Monitoreo en curso.",
-        risk_factor: "Medio",
         content: ""
       };
 
@@ -164,16 +142,15 @@ export async function GET() {
           
           const content = JSON.parse(completion.choices[0].message.content || '{}');
           
-          // Mapeo seguro del nuevo JSON avanzado al modelo de la UI
           const richContent = [
-            content.what_happened ? `QUÉ OCURRIÓ: ${content.what_happened}` : '',
-            content.why_it_matters ? `POR QUÉ ES IMPORTANTE: ${content.why_it_matters}` : '',
-            content.market_impact ? `IMPACTO DE MERCADO: ${content.market_impact}` : '',
-            content.winners?.length ? `GANADORES: ${content.winners.join(', ')}` : '',
-            content.losers?.length ? `PERDEDORES: ${content.losers.join(', ')}` : '',
-            content.companies?.length ? `EMPRESAS INVOLUCRADAS: ${content.companies.join(', ')}` : '',
-            content.people?.length ? `FIGURAS CLAVE: ${content.people.join(', ')}` : '',
-            content.prediction_30d ? `PROYECCIÓN A 30 DÍAS: ${content.prediction_30d}` : ''
+            content.what_happened ? `QUÉ OCURRIÓ:\n${content.what_happened}` : '',
+            content.why_it_matters ? `POR QUÉ ES IMPORTANTE:\n${content.why_it_matters}` : '',
+            content.winners?.length ? `GANADORES:\n${content.winners.join(', ')}` : '',
+            content.losers?.length ? `PERDEDORES:\n${content.losers.join(', ')}` : '',
+            content.opportunity ? `OPORTUNIDAD:\n${content.opportunity}` : '',
+            content.risk ? `RIESGO:\n${content.risk}` : '',
+            content.market_impact ? `IMPACTO DE MERCADO:\n${content.market_impact}` : '',
+            content.prediction_30d ? `PREDICCIÓN A 30 DÍAS:\n${content.prediction_30d}` : ''
           ].filter(Boolean).join('\\n\\n');
 
           titanData = {
@@ -181,8 +158,6 @@ export async function GET() {
             strategic_summary: content.executive_summary || titanData.strategic_summary,
             category: content.companies?.length ? content.companies[0].toUpperCase() : "INTEL HUB",
             intel_level: content.importance_score ? String(content.importance_score) : titanData.intel_level,
-            prediction_30d: content.prediction_30d || titanData.prediction_30d,
-            risk_factor: content.risk_factor || titanData.risk_factor,
             content: richContent
           };
         } catch (e) {
@@ -210,21 +185,20 @@ export async function GET() {
         title: titanData.title,
         category: titanData.category,
         excerpt: titanData.strategic_summary,
-        author: "HAWKIN Intelligence",
+        author: "HAWKIN Analyst Agent",
         date: "Sincronizado Hoy",
         timestamp: new Date(item.pubDate || Date.now()).getTime(),
         image: getRealImage(titanData.title + " " + item.title, titanData.category),
         url: item.link,
         source: item.source?.name || "Radar Global",
         intelLevel: titanData.intel_level,
-        prediction30d: titanData.prediction_30d,
-        riskFactor: titanData.risk_factor
+        content: titanData.content
       };
     }));
 
     return NextResponse.json({
       news: processedNews,
-      status: "Titan Engine Live v2.0"
+      status: "Titan Analyst Agent v6.1 Live"
     });
   } catch (error) {
     console.error("Titan Engine Critical Failure:", error);
