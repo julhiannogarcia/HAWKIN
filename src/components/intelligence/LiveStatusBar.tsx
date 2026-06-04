@@ -10,25 +10,37 @@ import {
 
 export default function LiveStatusBar() {
   const [times, setTimes] = useState({
-    utc: '',
-    ny: '',
-    london: '',
-    sv: ''
+    utc: '--:--:--',
+    ny: '--:--:--',
+    london: '--:--:--',
+    sv: '--:--:--'
   });
 
   useEffect(() => {
     const updateTimes = () => {
-      const now = new Date();
-      setTimes({
-        utc: now.toLocaleString('en-GB', { timeZone: 'UTC', hour: '2-digit', minute: '2-digit', second: '2-digit', hour12: false }),
-        ny: now.toLocaleString('en-US', { timeZone: 'America/New_York', hour: '2-digit', minute: '2-digit', hour12: false }),
-        london: now.toLocaleString('en-GB', { timeZone: 'Europe/London', hour: '2-digit', minute: '2-digit', hour12: false }),
-        sv: now.toLocaleString('en-US', { timeZone: 'America/Los_Angeles', hour: '2-digit', minute: '2-digit', hour12: false })
-      });
+      try {
+        const now = new Date();
+        const format = (tz: string) => {
+          try {
+            return now.toLocaleTimeString('en-US', { timeZone: tz, hour: '2-digit', minute: '2-digit', hour12: false });
+          } catch (e) {
+            return now.toLocaleTimeString(); // Fallback
+          }
+        };
+
+        setTimes({
+          utc: now.toISOString().substring(11, 16),
+          ny: format('America/New_York'),
+          london: format('Europe/London'),
+          sv: format('America/Los_Angeles')
+        });
+      } catch (e) {
+        console.error("LiveStatusBar Error:", e);
+      }
     };
 
     updateTimes();
-    const timer = setInterval(updateTimes, 1000);
+    const timer = setInterval(updateTimes, 10000); // Actualizamos cada 10s para ahorrar CPU
     return () => clearInterval(timer);
   }, []);
 
@@ -37,7 +49,7 @@ export default function LiveStatusBar() {
       <div className="flex items-center gap-8">
         <div className="flex items-center gap-2">
           <div className="w-1.5 h-1.5 bg-cyan-500 rounded-full animate-pulse" />
-          <span className="text-[7px] font-black text-cyan-500 uppercase tracking-[0.4em]">HAWKIN LIVE STATUS</span>
+          <span className="text-[7px] font-black text-cyan-500 uppercase tracking-[0.4em]">HAWKIN LIVE STATUS v6.1</span>
         </div>
         
         <div className="flex items-center gap-6 border-l border-white/10 pl-6">
@@ -61,17 +73,13 @@ export default function LiveStatusBar() {
       </div>
 
       <div className="flex items-center gap-8 text-right">
-        <div className="flex flex-col">
+        <div className="hidden md:flex flex-col">
           <span className="text-[6px] font-bold text-gray-600 uppercase">Señales Procesadas</span>
           <span className="text-[9px] font-black text-white italic">241,902</span>
         </div>
         <div className="flex flex-col border-l border-white/10 pl-6">
-          <span className="text-[6px] font-bold text-gray-600 uppercase">Precisión Histórica</span>
+          <span className="text-[6px] font-bold text-gray-600 uppercase">Precisión</span>
           <span className="text-[9px] font-black text-green-500">98.4%</span>
-        </div>
-        <div className="flex flex-col border-l border-white/10 pl-6">
-          <span className="text-[6px] font-bold text-gray-600 uppercase">Predicciones Activas</span>
-          <span className="text-[9px] font-black text-purple-500">1,405</span>
         </div>
       </div>
     </div>
