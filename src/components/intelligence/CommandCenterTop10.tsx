@@ -1,7 +1,7 @@
 'use client';
 
 import React from 'react';
-import { Target, CheckCircle, Zap } from 'lucide-react';
+import { Target, CircleCheck, Zap } from 'lucide-react';
 
 const TOP10 = [
   { rank: 1, title: 'NVIDIA (Dominio Absoluto)', category: 'EMPRESA LÍDER', impact: 'CRITICAL', confidence: 99 },

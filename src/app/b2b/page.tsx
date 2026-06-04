@@ -67,7 +67,7 @@ function PaypalBusinessButton({ amount, onSuccess }: { amount: string, onSuccess
   if (btnError) {
     return (
       <div className="p-6 bg-red-500/10 border border-red-500/20 rounded-3xl text-center space-y-4">
-         <AlertTriangle className="text-red-500 mx-auto" />
+         <TriangleAlert className="text-red-500 mx-auto" />
          <p className="text-xs font-bold text-red-500 uppercase">Error al cargar la pasarela.</p>
          <button onClick={() => window.location.reload()} className="text-[10px] underline font-black uppercase text-white">Recargar Página</button>
       </div>

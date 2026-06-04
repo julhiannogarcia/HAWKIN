@@ -1,13 +1,14 @@
 'use client';
 
-import React from 'react';
-import { Zap, Target, ArrowUpRight, ArrowDownRight, Share2, Eye, CircleCheck } from 'lucide-react';
+import React, { use } from 'react';
+import { Zap, Target, ArrowUpRight, Share2, Eye, CircleCheck } from 'lucide-react';
 import { motion } from 'framer-motion';
 
 // Componente placeholder para la página dinámica
-export default function CEODetailPage({ params }: { params: { slug: string } }) {
-  // En producción real esto leería de PostgreSQL según el slug (ej. 'sam-altman')
-  const ceoName = params.slug.replace('-', ' ').toUpperCase();
+// En Next.js 15, 'params' es una Promesa y debe ser desempaquetada con React.use()
+export default function CEODetailPage({ params }: { params: Promise<{ slug: string }> }) {
+  const { slug } = use(params);
+  const ceoName = slug.replace('-', ' ').toUpperCase();
   
   return (
     <main className="min-h-screen bg-[#020202] text-white pt-32 pb-24 text-left">
