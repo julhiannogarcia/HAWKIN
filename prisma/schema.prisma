@@ -57,23 +57,33 @@ model Subscription {
 
 // --- CONTENIDO: NOTICIAS Y RADAR ---
 model News {
-  id          String   @id @default(cuid())
-  title       String
-  content     String   @db.Text
-  excerpt     String?
-  category    String
-  image       String?
-  url         String?  // Enlace a la fuente original
-  isUrgent    Boolean  @default(false)
-  isLocked    Boolean  @default(true)
-  published   Boolean  @default(false)
-  authorId    String?
-  savedBy     User[]   @relation("UserSavedNews")
-  likes       Int      @default(0)
-  dislikes    Int      @default(0)
-  comments    Comment[]
-  createdAt   DateTime @default(now())
-  updatedAt   DateTime @updatedAt
+  id              String   @id @default(cuid())
+  title           String
+  content         String   @db.Text
+  excerpt         String?
+  category        String
+  image           String?
+  url             String?  // Enlace a la fuente original
+  
+  // --- V8: CAMPOS DE VERACIDAD INSTITUCIONAL ---
+  sourceName      String?
+  sourceUrl       String?
+  publishedAt     DateTime?
+  verifiedAt      DateTime?
+  trustScore      Float?
+  confidenceScore Float?
+  status          String   @default("UNVERIFIED") // VERIFIED, UNVERIFIED, RUMOR
+
+  isUrgent        Boolean  @default(false)
+  isLocked        Boolean  @default(true)
+  published       Boolean  @default(false)
+  authorId        String?
+  savedBy         User[]   @relation("UserSavedNews")
+  likes           Int      @default(0)
+  dislikes        Int      @default(0)
+  comments        Comment[]
+  createdAt       DateTime @default(now())
+  updatedAt       DateTime @updatedAt
 }
 
 model Comment {
@@ -83,6 +93,98 @@ model Comment {
   newsId    String
   news      News     @relation(fields: [newsId], references: [id])
   createdAt DateTime @default(now())
+}
+
+// ============================================================================
+// HAWKIN V8 - MOTOR DE VERDAD E INTELIGENCIA GLOBAL
+// ============================================================================
+
+model IntelligenceCompany {
+  id           String   @id @default(cuid())
+  slug         String   @unique
+  name         String
+  logo         String?
+  ceoName      String?
+  
+  // Scores Institucionales
+  hisScore     Float    @default(0)
+  innovation   Float    @default(0)
+  market       Float    @default(0)
+  talent       Float    @default(0)
+  execution    Float    @default(0)
+  capital      Float    @default(0)
+  risk         Float    @default(0)
+  confidence   Float    @default(0)
+  
+  // Inteligencia Explicativa
+  whyItMatters String?  @db.Text
+  prediction   String?  @db.Text
+  
+  dailyMetrics CompanyDailyMetric[]
+  updatedAt    DateTime @updatedAt
+}
+
+model CompanyDailyMetric {
+  id          String   @id @default(cuid())
+  companyId   String
+  company     IntelligenceCompany @relation(fields: [companyId], references: [id], onDelete: Cascade)
+  date        DateTime @default(now())
+  hisScore    Float
+}
+
+model CEOProfile {
+  id             String   @id @default(cuid())
+  name           String
+  companyId      String?
+  companyName    String?
+  image          String?
+  influenceScore Float    @default(0)
+  momentumScore  Float    @default(0)
+  trustScore     Float    @default(0)
+  mentionsCount  Int      @default(0)
+  lastMove       String?  @db.Text
+  lastUpdate     DateTime @updatedAt
+}
+
+model SecurityShieldAlert {
+  id              String   @id @default(cuid())
+  title           String
+  description     String   @db.Text
+  riskLevel       String   // LOW, MEDIUM, HIGH, CRITICAL
+  impact          String
+  affectedCompany String?
+  status          String   @default("ACTIVE")
+  createdAt       DateTime @default(now())
+  updatedAt       DateTime @updatedAt
+}
+
+model TradingIntelligence {
+  id              String   @id @default(cuid())
+  symbol          String   @unique
+  name            String
+  price           Float?
+  trend           String?  // UP, DOWN, STABLE
+  change          Float?
+  volatility      String?
+  aiImpact        String?  @db.Text
+  strategicSignal String?  @db.Text
+  confidenceScore Float?
+  dataSource      String?
+  timestamp       DateTime @default(now())
+  updatedAt       DateTime @updatedAt
+}
+
+model CommandCenterTop10 {
+  id              String   @id @default(cuid())
+  rank            Int      @unique // 1 al 10
+  category        String
+  title           String
+  impact          String?  @db.Text
+  risk            String?  @db.Text
+  opportunity     String?  @db.Text
+  consequence     String?  @db.Text
+  prediction      String?  @db.Text
+  updatedAt       DateTime @updatedAt
 }
 
 // --- ACADEMIA HAWKIN (LMS) ---
