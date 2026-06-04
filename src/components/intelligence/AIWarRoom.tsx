@@ -4,7 +4,7 @@ import React, { useState } from 'react';
 import { motion } from 'framer-motion';
 import { 
   Zap, Crosshair, Sword, Shield, Cpu, 
-  ChevronRight, ArrowRightLeft, TrendingUp, TrendingDown
+  ChevronRight, TrendingUp, TrendingDown
 } from 'lucide-react';
 
 const BATTLES = [
