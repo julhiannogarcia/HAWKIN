@@ -7,7 +7,7 @@ import GlobalTicker from '@/components/Ticker';
 import { motion, AnimatePresence } from 'framer-motion';
 import { 
   Bookmark, Shield, Zap, Globe, Clock, 
-  Loader2, Trash2, ArrowRight, Sparkles 
+  LoaderCircle, Trash2, ArrowRight, Sparkles 
 } from 'lucide-react';
 import { useAlpha } from '@/context/AlphaContext';
 import NewsCard from '@/components/NewsCard';
@@ -36,7 +36,7 @@ export default function VaultPage() {
 
   if (authLoading) return (
     <div className="min-h-screen bg-black flex items-center justify-center">
-      <Loader2 className="animate-spin text-cyan-500" size={40} />
+      <LoaderCircle className="animate-spin text-cyan-500" size={40} />
     </div>
   );
 
@@ -69,7 +69,7 @@ export default function VaultPage() {
 
         {loading ? (
           <div className="py-40 text-center space-y-6">
-             <Loader2 className="animate-spin text-cyan-500 mx-auto" size={40} />
+             <LoaderCircle className="animate-spin text-cyan-500 mx-auto" size={40} />
              <p className="text-[10px] font-black uppercase tracking-[0.5em] text-gray-700 animate-pulse">Sincronizando con base de datos segura...</p>
           </div>
         ) : savedNews.length === 0 ? (

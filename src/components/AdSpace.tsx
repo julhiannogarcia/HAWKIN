@@ -1,7 +1,7 @@
 'use client';
 
 import { motion } from 'framer-motion';
-import { ExternalLink, Zap, Building2, Volume2, Loader2, Play } from 'lucide-react';
+import { ExternalLink, Zap, Building2, Volume2, LoaderCircle, Play } from 'lucide-react';
 import { useState, useEffect } from 'react';
 
 interface AdSpaceProps {

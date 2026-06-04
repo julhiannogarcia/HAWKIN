@@ -8,7 +8,7 @@ import LiveFeed from '@/components/LiveFeed';
 import NewsCard from '@/components/NewsCard';
 import MasterIntel from '@/components/news/MasterIntel';
 import AdSpace from '@/components/AdSpace';
-import { Loader2, Radio } from 'lucide-react';
+import { LoaderCircle, Radio } from 'lucide-react';
 
 export default function NewsPage() {
   const [isMounted, setIsMounted] = useState(false);
@@ -20,7 +20,7 @@ export default function NewsPage() {
   if (!isMounted) {
     return (
       <div className="min-h-screen bg-black flex items-center justify-center">
-        <Loader2 className="animate-spin text-cyan-500" size={40} />
+        <LoaderCircle className="animate-spin text-cyan-500" size={40} />
       </div>
     );
   }

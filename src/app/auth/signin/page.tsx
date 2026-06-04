@@ -5,7 +5,7 @@ import { motion } from 'framer-motion';
 import Header from '@/components/Header';
 import Footer from '@/components/Footer';
 import { useAlpha } from '@/context/AlphaContext';
-import { Shield, Zap, Key, Loader2, Sparkles, UserPlus, Fingerprint, Globe, Lock, Download, Save } from 'lucide-react';
+import { Shield, Zap, Key, LoaderCircle, Sparkles, UserPlus, Fingerprint, Globe, Lock, Download, Save } from 'lucide-react';
 
 export default function SignInPage() {
   const { login, init, loading } = useAlpha();
@@ -103,7 +103,7 @@ export default function SignInPage() {
                {error && <p className="text-red-500 text-[9px] font-black uppercase italic animate-pulse">{error}</p>}
                <div className="flex flex-col gap-4">
                   <button onClick={handleLogin} disabled={loading || !accessKey} className="w-full py-6 bg-white text-black rounded-full font-black text-xs uppercase tracking-[0.4em] hover:bg-cyan-500 hover:text-white transition-all disabled:opacity-20">
-                    {loading ? <Loader2 className="animate-spin mx-auto" /> : 'CONECTAR AL IMPERIO'}
+                    {loading ? <LoaderCircle className="animate-spin mx-auto" /> : 'CONECTAR AL IMPERIO'}
                   </button>
                   <button onClick={() => setStep('selection')} className="text-[8px] font-black text-gray-700 uppercase tracking-widest hover:text-white transition-colors">Volver</button>
                </div>
@@ -130,7 +130,7 @@ export default function SignInPage() {
                {error && <p className="text-red-500 text-[9px] font-black uppercase italic animate-pulse">{error}</p>}
                <div className="flex flex-col gap-4">
                   <button onClick={handleInit} disabled={loading || nickname.length < 3} className="w-full py-6 bg-cyan-600 text-white rounded-full font-black text-xs uppercase tracking-[0.4em] hover:bg-white hover:text-black transition-all disabled:opacity-20 flex items-center justify-center gap-4">
-                    {loading ? <Loader2 className="animate-spin" /> : <><Sparkles size={18} /> GENERAR LLAVE ALPHA</>}
+                    {loading ? <LoaderCircle className="animate-spin" /> : <><Sparkles size={18} /> GENERAR LLAVE ALPHA</>}
                   </button>
                   <button onClick={() => setStep('selection')} className="text-[8px] font-black text-gray-700 uppercase tracking-widest hover:text-white transition-colors">Volver</button>
                </div>

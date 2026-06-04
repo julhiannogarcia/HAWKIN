@@ -7,7 +7,7 @@ import GlobalTicker from '@/components/Ticker';
 import { motion, AnimatePresence } from 'framer-motion';
 import { 
   ShieldCheck, Lock, Play, BookOpen, Star, 
-  ChevronRight, Loader2, Sparkles, GraduationCap, 
+  ChevronRight, LoaderCircle, Sparkles, GraduationCap, 
   Terminal, Activity, Globe, Zap 
 } from 'lucide-react';
 import { useAlpha } from '@/context/AlphaContext';
@@ -36,7 +36,7 @@ export default function LearningPage() {
   if (authLoading || loading) {
     return (
       <div className="min-h-screen bg-black flex flex-col items-center justify-center gap-6">
-        <Loader2 className="animate-spin text-cyan-500" size={40} />
+        <LoaderCircle className="animate-spin text-cyan-500" size={40} />
         <p className="text-cyan-500 font-black uppercase tracking-[0.5em] text-[10px] animate-pulse">Iniciando Academia HAWKIN...</p>
       </div>
     );

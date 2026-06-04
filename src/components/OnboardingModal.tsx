@@ -3,7 +3,7 @@
 import { useState, useEffect } from 'react';
 import { useSession } from 'next-auth/react';
 import { motion, AnimatePresence } from 'framer-motion';
-import { Shield, Zap, UserCheck, Loader2, Sparkles } from 'lucide-react';
+import { Shield, Zap, UserCheck, LoaderCircle, Sparkles } from 'lucide-react';
 
 export default function OnboardingModal() {
   const { data: session, update } = useSession();
@@ -111,7 +111,7 @@ export default function OnboardingModal() {
               disabled={loading || nickname.length < 3}
               className="w-full py-6 bg-white text-black rounded-full font-black text-xs uppercase tracking-[0.4em] hover:bg-cyan-500 hover:text-white transition-all shadow-2xl disabled:opacity-20 flex items-center justify-center gap-4"
             >
-               {loading ? <Loader2 className="animate-spin" size={20} /> : <><Sparkles size={18} /> ACTIVAR IDENTIDAD</>}
+               {loading ? <LoaderCircle className="animate-spin" size={20} /> : <><Sparkles size={18} /> ACTIVAR IDENTIDAD</>}
             </button>
           </motion.div>
         </motion.div>

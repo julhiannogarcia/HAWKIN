@@ -4,7 +4,7 @@ import React, { useState, useEffect } from 'react';
 import { 
   BarChart, Newspaper, Users, Sliders, Terminal, Edit3,
   DollarSign, Activity, ShoppingBag, Radio, LayoutDashboard, Shield,
-  ShieldCheck, CircleAlert, Trash2, Globe, Target, Zap, Loader2, Search,
+  ShieldCheck, CircleAlert, Trash2, Globe, Target, Zap, LoaderCircle, Search,
   Mail, Star, ChevronRight
 } from 'lucide-react';
 import { motion, AnimatePresence } from 'framer-motion';
@@ -106,7 +106,7 @@ export default function AdminContent() {
                <div className="absolute top-0 right-0 p-8 opacity-5 group-hover:opacity-10 transition-opacity">{s.icon || s.i}</div>
                <p className="text-[10px] font-black text-gray-600 uppercase tracking-widest mb-2">{s.label}</p>
                <div className="text-4xl font-black text-white italic tracking-tighter">
-                  {loadingStats ? <Loader2 className="animate-spin inline text-blue-500" size={24} /> : s.value || s.v}
+                  {loadingStats ? <LoaderCircle className="animate-spin inline text-blue-500" size={24} /> : s.value || s.v}
                </div>
                <div className="mt-6 flex items-center gap-2">
                   <span className="text-[10px] font-black text-blue-500">{s.t}</span>
@@ -150,7 +150,7 @@ export default function AdminContent() {
                      {loadingUsers ? (
                         <tr>
                            <td colSpan={5} className="p-20 text-center">
-                              <Loader2 className="animate-spin text-purple-500 mx-auto" size={32} />
+                              <LoaderCircle className="animate-spin text-purple-500 mx-auto" size={32} />
                               <p className="mt-4 text-[10px] font-black text-gray-600 uppercase tracking-widest">Sincronizando Base de Datos de Socios...</p>
                            </td>
                         </tr>

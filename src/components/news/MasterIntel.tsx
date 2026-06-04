@@ -5,7 +5,7 @@ import { motion, AnimatePresence } from 'framer-motion';
 import Link from 'next/link';
 import { 
   Zap, TriangleAlert, Users, Target, 
-  Cpu, Rocket, Loader2, Sparkles, Swords, Info, 
+  Cpu, Rocket, LoaderCircle, Sparkles, Swords, Info, 
   ArrowUpRight, Globe, Clock, Activity, Terminal, Flame
 } from 'lucide-react';
 
@@ -60,7 +60,7 @@ export default function MasterIntel() {
       <div className="p-32 bg-[#020202] border border-cyan-500/20 rounded-[80px] text-center space-y-12 shadow-[0_0_100px_rgba(34,211,238,0.1)] relative overflow-hidden">
         <div className="absolute inset-0 bg-[url('https://www.transparenttextures.com/patterns/carbon-fibre.png')] opacity-20" />
         <div className="relative z-10 space-y-8">
-           <Loader2 className="animate-spin text-cyan-500 mx-auto" size={80} />
+           <LoaderCircle className="animate-spin text-cyan-500 mx-auto" size={80} />
            <div className="space-y-4">
               <h2 className="text-2xl font-black uppercase tracking-[0.8em] text-cyan-400 animate-pulse">SINCRO NÚCLEO ALPHA</h2>
               <p className="text-gray-600 text-sm font-bold uppercase tracking-widest">Cargando flujos de inteligencia en tiempo real...</p>

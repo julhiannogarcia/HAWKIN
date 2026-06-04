@@ -11,7 +11,7 @@ import AdSpace from '@/components/AdSpace';
 import { useAlpha } from '@/context/AlphaContext';
 import { 
   Activity, ShieldCheck, Zap, Globe, Clock, Bell, BellRing, 
-  Loader2, ChartNoAxesColumn, TrendingUp, LayoutGrid, Radio, 
+  LoaderCircle, ChartNoAxesColumn, TrendingUp, LayoutGrid, Radio, 
   ExternalLink, Info 
 } from 'lucide-react';
 
@@ -52,7 +52,7 @@ export default function GoldPage() {
 
   if (!isMounted) return (
     <div className="min-h-screen bg-black flex items-center justify-center">
-      <Loader2 className="animate-spin text-[#FFD700]" size={40} />
+      <LoaderCircle className="animate-spin text-[#FFD700]" size={40} />
     </div>
   );
 
@@ -111,7 +111,7 @@ export default function GoldPage() {
                 disabled={isAlertActive || isConnecting}
                 className={`px-10 py-5 rounded-full font-black text-[10px] uppercase tracking-[0.4em] transition-all flex items-center gap-4 border-2 ${isAlertActive ? 'bg-[#FFD700]/10 border-[#FFD700] text-[#FFD700]' : 'bg-white text-black hover:bg-[#FFD700] hover:border-[#FFD700]'}`}
               >
-                {isConnecting ? <Loader2 className="animate-spin" size={16} /> : <BellRing size={16} />}
+                {isConnecting ? <LoaderCircle className="animate-spin" size={16} /> : <BellRing size={16} />}
                 {isAlertActive ? 'Alertas Globales Activas' : 'Sincronizar Señales'}
               </button>
            </div>
@@ -176,7 +176,7 @@ export default function GoldPage() {
 
            {loading ? (
              <div className="py-20 text-center">
-                <Loader2 className="animate-spin text-[#FFD700] mx-auto" size={32} />
+                <LoaderCircle className="animate-spin text-[#FFD700] mx-auto" size={32} />
              </div>
            ) : (
              <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">

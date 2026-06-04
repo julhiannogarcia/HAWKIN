@@ -5,7 +5,7 @@ import { useState, useEffect, useRef } from 'react';
 import Header from '@/components/Header';
 import Footer from '@/components/Footer';
 import GlobalTicker from '@/components/Ticker';
-import { UploadCloud, DollarSign, Users, BookOpen, CheckCircle, Clock, ChartNoAxesColumn, CirclePlus, FileCheck, Loader2 } from 'lucide-react';
+import { UploadCloud, DollarSign, Users, BookOpen, CheckCircle, Clock, ChartNoAxesColumn, CirclePlus, FileCheck, LoaderCircle } from 'lucide-react';
 
 export default function InstructorDashboard() {
   const [isUploading, setIsUploading] = useState(false);
@@ -117,7 +117,7 @@ export default function InstructorDashboard() {
                <AnimatePresence mode="wait">
                  {isUploading ? (
                    <motion.div initial={{ opacity: 0 }} animate={{ opacity: 1 }} exit={{ opacity: 0 }} className="py-10 space-y-6">
-                      <Loader2 className="mx-auto text-cyan-400 animate-spin" size={48} />
+                      <LoaderCircle className="mx-auto text-cyan-400 animate-spin" size={48} />
                       <div className="space-y-2">
                         <p className="text-[10px] font-black text-white uppercase tracking-widest">Sincronizando Material ({uploadProgress}%)</p>
                         <div className="w-full h-1 bg-white/5 rounded-full overflow-hidden">

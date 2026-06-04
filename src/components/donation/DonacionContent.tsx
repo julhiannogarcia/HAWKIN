@@ -7,7 +7,7 @@ import Footer from '@/components/Footer';
 import GlobalTicker from '@/components/Ticker';
 import AdSpace from '@/components/AdSpace';
 import { useAlpha } from '@/context/AlphaContext';
-import { Heart, Globe, Users, Zap, Mail, ShieldCheck, Info, Loader2 } from 'lucide-react';
+import { Heart, Globe, Users, Zap, Mail, ShieldCheck, Info, LoaderCircle } from 'lucide-react';
 
 export default function DonacionPage() {
   const { user } = useAlpha();

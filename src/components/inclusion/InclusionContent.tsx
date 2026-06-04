@@ -7,7 +7,7 @@ import GlobalTicker from '@/components/Ticker';
 import { motion, AnimatePresence } from 'framer-motion';
 import { 
   Users, Globe, Heart, ShieldCheck, 
-  ArrowUpRight, Clock, Star, Zap, Loader2, Sparkles
+  ArrowUpRight, Clock, Star, Zap, LoaderCircle, Sparkles
 } from 'lucide-react';
 import { useAlpha } from '@/context/AlphaContext';
 

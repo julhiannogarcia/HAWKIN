@@ -2,7 +2,7 @@
 
 import React, { useState, useEffect, useRef } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
-import { Sparkles, Terminal, Shield, Zap, Send, Loader2, Info, Lock, Globe, X } from 'lucide-react';
+import { Sparkles, Terminal, Shield, Zap, Send, LoaderCircle, Info, Lock, Globe, X } from 'lucide-react';
 import { useAlpha } from '@/context/AlphaContext';
 
 export default function HawkinAI() {
@@ -93,7 +93,7 @@ export default function HawkinAI() {
                {loading && (
                  <div className="flex justify-start">
                     <div className="bg-white/5 p-6 rounded-[30px] border border-white/5 flex items-center gap-4">
-                       <Loader2 className="animate-spin text-cyan-500" size={16} />
+                       <LoaderCircle className="animate-spin text-cyan-500" size={16} />
                        <span className="text-[10px] font-black uppercase tracking-widest text-gray-600 animate-pulse">Procesando...</span>
                     </div>
                  </div>

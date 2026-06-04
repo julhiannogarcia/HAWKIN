@@ -63,7 +63,7 @@ export default function ShieldPage() {
 
             {loading ? (
               <div className="p-20 bg-white/[0.01] border border-dashed border-white/10 rounded-[60px] flex flex-col items-center justify-center gap-6">
-                 <Loader2 className="animate-spin text-red-500" size={40} />
+                 <LoaderCircle className="animate-spin text-red-500" size={40} />
                  <p className="text-[10px] font-black uppercase tracking-[0.4em] text-gray-700">Analizando red global de amenazas...</p>
               </div>
             ) : (
@@ -133,7 +133,7 @@ export default function ShieldPage() {
   );
 }
 
-function Loader2({ size, className }: { size: number, className?: string }) {
+function LoaderCircle({ size, className }: { size: number, className?: string }) {
   return (
     <svg xmlns="http://www.w3.org/2000/svg" width={size} height={size} viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="3" strokeLinecap="round" strokeLinejoin="round" className={className}>
       <path d="M21 12a9 9 0 1 1-6.219-8.56"/>

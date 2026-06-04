@@ -1,7 +1,7 @@
 'use client';
 
 import { useState, useEffect } from 'react';
-import { Loader2, CircleCheckBig, CircleAlert, Newspaper, Sparkles, Send, Globe, Trash2, Link as LinkIcon, Image as ImageIcon, ExternalLink, Clock, X, Terminal, Edit3 } from 'lucide-react';
+import { LoaderCircle, CircleCheckBig, CircleAlert, Newspaper, Sparkles, Send, Globe, Trash2, Link as LinkIcon, Image as ImageIcon, ExternalLink, Clock, X, Terminal, Edit3 } from 'lucide-react';
 import { motion, AnimatePresence } from 'framer-motion';
 
 export default function ManageNews() {
@@ -155,7 +155,7 @@ export default function ManageNews() {
             disabled={isLoading}
             className="px-16 py-6 bg-gradient-to-r from-cyan-600 to-blue-700 text-white rounded-full font-black text-[12px] uppercase tracking-[0.3em] shadow-[0_0_50px_rgba(34,211,238,0.2)] hover:scale-105 active:scale-95 transition-all flex items-center justify-center gap-4 disabled:opacity-50"
           >
-            {isLoading ? <Loader2 className="animate-spin" size={20} /> : (editId ? <Sparkles size={20} /> : <Send size={20} />)}
+            {isLoading ? <LoaderCircle className="animate-spin" size={20} /> : (editId ? <Sparkles size={20} /> : <Send size={20} />)}
             {isLoading ? 'SINCRONIZANDO...' : (editId ? 'ACTUALIZAR REPORTE' : 'INYECTAR AHORA')}
           </button>
         </div>
@@ -291,7 +291,7 @@ export default function ManageNews() {
          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
             {loadingList ? (
                <div className="col-span-full py-20 text-center">
-                  <Loader2 className="animate-spin text-cyan-500 mx-auto" size={40} />
+                  <LoaderCircle className="animate-spin text-cyan-500 mx-auto" size={40} />
                </div>
             ) : existingNews.map((news) => (
                <div key={news.id} className={`glass-card group relative p-0 overflow-hidden h-96 flex flex-col border-white/5 transition-all ${editId === news.id ? 'border-cyan-500 shadow-[0_0_30px_rgba(34,211,238,0.2)]' : 'hover:border-red-500/30'}`}>

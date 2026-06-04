@@ -4,7 +4,7 @@ import React, { useState, useEffect } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
 import NewsCard from '@/components/NewsCard';
 import AdSpace from '@/components/AdSpace';
-import { Globe, Coins, ShieldAlert, Laptop, ChevronDown, Sparkles, Loader2 } from 'lucide-react';
+import { Globe, Coins, ShieldAlert, Laptop, ChevronDown, Sparkles, LoaderCircle } from 'lucide-react';
 import { useAlpha } from '@/context/AlphaContext';
 
 export default function LiveFeed() {
@@ -55,7 +55,7 @@ export default function LiveFeed() {
 
       {loading ? (
         <div className="py-40 flex flex-col items-center justify-center gap-6">
-           <Loader2 className="animate-spin text-cyan-500" size={40} />
+           <LoaderCircle className="animate-spin text-cyan-500" size={40} />
            <p className="text-[10px] font-black uppercase tracking-[0.5em] text-gray-700 animate-pulse">Interceptando flujos de datos...</p>
         </div>
       ) : (

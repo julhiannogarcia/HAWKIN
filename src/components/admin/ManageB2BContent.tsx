@@ -3,7 +3,7 @@
 import { useState, useEffect } from 'react';
 import { 
   ShoppingBag, UploadCloud, Clock, Trash2, Edit3, Globe, 
-  Target, DollarSign, Loader2, ShieldCheck, X, Send, 
+  Target, DollarSign, LoaderCircle, ShieldCheck, X, Send, 
   ExternalLink, Calendar, LayoutDashboard, Plus, Sparkles,
   CircleAlert, CircleCheckBig, Activity
 } from 'lucide-react';
@@ -315,7 +315,7 @@ export default function ManageAds() {
                   disabled={isProcessing}
                   className="w-full md:w-auto px-20 py-6 bg-gradient-to-r from-blue-600 to-cyan-600 text-white rounded-full font-black text-[12px] uppercase tracking-[0.4em] shadow-[0_20px_50px_rgba(37,99,235,0.3)] hover:scale-105 transition-all flex items-center justify-center gap-4 disabled:opacity-50"
                 >
-                  {isProcessing ? <Loader2 className="animate-spin" size={20} /> : (editId ? <Sparkles size={20} /> : <Send size={20} />)}
+                  {isProcessing ? <LoaderCircle className="animate-spin" size={20} /> : (editId ? <Sparkles size={20} /> : <Send size={20} />)}
                   {isProcessing ? 'PROCESANDO...' : (editId ? 'ACTUALIZAR CAMPAÑA' : 'ACTIVAR PAUTA EN VIVO')}
                 </button>
              </div>
@@ -368,7 +368,7 @@ export default function ManageAds() {
          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
             {loading ? (
               <div className="col-span-full py-20 text-center">
-                 <Loader2 className="animate-spin text-blue-500 mx-auto" size={40} />
+                 <LoaderCircle className="animate-spin text-blue-500 mx-auto" size={40} />
               </div>
             ) : campaigns.length > 0 ? campaigns.map((ad) => (
               <motion.div 

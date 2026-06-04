@@ -2,7 +2,7 @@
 
 import React, { useState, useEffect } from 'react';
 import dynamic from 'next/dynamic';
-import { Loader2, ChevronRight } from 'lucide-react';
+import { LoaderCircle, ChevronRight } from 'lucide-react';
 
 // CARGA DINÁMICA CON SSR: FALSE PARA BLINDAR LA ESTABILIDAD
 const Header = dynamic(() => import('@/components/Header'), { ssr: false });
@@ -31,7 +31,7 @@ export default function Home() {
   if (!isMounted) {
     return (
       <div className="min-h-screen bg-black flex items-center justify-center">
-        <Loader2 className="animate-spin text-cyan-500" size={40} />
+        <LoaderCircle className="animate-spin text-cyan-500" size={40} />
       </div>
     );
   }

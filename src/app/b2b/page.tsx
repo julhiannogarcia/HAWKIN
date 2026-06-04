@@ -6,7 +6,7 @@ import Footer from '@/components/Footer';
 import GlobalTicker from '@/components/Ticker';
 import { motion, AnimatePresence } from 'framer-motion';
 import { 
-  ShieldCheck, Loader2, MessageCircle, Radio, 
+  ShieldCheck, LoaderCircle, MessageCircle, Radio, 
   LayoutDashboard, ShoppingBag, Target, Tv, Eye, ExternalLink, Play,
   Sparkles, Calendar, Globe, MapPin, Zap, ChevronRight, Mail, UploadCloud, 
   UserCheck, CreditCard, Info, AlertTriangle, CheckCircle2, Lock
