@@ -2,7 +2,7 @@
 
 import React, { useState, useEffect } from 'react';
 import { 
-  BarChart, Newspaper, Users, Sliders, Terminal, Edit3,
+  ChartBar, Newspaper, Users, SlidersHorizontal, Terminal, Pencil,
   DollarSign, Activity, ShoppingBag, Radio, LayoutDashboard, Shield,
   ShieldCheck, CircleAlert, Trash2, Globe, Target, Zap, LoaderCircle, Search,
   Mail, Star, ChevronRight
@@ -186,7 +186,7 @@ export default function AdminContent() {
                            </td>
                            <td className="p-8 text-right">
                               <button className="p-3 bg-white/5 rounded-xl text-gray-500 hover:text-white hover:bg-purple-600 transition-all">
-                                 <Edit3 size={14} />
+                                 <Pencil size={14} />
                               </button>
                            </td>
                         </tr>
@@ -228,7 +228,7 @@ export default function AdminContent() {
          {/* CONTROL DE PRECIOS */}
          <div className="space-y-8">
             <h3 className="text-xl font-black uppercase italic tracking-tighter text-blue-400 flex items-center gap-3">
-               <Sliders size={20} /> Calibración Global
+               <SlidersHorizontal size={20} /> Calibración Global
             </h3>
             <div className="p-10 rounded-[50px] bg-gradient-to-br from-white/[0.03] to-transparent border border-white/5 space-y-8 shadow-xl">
                {[
@@ -241,7 +241,7 @@ export default function AdminContent() {
                         <p className="text-2xl font-black text-white">{p.value}</p>
                      </div>
                      <button className="p-3 bg-white/5 rounded-2xl hover:bg-blue-600 transition-all text-gray-500 hover:text-white">
-                        <Edit3 size={16} />
+                        <Pencil size={16} />
                      </button>
                   </div>
                ))}

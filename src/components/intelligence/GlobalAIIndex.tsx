@@ -5,7 +5,7 @@ import { motion, AnimatePresence } from 'framer-motion';
 import { 
   TrendingUp, TrendingDown, Zap, Shield, Cpu, 
   Activity, Users, Rocket, Globe, Clock, 
-  ChartBar, Target, ChevronRight, AlertCircle,
+  ChartBar, Target, ChevronRight, CircleAlert,
   ShieldCheck, ArrowUpRight, ArrowDownRight, Info,
   Search, Eye, Gauge, Compass
 } from 'lucide-react';

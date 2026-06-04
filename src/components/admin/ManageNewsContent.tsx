@@ -1,7 +1,7 @@
 'use client';
 
 import { useState, useEffect } from 'react';
-import { LoaderCircle, CircleCheckBig, CircleAlert, Newspaper, Sparkles, Send, Globe, Trash2, Link as LinkIcon, Image as ImageIcon, ExternalLink, Clock, X, Terminal, Edit3 } from 'lucide-react';
+import { LoaderCircle, CircleCheckBig, CircleAlert, Newspaper, Sparkles, Send, Globe, Trash2, Link, Image, ExternalLink, Clock, X, Terminal, Pencil } from 'lucide-react';
 import { motion, AnimatePresence } from 'framer-motion';
 
 export default function ManageNews() {
@@ -187,7 +187,7 @@ export default function ManageNews() {
         <div className="lg:col-span-4 space-y-8">
            <div className="glass-card p-8 bg-gradient-to-br from-cyan-500/5 to-transparent border-cyan-500/20 space-y-8">
               <h3 className="text-xs font-black uppercase tracking-[0.4em] text-cyan-400 flex items-center gap-3">
-                 <ImageIcon size={16} /> Activos Visuales
+                 <Image size={16} /> Activos Visuales
               </h3>
               
               <div className="space-y-6">
@@ -302,7 +302,7 @@ export default function ManageNews() {
                            onClick={() => handleEdit(news)}
                            className="p-3 bg-cyan-600/20 hover:bg-cyan-600 text-cyan-500 hover:text-white rounded-xl transition-all border border-cyan-500/20"
                         >
-                           <Edit3 size={16} />
+                           <Pencil size={16} />
                         </button>
                         <button 
                            onClick={() => handleDelete(news.id)}

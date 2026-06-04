@@ -2,7 +2,7 @@
 
 import { useState, useEffect } from 'react';
 import { 
-  ShoppingBag, UploadCloud, Clock, Trash2, Edit3, Globe, 
+  ShoppingBag, UploadCloud, Clock, Trash2, Pencil, Globe, 
   Target, DollarSign, LoaderCircle, ShieldCheck, X, Send, 
   ExternalLink, Calendar, LayoutDashboard, Plus, Sparkles,
   CircleAlert, CircleCheckBig, Activity
@@ -389,7 +389,7 @@ export default function ManageAds() {
                           onClick={() => handleEdit(ad)}
                           className="p-3 bg-white/10 hover:bg-blue-600 text-white rounded-xl transition-all border border-white/10"
                        >
-                          <Edit3 size={16} />
+                          <Pencil size={16} />
                        </button>
                        <button 
                           onClick={() => handleDelete(ad.id)}
