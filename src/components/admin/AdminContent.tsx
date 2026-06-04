@@ -218,8 +218,8 @@ export default function AdminContent() {
             <div className="bg-black border border-red-900/30 rounded-[50px] p-10 font-mono text-[11px] leading-relaxed relative overflow-hidden shadow-2xl">
                <div className="absolute top-0 right-0 w-full h-1 bg-gradient-to-r from-transparent via-red-500/20 to-transparent" />
                <div className="space-y-3">
-                  <p className="text-gray-600">[{new Date().toISOString()}] INFO: Acceso Administrativo (Sistema Alpha ID).</p>
-                  <p className="text-gray-400">[{new Date().toISOString()}] SUCCESS: Red de socios sincronizada con éxito.</p>
+                  <p className="text-gray-600">INFO: Acceso Administrativo (Sistema Alpha ID).</p>
+                  <p className="text-gray-400">SUCCESS: Red de socios sincronizada con éxito.</p>
                   <p className="text-blue-400 animate-pulse">{'>'} ESPERANDO COMANDOS ALPHA...</p>
                </div>
             </div>

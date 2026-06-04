@@ -13,9 +13,10 @@ export default function MasterIntel() {
   const [intel, setIntel] = useState<any>(null);
   const [loading, setLoading] = useState(true);
   const [logs, setLogs] = useState<string[]>([]);
-  const [currentTime, setCurrentTime] = useState(new Date().toLocaleTimeString('es-PE'));
+  const [currentTime, setCurrentTime] = useState('');
 
   useEffect(() => {
+    setCurrentTime(new Date().toLocaleTimeString('es-PE'));
     const timer = setInterval(() => {
       setCurrentTime(new Date().toLocaleTimeString('es-PE'));
     }, 1000);
@@ -189,7 +190,7 @@ export default function MasterIntel() {
                               )}
                            </div>
                            <div className="flex items-center gap-3 text-[10px] font-black text-gray-600 uppercase">
-                              <Clock size={12} className="text-cyan-500" /> {new Date(news.timestamp).toLocaleTimeString('es-PE', {hour: '2-digit', minute:'2-digit'})}
+                              <Clock size={12} className="text-cyan-500" /> {news.date || 'Sincronizado'}
                            </div>
                         </div>
                       </div>

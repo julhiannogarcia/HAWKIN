@@ -1,8 +1,8 @@
 'use client';
 
 import dynamic from 'next/dynamic';
-import { LoaderCircle } from 'lucide-react';
-import { useParams } from 'next/navigation';
+import { LoaderCircle, ChevronRight } from 'lucide-react';
+import { use } from 'react';
 
 const NewsDetailContent = dynamic(() => import('@/components/news/NewsDetailContent'), {
   ssr: false,
@@ -16,9 +16,9 @@ const NewsDetailContent = dynamic(() => import('@/components/news/NewsDetailCont
   )
 });
 
-export default function NewsPage() {
-  const params = useParams();
-  const id = params.id as string;
+export default function NewsPage({ params }: { params: Promise<{ id: string }> }) {
+  const resolvedParams = use(params);
+  const id = resolvedParams.id;
   
   return <NewsDetailContent newsId={id} />;
 }
