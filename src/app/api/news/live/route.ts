@@ -60,22 +60,21 @@ function generateShortId(text: string) {
 // INTELIGENCIA DE RESPALDO PROFESIONAL (GARANTÍA DE DISPONIBILIDAD)
 // =====================================================================
 const FALLBACK_NEWS = [
-  { 
-    id: 'fallback-1', title: "NVIDIA Blackwell: Análisis de Rendimiento en Nodos Alpha", 
-    category: "🚀 CHIPS", excerpt: "Las pruebas de arquitectura Blackwell demuestran una eficiencia energética sin precedentes.", 
-    author: "HAWKIN Analyst", date: "Sincronizado Hoy", intelLevel: "9.8", trustScore: 99
-  },
-  { 
-    id: 'fallback-2', title: "OpenAI o3: Evolución del Razonamiento Lógico", 
-    category: "🧠 AI MODELS", excerpt: "El nuevo modelo de OpenAI introduce capacidades de razonamiento similares a las humanas.", 
-    author: "HAWKIN Analyst", date: "Sincronizado Hoy", intelLevel: "9.5", trustScore: 98
-  }
+  { id: 'f1', title: "NVIDIA Blackwell: Dominio del Hardware AGI", category: "🚀 CHIPS", excerpt: "Arquitectura Blackwell demuestra eficiencia energética sin precedentes.", author: "HAWKIN Analyst", date: "Sincronizado", intelLevel: "9.8", trustScore: 99 },
+  { id: 'f2', title: "OpenAI o3: Razonamiento Lógico de Nivel Humano", category: "🧠 MODELS", excerpt: "Nueva frontera en resolución de tareas complejas y matemáticas.", author: "HAWKIN Analyst", date: "Sincronizado", intelLevel: "9.5", trustScore: 98 },
+  { id: 'f3', title: "Google DeepMind: Revolución en Biología Digital", category: "🧬 HEALTH", excerpt: "AlphaFold 3 acelera el descubrimiento de fármacos a escala global.", author: "HAWKIN Analyst", date: "Sincronizado", intelLevel: "9.2", trustScore: 97 },
+  { id: 'f4', title: "Anthropic Claude 3.5: Liderazgo en Benchmarks", category: "📊 BENCHMARKS", excerpt: "Supera a GPT-4o en razonamiento y generación de código.", author: "HAWKIN Analyst", date: "Sincronizado", intelLevel: "9.4", trustScore: 96 },
+  { id: 'f5', title: "xAI Colossus: El Clúster más Potente del Mundo", category: "💻 INFRA", excerpt: "Ecosistema de Memphis acelera el entrenamiento de Grok-3.", author: "HAWKIN Analyst", date: "Sincronizado", intelLevel: "9.1", trustScore: 95 },
+  { id: 'f6', title: "Regulación IA: Nuevos Marcos en la UE y EEUU", category: "⚖️ LAW", excerpt: "Estándares de transparencia para modelos de frontera.", author: "HAWKIN Analyst", date: "Sincronizado", intelLevel: "8.5", trustScore: 99 },
+  { id: 'f7', title: "Apple Intelligence: IA Local en Millones de Nodos", category: "📱 MOBILE", excerpt: "Integración masiva en iOS redefine la privacidad del usuario.", author: "HAWKIN Analyst", date: "Sincronizado", intelLevel: "8.8", trustScore: 94 },
+  { id: 'f8', title: "Microsoft Copilot: Adopción Empresarial Masiva", category: "🏢 B2B", excerpt: "Transformación del flujo de trabajo en corporaciones Fortune 500.", author: "HAWKIN Analyst", date: "Sincronizado", intelLevel: "8.9", trustScore: 93 },
+  { id: 'f9', title: "Tesla FSD v13: Autonomía Urbana de Élite", category: "🚗 AUTO", excerpt: "Avances significativos en navegación por visión computacional.", author: "HAWKIN Analyst", date: "Sincronizado", intelLevel: "9.0", trustScore: 92 },
+  { id: 'f10', title: "Figure AI: Humanoides en Líneas de Producción", category: "🤖 ROBOTS", excerpt: "Despliegue exitoso de robots autónomos en fábricas reales.", author: "HAWKIN Analyst", date: "Sincronizado", intelLevel: "9.3", trustScore: 91 }
 ];
 
 export async function GET() {
   try {
     let openai: any = null;
-    // ... rest of setup ...
     if (process.env.OPENAI_API_KEY) {
       openai = new OpenAI({ apiKey: process.env.OPENAI_API_KEY });
     }
@@ -90,13 +89,13 @@ export async function GET() {
       'https://venturebeat.com/category/ai/feed/',
       'http://export.arxiv.org/rss/cs.AI',
       'https://www.sciencedaily.com/rss/computers_math/artificial_intelligence.xml',
-      'https://www.reutersagency.com/feed/?best-topics=technology&post_type=best'
+      'https://www.reutersagency.com/feed/?best-topics=technology&post_type=best',
+      'https://news.google.com/rss/search?q=Artificial+Intelligence+Business+NVIDIA+OpenAI&hl=en-US&gl=US&ceid=US:en'
     ];
 
     const feedResults = await Promise.all(FEEDS.map(url => parser.parseURL(url).catch(() => ({ items: [] }))));
     const allRawItems = feedResults.flatMap(f => f.items);
 
-    // DEDUPLICACIÓN
     const seenTitles = new Set();
     const uniqueItems = allRawItems.filter(item => {
       const titleClean = item.title?.toLowerCase().trim();
@@ -105,44 +104,31 @@ export async function GET() {
       return true;
     });
 
-    // SCORING
-    const KEY_COMPANIES = ['openai', 'nvidia', 'anthropic', 'deepmind', 'microsoft', 'meta', 'xai', 'amazon', 'apple', 'mistral', 'perplexity'];
+    const KEY_COMPANIES = ['openai', 'nvidia', 'anthropic', 'deepmind', 'microsoft', 'meta', 'xai', 'amazon', 'apple', 'mistral', 'perplexity', 'figure'];
     const KEY_CEOS = ['altman', 'musk', 'huang', 'hassabis', 'amodei', 'nadella', 'zuckerberg', 'pichai', 'sutskever', 'wang'];
-    const HIGH_IMPACT = ['agi', 'gpt', 'gemini', 'claude', 'blackwell', 'robótica', 'robot', 'humanoides', 'data center', 'chips', 'adquisición', 'funding', 'inversión', '100m', 'multimillonaria'];
-    const ELITE_SOURCES = ['openai', 'nvidia', 'deepmind', 'reuters'];
+    const HIGH_IMPACT = ['agi', 'gpt', 'gemini', 'claude', 'blackwell', 'robótica', 'robot', 'humanoides', 'chips', 'adquisición', 'funding', 'inversión', 'llm', 'autonomous'];
 
     const scoredItems = uniqueItems.map(item => {
       let score = 0;
       const text = (item.title + " " + (item.contentSnippet || "")).toLowerCase();
-      const source = (item.source?.name || "").toLowerCase();
-
-      KEY_COMPANIES.forEach(c => { if (text.includes(c)) score += 10; });
-      KEY_CEOS.forEach(p => { if (text.includes(p)) score += 15; });
-      HIGH_IMPACT.forEach(w => { if (text.includes(w)) score += 20; });
-      ELITE_SOURCES.forEach(s => { if (source.includes(s)) score += 5; });
-
+      KEY_COMPANIES.forEach(c => { if (text.includes(c)) score += 12; });
+      KEY_CEOS.forEach(p => { if (text.includes(p)) score += 18; });
+      HIGH_IMPACT.forEach(w => { if (text.includes(w)) score += 25; });
       return { ...item, titanScore: score };
     });
 
-    const sourceCount: Record<string, number> = {};
     const finalSelection = scoredItems
       .sort((a, b) => b.titanScore - a.titanScore)
-      .filter(item => {
-        const srcName = item.source?.name || 'Unknown';
-        if ((sourceCount[srcName] || 0) >= 2) return false;
-        sourceCount[srcName] = (sourceCount[srcName] || 0) + 1;
-        return true;
-      })
-      .slice(0, 10);
+      .slice(0, 20);
 
     const processedNews = await Promise.all(finalSelection.map(async (item) => {
       const uniqueId = generateShortId(item.link || item.title || "");
       
       let titanData = {
-        title: item.title?.split(' - ')[0] || "Señal de Inteligencia Detectada",
-        strategic_summary: item.contentSnippet?.substring(0, 160) + "..." || "Analizando flujo de datos...",
-        category: "🚀 BIG TECH",
-        intel_level: "7.0",
+        title: item.title?.split(' - ')[0] || "Señal Detectada",
+        strategic_summary: item.contentSnippet?.substring(0, 200) + "..." || "Analizando flujo...",
+        category: "🚀 INTEL",
+        intel_level: "7.5",
         content: ""
       };
 
@@ -152,77 +138,49 @@ export async function GET() {
             model: "gpt-4o-mini",
             messages: [
               { role: "system", content: TITAN_SYSTEM_PROMPT },
-              { role: "user", content: `Analiza esta noticia para HAWKIN:\nTítulo: ${item.title}\nResumen: ${item.contentSnippet}` }
+              { role: "user", content: `Analiza: ${item.title}\n${item.contentSnippet}` }
             ],
             response_format: { type: "json_object" }
           });
-          
           const content = JSON.parse(completion.choices[0].message.content || '{}');
-          
-          const richContent = [
-            content.what_happened ? `QUÉ OCURRIÓ:\n${content.what_happened}` : '',
-            content.why_it_matters ? `POR QUÉ ES IMPORTANTE:\n${content.why_it_matters}` : '',
-            content.winners?.length ? `GANADORES:\n${content.winners.join(', ')}` : '',
-            content.losers?.length ? `PERDEDORES:\n${content.losers.join(', ')}` : '',
-            content.opportunity ? `OPORTUNIDAD:\n${content.opportunity}` : '',
-            content.risk ? `RIESGO:\n${content.risk}` : '',
-            content.market_impact ? `IMPACTO DE MERCADO:\n${content.market_impact}` : '',
-            content.prediction_30d ? `PREDICCIÓN A 30 DÍAS:\n${content.prediction_30d}` : ''
-          ].filter(Boolean).join('\\n\\n');
-
           titanData = {
             title: content.title || titanData.title,
             strategic_summary: content.executive_summary || titanData.strategic_summary,
-            category: content.companies?.length ? content.companies[0].toUpperCase() : "INTEL HUB",
-            intel_level: content.importance_score ? String(content.importance_score) : titanData.intel_level,
-            content: richContent
+            category: content.companies?.length ? content.companies[0].toUpperCase() : "AI HUB",
+            intel_level: content.importance_score ? String(content.importance_score) : "8.0",
+            content: ""
           };
-        } catch (e) {
-          console.error("Titan AI Processing Error:", e);
-        }
+        } catch (e) { console.error("Titan AI Skip:", e); }
       }
-
-      const getRealImage = (title: string, category: string) => {
-        const t = title.toLowerCase();
-        const c = category.toLowerCase();
-        const base = "https://images.unsplash.com/";
-        if (t.includes("nvidia") || t.includes("blackwell") || t.includes("gpu") || c.includes("chips")) 
-          return `${base}photo-1591405351990-4726e331f141?auto=format&fit=crop&q=80&w=1000&sig=${uniqueId}`;
-        if (t.includes("openai") || t.includes("gpt") || t.includes("altman")) 
-          return `${base}photo-1677442136019-21780ecad995?auto=format&fit=crop&q=80&w=1000&sig=${uniqueId}`;
-        if (t.includes("musk") || t.includes("xai") || t.includes("tesla"))
-          return `${base}photo-1541562232579-512a21360020?auto=format&fit=crop&q=80&w=1000&sig=${uniqueId}`;
-        if (c.includes("shield") || t.includes("cyber") || t.includes("hack"))
-          return `${base}photo-1633265486232-442b85c74e5f?auto=format&fit=crop&q=80&w=1000&sig=${uniqueId}`;
-        return `${base}photo-1451187580459-43490279c0fa?auto=format&fit=crop&q=80&w=1000&sig=${uniqueId}`;
-      };
 
       return {
         id: uniqueId,
         title: titanData.title,
         category: titanData.category,
         excerpt: titanData.strategic_summary,
-        author: "HAWKIN Analyst Agent",
+        author: "HAWKIN Analyst",
         date: "Sincronizado Hoy",
         timestamp: new Date(item.pubDate || Date.now()).getTime(),
-        image: getRealImage(titanData.title + " " + item.title, titanData.category),
+        image: `https://images.unsplash.com/photo-1451187580459-43490279c0fa?auto=format&fit=crop&q=80&w=800&sig=${uniqueId}`,
         url: item.link,
         source: item.source?.name || "Radar Global",
         intelLevel: titanData.intel_level,
-        content: titanData.content,
-        // --- V7.5 TRUST SCORE ENGINE ---
-        trustScore: score > 30 ? 98 : score > 15 ? 85 : 70, // Base algorítmica temporal antes de mover a DB
-        lastVerified: new Date().toISOString()
+        trustScore: 98
       };
     }));
 
+    let newsPool = [...processedNews];
+    if (newsPool.length < 10) {
+      newsPool = [...newsPool, ...FALLBACK_NEWS.slice(0, 10 - newsPool.length)];
+    }
+
     return NextResponse.json({
-      news: processedNews.length > 0 ? processedNews : FALLBACK_NEWS,
-      status: "Titan Analyst Agent v7.5 Live",
+      news: newsPool.slice(0, 15),
+      status: "Titan Analyst v7.5 Online",
       cacheTTL: "300s"
     });
   } catch (error) {
-    console.error("Titan Engine Critical Failure:", error);
+    console.error("Titan Critical Failure:", error);
     return NextResponse.json({
       news: FALLBACK_NEWS,
       status: "Degraded Mode // Fallback Active",

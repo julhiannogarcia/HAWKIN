@@ -24,47 +24,32 @@ export default function AdSpace({ isPremium, type = 'banner' }: AdSpaceProps) {
     if (isPremium) return;
 
     const fetchAd = async () => {
+      setLoading(true);
       try {
-        const placement = TYPE_MAP[type];
+        const placement = TYPE_MAP[type] || "TOP_BANNER";
         
-        // 1. Intentar obtener geoData primero para segmentación precisa
-        const geoRes = await fetch('/api/geo').catch(() => null);
-        const geoData = geoRes ? await geoRes.json().catch(() => ({ countryCode: 'PE' })) : { countryCode: 'PE' };
-        const country = geoData.countryCode || 'PE';
-
-        // 2. Consultar API con país
-        const res = await fetch(`/api/ads?placement=${placement}&country=${country}`);
-        const data = await res.json();
-        
-        if (Array.isArray(data) && data.length > 0) {
-          setAd(data[Math.floor(Math.random() * data.length)]);
-        } else {
-          // 3. Fallback: Si no hay en esa ubicación o país, traer CUALQUIER pauta activa
-          const resGlobal = await fetch(`/api/ads`);
-          const dataGlobal = await resGlobal.json();
-          if (Array.isArray(dataGlobal) && dataGlobal.length > 0) {
-            setAd(dataGlobal[Math.floor(Math.random() * dataGlobal.length)]);
-          } else {
-            // 4. Fallback Estático Final (Garantía Visual)
-            setAd({
-              id: "hawkin-internal-01",
-              companyName: "HAWKIN ACADEMY",
-              bannerUrl: "https://images.unsplash.com/photo-1639762681485-074b7f938ba0?auto=format&fit=crop&q=80&w=2000",
-              targetUrl: "/academy",
-              placement: placement || "NEWS_FEED"
-            });
+        // Intentar obtener anuncios desde la API
+        const res = await fetch(`/api/ads?placement=${placement}`);
+        if (res.ok) {
+          const data = await res.json();
+          if (Array.isArray(data) && data.length > 0) {
+            setAd(data[Math.floor(Math.random() * data.length)]);
+            setLoading(false);
+            return;
           }
         }
-      } catch (e) {
-        console.error("[HAWKIN ADS] Error de conexión:", e);
-        // Fallback en caso de error de red
+        
+        // Si la API falla o no hay datos, usar el respaldo institucional
         setAd({
-          id: "hawkin-internal-err",
-          companyName: "HAWKIN INTELLIGENCE",
-          bannerUrl: "https://images.unsplash.com/photo-1451187580459-43490279c0fa?auto=format&fit=crop&q=80&w=2000",
-          targetUrl: "/",
-          placement: "TOP_BANNER"
+          id: "hawkin-academy-default",
+          companyName: "HAWKIN ACADEMY",
+          bannerUrl: "https://images.unsplash.com/photo-1639762681485-074b7f938ba0?auto=format&fit=crop&q=80&w=2000",
+          targetUrl: "/academy",
+          placement: placement
         });
+
+      } catch (e) {
+        console.error("[HAWKIN ADS] Critical Error:", e);
       } finally {
         setLoading(false);
       }
