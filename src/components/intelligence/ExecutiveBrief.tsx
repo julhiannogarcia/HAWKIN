@@ -35,7 +35,7 @@ export default function ExecutiveBrief() {
                 <Target size={16} className="text-purple-500" />
                 <span className="text-[10px] font-black text-purple-500 uppercase tracking-widest">Executive Terminal</span>
               </div>
-              <h2 className="text-5xl md:text-7xl font-black italic tracking-tighter uppercase leading-none text-white">
+              <h2 className="text-4xl md:text-5xl font-black italic tracking-tighter uppercase leading-none text-white">
                  Winners & <span className="text-purple-500">Losers.</span>
               </h2>
               <p className="text-gray-500 mt-4 text-[10px] font-black uppercase tracking-[0.5em]">Análisis Competitivo y Señales Estratégicas</p>

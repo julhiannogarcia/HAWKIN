@@ -26,39 +26,39 @@ export default function GlobalAIPulse() {
         <div className="flex flex-col md:flex-row justify-between items-start md:items-end mb-16 gap-10">
            <div className="space-y-6">
               <div className="flex items-center gap-3">
-                 <div className="px-3 py-1 bg-cyan-500 text-black text-[9px] font-black uppercase tracking-[0.2em] rounded shadow-[0_0_15px_rgba(34,211,238,0.3)]">Real-Time Pulse</div>
-                 <div className="h-px w-20 bg-cyan-500/30" />
-                 <span className="text-[10px] font-black text-gray-600 uppercase tracking-widest italic">Sincronizando con Red Global de Sensores...</span>
+                 <div className="px-2 py-0.5 bg-cyan-500 text-black text-[7px] font-black uppercase tracking-[0.2em] rounded shadow-[0_0_10px_rgba(34,211,238,0.2)]">Real-Time Pulse</div>
+                 <div className="h-px w-12 bg-cyan-500/30" />
+                 <span className="text-[8px] font-black text-gray-600 uppercase tracking-widest italic">Sincronizando Sensores...</span>
               </div>
-              <h2 className="text-6xl md:text-8xl font-black italic tracking-tighter uppercase leading-none text-white">
+              <h2 className="text-4xl md:text-5xl font-black italic tracking-tighter uppercase leading-none text-white">
                  Global AI <span className="text-cyan-400">Pulse.</span>
               </h2>
            </div>
 
            {/* TEMPERATURE GAUGE */}
-           <div className="flex items-center gap-10 bg-white/[0.02] border border-white/10 p-8 rounded-[40px] shadow-2xl">
-              <div className="relative w-32 h-32 flex items-center justify-center">
+           <div className="flex items-center gap-8 bg-white/[0.015] border border-white/5 p-6 rounded-[35px] shadow-xl">
+              <div className="relative w-24 h-24 flex items-center justify-center">
                  <svg className="w-full h-full transform -rotate-90">
-                    <circle cx="64" cy="64" r="58" stroke="currentColor" strokeWidth="2" fill="transparent" className="text-white/5" />
+                    <circle cx="48" cy="48" r="44" stroke="currentColor" strokeWidth="1.5" fill="transparent" className="text-white/5" />
                     <motion.circle 
-                       cx="64" cy="64" r="58" stroke="currentColor" strokeWidth="4" fill="transparent" 
-                       strokeDasharray="364.4" 
-                       initial={{ strokeDashoffset: 364.4 }}
-                       animate={{ strokeDashoffset: 364.4 - (364.4 * 87) / 100 }}
+                       cx="48" cy="48" r="44" stroke="currentColor" strokeWidth="3" fill="transparent" 
+                       strokeDasharray="276.4" 
+                       initial={{ strokeDashoffset: 276.4 }}
+                       animate={{ strokeDashoffset: 276.4 - (276.4 * 87) / 100 }}
                        transition={{ duration: 2, ease: "easeOut" }}
-                       className="text-orange-500 drop-shadow-[0_0_8px_rgba(249,115,22,0.5)]"
+                       className="text-orange-500 drop-shadow-[0_0_6px_rgba(249,115,22,0.4)]"
                     />
                  </svg>
                  <div className="absolute flex flex-col items-center">
-                    <span className="text-4xl font-black italic text-white leading-none">87</span>
-                    <span className="text-[8px] font-black text-orange-500 uppercase tracking-widest mt-1">Caliente</span>
+                    <span className="text-2xl font-black italic text-white leading-none">87</span>
+                    <span className="text-[6px] font-black text-orange-500 uppercase tracking-widest mt-0.5">Caliente</span>
                  </div>
               </div>
-              <div className="flex flex-col gap-2 text-right">
-                 <span className="text-[9px] font-black text-gray-600 uppercase tracking-[0.4em]">Market Temp</span>
-                 <div className="flex items-center gap-2">
-                    <Flame size={18} className="text-orange-500 animate-pulse" />
-                    <span className="text-lg font-black uppercase text-white italic tracking-tighter text-right">Explosivo</span>
+              <div className="flex flex-col gap-1 text-right">
+                 <span className="text-[8px] font-black text-gray-600 uppercase tracking-[0.4em]">Market Temp</span>
+                 <div className="flex items-center gap-2 justify-end">
+                    <Flame size={14} className="text-orange-500 animate-pulse" />
+                    <span className="text-base font-black uppercase text-white italic tracking-tighter text-right">Explosivo</span>
                  </div>
               </div>
            </div>
@@ -73,17 +73,17 @@ export default function GlobalAIPulse() {
                     <Activity size={180} className="text-cyan-500" />
                  </div>
 
-                 <div className="space-y-2 text-left">
-                    <span className="text-[10px] font-black text-gray-500 uppercase tracking-[0.5em]">Current Activity</span>
-                    <div className="flex items-baseline gap-4">
-                       <h3 className="text-9xl font-black italic text-white leading-none tracking-tighter">{pulse}</h3>
-                       <span className="text-2xl font-black text-cyan-500 italic">/ 100</span>
+                 <div className="space-y-1 text-left">
+                    <span className="text-[8px] font-black text-gray-500 uppercase tracking-[0.5em]">Current Activity</span>
+                    <div className="flex items-baseline gap-2">
+                       <h3 className="text-7xl font-black italic text-white leading-none tracking-tighter">{pulse}</h3>
+                       <span className="text-xl font-black text-cyan-500 italic">/ 100</span>
                     </div>
                  </div>
 
-                 <div className="p-4 bg-cyan-500/10 border border-cyan-500/20 rounded-2xl inline-flex items-center gap-4">
-                    <div className="w-2 h-2 bg-cyan-500 rounded-full animate-ping" />
-                    <span className="text-[10px] font-black uppercase tracking-widest text-cyan-400">Actividad Extrema Detectada</span>
+                 <div className="p-3 bg-cyan-500/5 border border-cyan-500/10 rounded-xl inline-flex items-center gap-3">
+                    <div className="w-1.5 h-1.5 bg-cyan-500 rounded-full animate-ping" />
+                    <span className="text-[8px] font-black uppercase tracking-widest text-cyan-400">Actividad Extrema</span>
                  </div>
 
                  <div className="grid grid-cols-2 gap-6 pt-6">

@@ -1,41 +1,46 @@
-// --- HAWKIN AI v29.0: RECONOCIMIENTO PERSONALIZADO (MAYO 2026) ---
 import { NextResponse } from "next/server";
 import Groq from "groq-sdk";
 
 export async function POST(req: Request) {
   try {
-    const { messages, userName } = await req.json(); // Recibimos el nombre del socio
-    const userMessage = messages[messages.length - 1].text;
+    const { prompt } = await req.json();
     const apiKey = process.env.GROQ_API_KEY;
 
     if (!apiKey) {
-      return NextResponse.json({ text: "Socio, falta mi núcleo de energía gratuito." });
+      return NextResponse.json({ answer: "Sistema fuera de línea. Falta núcleo de energía (API Key)." });
     }
 
     const groq = new Groq({ apiKey });
 
-    // PERSONALIZACIÓN SEGÚN EL SOCIO
-    const nameToUse = userName || "Socio";
-    const SYSTEM_PROMPT = `Eres HAWKIN AI, el cerebro del ecosistema HAWKIN. 
-    Tu misión es asistir de forma natural y creativa.
-    REGLA DE CONFIANZA: Saluda y dirígete al usuario como '${nameToUse}'. Hazle sentir que lo conoces y que es parte del imperio.
-    Si el nombre es 'Socio', mantén el tono habitual. Si tienes un nombre real o nick, úsalo para generar cercanía.`;
+    const SYSTEM_PROMPT = `Eres HAWKIN AI, un Asistente Técnico de Élite.
+    
+    TU MISIÓN:
+    1. Resolver problemas técnicos, reparaciones de computadoras, manuales, guías PDF y software.
+    2. Proporcionar información estratégica basada ÚNICAMENTE en el contenido de la plataforma HAWKIN (Inteligencia Artificial, Mercados, Liderazgo).
+    
+    TUS PROHIBICIONES ABSOLUTAS:
+    - NO des información sobre el fundador (Julhianno Garcia) ni sobre su vida social.
+    - NO hables sobre cómo se creó la página o detalles internos de desarrollo personal.
+    - SI el usuario pregunta por el fundador o la creación del sitio, responde: "Mi protocolo me obliga a centrarme exclusivamente en soporte técnico e inteligencia estratégica. ¿En qué puedo asistirte técnicamente hoy?".
+    
+    TONO: Autoritario, conciso, profesional y técnico.`;
 
     const chatCompletion = await groq.chat.completions.create({
       messages: [
         { role: "system", content: SYSTEM_PROMPT },
-        { role: "user", content: userMessage }
+        { role: "user", content: prompt }
       ],
       model: "llama-3.3-70b-versatile",
-      temperature: 0.8,
-      max_tokens: 500,
+      temperature: 0.5,
+      max_tokens: 800,
     });
 
     const aiText = chatCompletion.choices[0]?.message?.content;
 
-    return NextResponse.json({ text: aiText || `Hola ${nameToUse}, estoy procesando tu mensaje.` });
+    return NextResponse.json({ answer: aiText || "Error de procesamiento en el núcleo Alpha." });
 
   } catch (error: any) {
-    return NextResponse.json({ text: "Socio, dame un momento para sincronizarme." });
+    console.error("Hawkin AI Error:", error);
+    return NextResponse.json({ answer: "Socio, los sistemas están experimentando turbulencias. Intenta de nuevo." });
   }
 }

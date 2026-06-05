@@ -102,7 +102,7 @@ export default function RadarPage() {
                 <div className="w-3 h-3 bg-red-500 rounded-full animate-pulse shadow-[0_0_15px_rgba(239,68,68,1)]" />
                 <span className="text-[12px] font-black text-red-500 uppercase tracking-[0.5em]">Live Intelligence Feed</span>
               </div>
-              <h1 className="text-6xl md:text-9xl font-black tracking-tighter uppercase italic text-white leading-none">
+              <h1 className="text-5xl md:text-7xl font-black tracking-tighter uppercase italic text-white leading-none">
                 Radar <span className="text-cyan-400">Global.</span>
               </h1>
               <p className="text-gray-500 mt-6 text-xl font-light max-w-2xl leading-relaxed uppercase tracking-widest">

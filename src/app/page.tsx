@@ -23,7 +23,6 @@ const CommandCenterTop10 = dynamic(() => import('@/components/intelligence/Comma
 const MarketTalentTerminal = dynamic(() => import('@/components/intelligence/MarketTalentTerminal'), { ssr: false });
 const ExecutiveBrief = dynamic(() => import('@/components/intelligence/ExecutiveBrief'), { ssr: false });
 const LiveStatusBar = dynamic(() => import('@/components/intelligence/LiveStatusBar'), { ssr: false });
-const FounderSection = dynamic(() => import('@/components/FounderSection'), { ssr: false });
 
 export default function Home() {
   const [isMounted, setIsMounted] = useState(false);
@@ -79,7 +78,7 @@ export default function Home() {
         <Pricing />
         <Footer />
         <div className="text-center pb-10 opacity-20">
-           <span className="text-[7px] font-black uppercase tracking-[0.8em] text-gray-500">TITAN AI SYSTEM v9.2.1 // OPERATIONAL</span>
+           <span className="text-[7px] font-black uppercase tracking-[0.8em] text-gray-500">TITAN AI SYSTEM v11.0 // MINIMALIST ACTIVE</span>
         </div>
         <GlobalTicker />
       </div>

@@ -133,7 +133,7 @@ export default function GlobalAIIndex() {
            <div className="lg:col-span-8 space-y-10">
               <div className="flex items-end justify-between border-l-4 border-cyan-500 pl-8 mb-10">
                  <div>
-                    <h2 className="text-6xl md:text-8xl font-black italic tracking-tighter uppercase leading-none text-white">
+                    <h2 className="text-4xl md:text-6xl font-black italic tracking-tighter uppercase leading-none text-white">
                        Global AI <br /> <span className="text-cyan-400">Index.</span>
                     </h2>
                     <p className="text-gray-500 mt-4 text-[10px] font-black uppercase tracking-[0.5em]">La Medición del Dominio Tecnológico Mundial</p>

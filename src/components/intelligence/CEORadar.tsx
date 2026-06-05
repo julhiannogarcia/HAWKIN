@@ -120,49 +120,49 @@ export default function CEORadar() {
                 <Users size={16} className="text-cyan-500" />
                 <span className="text-[10px] font-black text-cyan-500 uppercase tracking-[0.4em]">Influence & Momentum</span>
               </div>
-              <h2 className="text-5xl md:text-7xl font-black italic tracking-tighter uppercase leading-none text-white">
+              <h2 className="text-4xl md:text-5xl font-black italic tracking-tighter uppercase leading-none text-white">
                  CEO <span className="text-cyan-400">Radar.</span>
               </h2>
               <p className="text-gray-500 mt-4 text-[10px] font-black uppercase tracking-[0.5em]">Líderes que controlan el futuro tecnológico</p>
            </div>
         </div>
 
-        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-5 gap-6">
+        <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-5 gap-4 md:gap-6">
           {CEOS.map((ceo, index) => (
             <motion.div 
               key={index}
               initial={{ opacity: 0, y: 20 }}
               whileInView={{ opacity: 1, y: 0 }}
               transition={{ delay: index * 0.05 }}
-              className="bg-white/[0.02] border border-white/5 rounded-3xl p-6 hover:bg-white/[0.04] hover:border-cyan-500/30 transition-all duration-500 group relative flex flex-col"
+              className="bg-white/[0.015] border border-white/5 rounded-[35px] p-4 md:p-6 hover:bg-white/[0.03] hover:border-cyan-500/30 transition-all duration-500 group relative flex flex-col"
             >
-              <div className="absolute top-4 right-4 bg-black/50 backdrop-blur-md px-2 py-1 rounded text-[8px] font-black text-cyan-400">
+              <div className="absolute top-3 right-3 bg-black/50 backdrop-blur-md px-1.5 py-0.5 rounded text-[7px] font-black text-cyan-500">
                 #{index + 1}
               </div>
               
               <CEOImage src={ceo.photo} alt={ceo.name} logo={ceo.logo} />
 
-              <div className="text-center mb-6">
-                 <h3 className="text-xl font-black uppercase italic tracking-tighter text-white">{ceo.name}</h3>
-                 <p className="text-[9px] font-black text-gray-500 uppercase tracking-widest mt-1">{ceo.role} @ {ceo.company}</p>
+              <div className="text-center mb-4 md:mb-6">
+                 <h3 className="text-base md:text-lg font-black uppercase italic tracking-tighter text-white">{ceo.name}</h3>
+                 <p className="text-[7px] md:text-[8px] font-black text-gray-500 uppercase tracking-widest mt-0.5">{ceo.role} @ {ceo.company}</p>
               </div>
 
-              <div className="grid grid-cols-2 gap-2 mb-6">
-                 <div className="bg-black/40 border border-white/5 rounded-xl p-3 text-center">
-                    <span className="text-[7px] font-black text-gray-600 uppercase tracking-widest block mb-1">Influence</span>
-                    <span className="text-lg font-black text-white">{ceo.influence}</span>
+              <div className="grid grid-cols-2 gap-1.5 md:gap-2 mb-4 md:mb-6">
+                 <div className="bg-black/40 border border-white/5 rounded-xl p-2 md:p-3 text-center">
+                    <span className="text-[6px] font-black text-gray-600 uppercase tracking-widest block mb-0.5">Influence</span>
+                    <span className="text-base md:text-lg font-black text-white">{ceo.influence}</span>
                  </div>
-                 <div className="bg-black/40 border border-white/5 rounded-xl p-3 text-center">
-                    <span className="text-[7px] font-black text-gray-600 uppercase tracking-widest block mb-1">Momentum</span>
-                    <span className="text-lg font-black text-cyan-400">{ceo.momentum}</span>
+                 <div className="bg-black/40 border border-white/5 rounded-xl p-2 md:p-3 text-center">
+                    <span className="text-[6px] font-black text-gray-600 uppercase tracking-widest block mb-0.5">Momentum</span>
+                    <span className="text-base md:text-lg font-black text-cyan-400">{ceo.momentum}</span>
                  </div>
               </div>
 
-              <div className="mt-auto pt-4 border-t border-white/5 text-left">
-                 <span className="text-[7px] font-black text-gray-600 uppercase tracking-widest flex items-center gap-1 mb-2">
-                    <Activity size={10} /> Último Movimiento
+              <div className="mt-auto pt-3 border-t border-white/5 text-left">
+                 <span className="text-[6px] font-black text-gray-600 uppercase tracking-widest flex items-center gap-1 mb-1">
+                    <Activity size={8} /> Último Movimiento
                  </span>
-                 <p className="text-[10px] text-gray-400 font-light leading-snug italic">"{ceo.lastMove}"</p>
+                 <p className="text-[9px] text-gray-400 font-light leading-snug italic line-clamp-2 group-hover:line-clamp-none transition-all">"{ceo.lastMove}"</p>
               </div>
             </motion.div>
           ))}

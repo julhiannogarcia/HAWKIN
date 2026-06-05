@@ -35,7 +35,7 @@ export default function MarketTalentTerminal() {
              <Landmark size={16} className="text-green-500" />
              <span className="text-[10px] font-black text-green-500 uppercase tracking-widest">Global Capital & Talent</span>
            </div>
-           <h2 className="text-5xl md:text-7xl font-black italic tracking-tighter uppercase leading-none text-white">
+           <h2 className="text-4xl md:text-5xl font-black italic tracking-tighter uppercase leading-none text-white">
               Resource <span className="text-green-500">Radar.</span>
            </h2>
            <p className="text-gray-500 mt-4 text-[10px] font-black uppercase tracking-[0.5em]">Dónde entra el dinero. Dónde van las mentes.</p>

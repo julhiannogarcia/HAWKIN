@@ -39,17 +39,17 @@ export default function Hero() {
           animate={{ opacity: 1, y: 0 }}
           className="space-y-8"
         >
-          <div className="inline-flex items-center gap-2 px-4 py-2 bg-cyan-500/10 border border-cyan-500/20 rounded-full mb-4">
-             <Zap className="text-cyan-400" size={14} />
-             <span className="text-[10px] font-black text-cyan-400 uppercase tracking-[0.4em]">Ecosistema Global de IA</span>
+          <div className="inline-flex items-center gap-2 px-3 py-1.5 bg-cyan-500/5 border border-cyan-500/10 rounded-full mb-4">
+             <Zap className="text-cyan-400" size={12} />
+             <span className="text-[8px] font-black text-cyan-400 uppercase tracking-[0.4em]">Ecosistema Global de IA</span>
           </div>
 
-          <h1 className="text-7xl md:text-[120px] font-black tracking-tighter leading-[0.8] uppercase italic">
+          <h1 className="text-5xl md:text-8xl font-black tracking-tighter leading-[0.9] uppercase italic">
             Radar Alpha: <br />
-            <span className="bg-gradient-to-r from-cyan-400 via-purple-500 to-pink-500 bg-clip-text text-transparent drop-shadow-[0_0_30px_rgba(34,211,238,0.3)]">IA en Tiempo Real.</span>
+            <span className="bg-gradient-to-r from-cyan-400 via-purple-500 to-pink-500 bg-clip-text text-transparent drop-shadow-[0_0_20px_rgba(34,211,238,0.2)]">IA en Tiempo Real.</span>
           </h1>
 
-          <p className="text-gray-400 text-xl max-w-2xl mx-auto font-light leading-relaxed">
+          <p className="text-gray-500 text-base md:text-lg max-w-xl mx-auto font-light leading-relaxed">
             Interceptando los flujos de datos más críticos del planeta. 
             Filtraciones de OpenAI, NVIDIA y el pulso de Silicon Valley al segundo.
           </p>
@@ -57,11 +57,10 @@ export default function Hero() {
           <div className="flex flex-col md:flex-row items-center justify-center gap-6 pt-10">
             <button 
               onClick={() => document.getElementById('planes')?.scrollIntoView({behavior: 'smooth'})}
-              className="btn-glow text-[11px] py-6 px-12 group flex items-center gap-4"
+              className="btn-glow text-[10px] py-4 px-10 group flex items-center gap-3"
             >
-               COMENZAR AHORA <Shield size={18} className="group-hover:rotate-12 transition-transform" />
+               COMENZAR AHORA
             </button>
-          </div>
         </motion.div>
       </div>
 

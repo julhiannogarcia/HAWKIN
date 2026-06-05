@@ -4,7 +4,7 @@ import { useState, useEffect } from 'react';
 import Link from 'next/link';
 import { usePathname } from 'next/navigation';
 import { motion, AnimatePresence } from 'framer-motion';
-import { Menu, X, Shield, Globe, Terminal, User, Power, Bookmark } from 'lucide-react';
+import { Menu, X, Globe, Terminal, User, Power, Bookmark } from 'lucide-react';
 import { useAlpha } from '@/context/AlphaContext';
 
 export default function Header() {
@@ -27,11 +27,8 @@ export default function Header() {
       <nav className="max-w-6xl mx-auto flex items-center justify-between glass-card bg-black/40 backdrop-blur-xl border-white/5 py-4 px-8 rounded-full shadow-[0_20px_50px_rgba(0,0,0,0.5)]">
         
         {/* LOGO INSTITUCIONAL */}
-        <Link href="/" className="flex items-center gap-4 group">
-          <div className="w-10 h-10 bg-gradient-to-tr from-cyan-400 to-purple-600 rounded-xl flex items-center justify-center group-hover:rotate-12 transition-transform shadow-[0_0_20px_rgba(6,182,212,0.3)]">
-             <Shield className="text-white fill-white" size={24} />
-          </div>
-          <span className="text-2xl font-black tracking-tighter uppercase italic leading-none">HAWKIN</span>
+        <Link href="/" className="flex items-center gap-3 group transition-all">
+          <span className="text-xl font-black tracking-tighter uppercase italic leading-none hover:text-cyan-400 transition-colors">HAWKIN</span>
         </Link>
 
         {/* NAV LINKS DESKTOP */}

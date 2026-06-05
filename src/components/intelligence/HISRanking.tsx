@@ -132,7 +132,7 @@ export default function HISRanking() {
                 <div className="px-2 py-0.5 bg-cyan-500 text-black text-[8px] font-black uppercase rounded">Proprietary Metric</div>
                 <span className="text-[10px] font-black text-gray-500 uppercase tracking-widest">Global AI Index v6.1</span>
               </div>
-              <h2 className="text-5xl md:text-7xl font-black italic tracking-tighter uppercase leading-none text-white">
+              <h2 className="text-4xl md:text-5xl font-black italic tracking-tighter uppercase leading-none text-white">
                  HAWKIN Intelligence <span className="text-cyan-400">Score (HIS).</span>
               </h2>
               <p className="text-gray-500 mt-4 text-[10px] font-black uppercase tracking-[0.5em]">El Estado Mundial del Dominio Corporativo en IA</p>
@@ -149,32 +149,32 @@ export default function HISRanking() {
              >
                 <div className="flex flex-col lg:flex-row justify-between gap-12 items-center lg:items-stretch">
                    
-                   <div className="flex items-center gap-8 md:gap-12 lg:w-1/3">
-                      <div className="text-3xl md:text-4xl font-black text-gray-800 italic w-8 md:w-12">#{index + 1}</div>
-                      <div className="w-24 h-24 md:w-32 md:h-32 bg-white/5 rounded-[30px] md:rounded-[40px] flex items-center justify-center p-6 md:p-8 border border-white/5 group-hover:bg-white/10 transition-all shadow-3xl relative overflow-hidden shrink-0">
+                   <div className="flex items-center gap-6 md:gap-8 lg:w-1/3">
+                      <div className="text-2xl md:text-3xl font-black text-gray-800 italic w-6 md:w-10">#{index + 1}</div>
+                      <div className="w-20 h-20 md:w-24 md:h-24 bg-white/5 rounded-[25px] md:rounded-[30px] flex items-center justify-center p-4 md:p-6 border border-white/5 group-hover:bg-white/10 transition-all shadow-xl relative overflow-hidden shrink-0">
                          <div className="absolute inset-0 bg-gradient-to-br from-cyan-500/10 to-transparent opacity-0 group-hover:opacity-100 transition-opacity" />
                          <img src={company.logo} alt={company.name} className="w-full h-full object-contain brightness-0 invert opacity-60 group-hover:opacity-100 group-hover:scale-110 transition-all duration-700 relative z-10" />
                       </div>
                       <div>
-                         <h3 className="text-3xl md:text-4xl font-black uppercase italic tracking-tighter text-white">{company.name}</h3>
-                         <p className="text-[9px] md:text-[10px] font-black text-gray-600 uppercase tracking-widest mt-2 flex items-center gap-2">
+                         <h3 className="text-xl md:text-2xl font-black uppercase italic tracking-tighter text-white">{company.name}</h3>
+                         <p className="text-[8px] md:text-[9px] font-black text-gray-600 uppercase tracking-widest mt-1 flex items-center gap-2">
                             CEO: <span className="text-white italic">{company.ceo}</span>
                          </p>
                          <button 
                            onClick={() => setShowFormula(showFormula === company.id ? null : company.id)}
-                           className="mt-4 text-[8px] font-black uppercase tracking-widest text-cyan-500 hover:text-white flex items-center gap-2 underline decoration-dotted"
+                           className="mt-2 text-[7px] font-black uppercase tracking-widest text-cyan-500/50 hover:text-cyan-400 transition-colors underline decoration-dotted"
                          >
-                            <Info size={10} /> ¿Cómo se calcula?
+                            Fórmula HIS
                          </button>
                       </div>
                    </div>
 
-                   <div className="flex flex-col justify-center items-center lg:items-end gap-2 lg:w-1/3">
-                      <div className="text-[9px] md:text-[10px] font-black text-gray-600 uppercase tracking-[0.4em] text-center lg:text-right w-full">HIS Score</div>
-                      <div className="flex items-baseline gap-4">
-                         <span className="text-7xl md:text-8xl font-black italic tracking-tighter text-white leading-none">{company.his}</span>
-                         <div className={`flex items-center gap-1 text-xs md:text-sm font-black ${company.change > 0 ? 'text-cyan-400' : 'text-red-500'}`}>
-                            {company.change > 0 ? <TrendingUp size={16} /> : <TrendingDown size={16} />}
+                   <div className="flex flex-col justify-center items-center lg:items-end gap-1 lg:w-1/3">
+                      <div className="text-[8px] md:text-[9px] font-black text-gray-600 uppercase tracking-[0.4em] text-center lg:text-right w-full">HIS Score</div>
+                      <div className="flex items-baseline gap-3">
+                         <span className="text-5xl md:text-6xl font-black italic tracking-tighter text-white leading-none">{company.his}</span>
+                         <div className={`flex items-center gap-1 text-[10px] md:text-xs font-black ${company.change > 0 ? 'text-cyan-400' : 'text-red-500'}`}>
+                            {company.change > 0 ? <TrendingUp size={12} /> : <TrendingDown size={12} />}
                             {company.change}%
                          </div>
                       </div>

@@ -20,7 +20,7 @@ export default function TradingIntelligence() {
              <Landmark size={16} className="text-green-500" />
              <span className="text-[10px] font-black text-green-500 uppercase tracking-widest">Financial Terminal</span>
            </div>
-           <h2 className="text-5xl md:text-7xl font-black italic tracking-tighter uppercase leading-none text-white">
+           <h2 className="text-4xl md:text-5xl font-black italic tracking-tighter uppercase leading-none text-white">
               Trading <span className="text-green-500">Intelligence.</span>
            </h2>
            <p className="text-gray-500 mt-4 text-[10px] font-black uppercase tracking-[0.5em]">El Dinero Detrás de la IA Global</p>

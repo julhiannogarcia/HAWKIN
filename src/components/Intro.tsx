@@ -3,7 +3,6 @@
 import { motion, AnimatePresence } from 'framer-motion';
 import { useState, useEffect } from 'react';
 import { REGIONAL_EVENTS } from '@/lib/events';
-import { Shield } from 'lucide-react';
 
 export default function Intro() {
   const [isVisible, setIsVisible] = useState(false);
@@ -83,7 +82,7 @@ export default function Intro() {
               </motion.div>
             )}
 
-            {/* Slide Final: HAWKIN Reveal Con Logo Corporativo */}
+            {/* Slide Final: HAWKIN Reveal */}
             <motion.div
               initial={{ opacity: 0, scale: 0.9, filter: 'blur(10px)' }}
               animate={{ 
@@ -92,16 +91,13 @@ export default function Intro() {
                 filter: ['blur(10px)', 'blur(0px)', 'blur(0px)', 'blur(10px)']
               }}
               transition={{ delay: 3.5, duration: 3.5, times: [0, 0.2, 0.8, 1], ease: "easeInOut" }}
-              className="absolute inset-0 flex flex-col items-center justify-center gap-8"
+              className="absolute inset-0 flex flex-col items-center justify-center gap-4"
             >
-              <div className="w-32 h-32 bg-gradient-to-tr from-cyan-400 to-purple-600 rounded-[40px] flex items-center justify-center shadow-[0_0_50px_rgba(0,242,255,0.4)]">
-                 <Shield className="text-white fill-white" size={60} />
-              </div>
               <div className="text-center">
-                 <h1 className="text-7xl md:text-9xl font-black tracking-[0.1em] bg-gradient-to-r from-cyan-400 to-purple-600 bg-clip-text text-transparent drop-shadow-[0_0_30px_rgba(0,242,255,0.5)]">
+                 <h1 className="text-6xl md:text-8xl font-black tracking-[0.1em] bg-gradient-to-r from-cyan-400 to-purple-600 bg-clip-text text-transparent drop-shadow-[0_0_20px_rgba(0,242,255,0.3)]">
                    HAWKIN
                  </h1>
-                 <p className="mt-4 text-cyan-400 tracking-[0.5em] uppercase font-light">La Libertad del Futuro</p>
+                 <p className="mt-4 text-cyan-400 tracking-[0.5em] uppercase font-light text-[10px]">La Libertad del Futuro</p>
               </div>
             </motion.div>
           </div>

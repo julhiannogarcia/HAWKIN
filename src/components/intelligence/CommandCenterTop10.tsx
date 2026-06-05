@@ -26,7 +26,7 @@ export default function CommandCenterTop10() {
              <Target size={16} className="text-yellow-500" />
              <span className="text-[10px] font-black text-yellow-500 uppercase tracking-widest">Global Ranking System</span>
            </div>
-           <h2 className="text-5xl md:text-7xl font-black italic tracking-tighter uppercase leading-none text-white">
+           <h2 className="text-4xl md:text-5xl font-black italic tracking-tighter uppercase leading-none text-white">
               Command <span className="text-yellow-500">Center Top 10.</span>
            </h2>
            <p className="text-gray-500 mt-4 text-[10px] font-black uppercase tracking-[0.5em]">La Elite Absoluta del Día (Actualizado 24/7)</p>

@@ -19,7 +19,7 @@ export default function SecurityShield() {
              <ShieldAlert size={16} className="text-red-500" />
              <span className="text-[10px] font-black text-red-500 uppercase tracking-widest">Global Risk Center</span>
            </div>
-           <h2 className="text-5xl md:text-7xl font-black italic tracking-tighter uppercase leading-none text-white">
+           <h2 className="text-4xl md:text-5xl font-black italic tracking-tighter uppercase leading-none text-white">
               Security <span className="text-red-600">Shield.</span>
            </h2>
            <p className="text-gray-500 mt-4 text-[10px] font-black uppercase tracking-[0.5em]">Monitoreo de Ciberseguridad y Riesgos Regulatorios</p>
