@@ -14,7 +14,7 @@ export default function Header() {
 
   const navLinks = [
     { name: 'Inicio', href: '/' },
-    { name: 'Radar', href: '/#news', special: true, color: 'text-cyan-400' }, 
+    { name: 'Radar', href: '/radar', special: true, color: 'text-cyan-400' }, 
     { name: 'Shield', href: '/shield', special: true, color: 'text-purple-500' },
     { name: 'Donación', href: '/donacion', special: true, color: 'text-pink-500' }, 
     { name: 'B2B', href: '/b2b' },

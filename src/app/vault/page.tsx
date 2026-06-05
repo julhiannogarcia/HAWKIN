@@ -78,7 +78,7 @@ export default function VaultPage() {
                 <Zap size={40} />
              </div>
              <p className="text-gray-600 font-black uppercase text-xs tracking-widest">No has almacenado ningún reporte todavía.</p>
-             <button onClick={() => window.location.href = '/#news'} className="px-8 py-3 bg-white/5 border border-white/10 rounded-full text-[10px] font-black uppercase hover:bg-white hover:text-black transition-all">Explorar Radar</button>
+             <button onClick={() => window.location.href = '/radar'} className="px-8 py-3 bg-white/5 border border-white/10 rounded-full text-[10px] font-black uppercase hover:bg-white hover:text-black transition-all">Explorar Radar</button>
           </div>
         ) : (
           <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
