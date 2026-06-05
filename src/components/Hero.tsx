@@ -61,6 +61,7 @@ export default function Hero() {
             >
                COMENZAR AHORA
             </button>
+          </div>
         </motion.div>
       </div>
 
