@@ -102,7 +102,7 @@ export default function Home() {
         <Pricing />
         <Footer />
         <div className="text-center pb-10 opacity-20">
-           <span className="text-[7px] font-black uppercase tracking-[0.8em] text-gray-500">TITAN AI SYSTEM v6.1 // OPERATIONAL</span>
+           <span className="text-[7px] font-black uppercase tracking-[0.8em] text-gray-500">TITAN AI SYSTEM v9.2.1 // OPERATIONAL</span>
         </div>
         <GlobalTicker />
       </div>
