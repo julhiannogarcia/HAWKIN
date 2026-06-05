@@ -1,7 +1,7 @@
 'use client';
 
 import React from 'react';
-import { ShieldAlert, ShieldCheck, Activity, Globe, Lock, TriangleAlert } from 'lucide-react';
+import { ShieldAlert, ShieldCheck, Activity, Globe, Lock, TriangleAlert, Clock } from 'lucide-react';
 
 const ALERTS = [
   { id: 1, title: 'Vulnerabilidad Zero-Day en Protocolos de Auth', company: 'Multiples', risk: 'CRITICAL', impact: 'Pérdida de control de sesiones', status: 'ACTIVE', source: 'CISA', trust: 98, date: 'Hace 2 horas' },

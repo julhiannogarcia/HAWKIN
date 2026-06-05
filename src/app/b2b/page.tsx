@@ -98,7 +98,18 @@ export default function B2BPage() {
   // 2. ESTADOS
   const [isProcessing, setIsProcessing] = useState(false);
   const [paypalOrderId, setPaypalOrderId] = useState('');
-  const [availability, setAvailability] = useState<any>(null);
+  const [availability, setAvailability] = useState<{ day: number, available: boolean }[]>([]);
+  const [todayStr, setTodayStr] = useState('');
+
+  useEffect(() => {
+    // Generar disponibilidad aleatoria estable solo en el cliente
+    const days = Array.from({ length: 31 }, (_, i) => ({ 
+      day: i + 1, 
+      available: Math.random() > 0.1 
+    }));
+    setAvailability(days);
+    setTodayStr(new Date().toISOString().split('T')[0]);
+  }, []);
 
   const AD_PLANS = useMemo(() => [
     { id: 'plus', title: 'Plan Maestro Plus', days: 20, basePriceUSD: 265, placement: 'TOP_BANNER', reachLocal: '2.5M+', reachGlobal: '12M+', icon: <Sparkles className="text-blue-400" />, desc: 'Máxima visibilidad en cabecera global.' },
@@ -168,8 +179,6 @@ export default function B2BPage() {
 
   if (!isMounted) return <div className="min-h-screen bg-black" />;
 
-  const todayStr = new Date().toISOString().split('T')[0];
-
   return (
     <div className="min-h-screen bg-[#010101] text-white font-sans flex flex-col">
       <Header />
@@ -220,7 +229,7 @@ export default function B2BPage() {
                   <div className="p-8 bg-white/[0.02] border border-white/5 rounded-[40px] space-y-6">
                      <h4 className="text-xs font-black uppercase tracking-widest flex items-center gap-3"><Calendar className="text-blue-500" size={18} /> Disponibilidad</h4>
                      <div className="grid grid-cols-7 gap-1.5">
-                        {Array.from({ length: 31 }, (_, i) => ({ day: i + 1, available: Math.random() > 0.1 })).map((d) => (
+                        {availability.map((d) => (
                           <div key={d.day} className={`aspect-square rounded-lg flex items-center justify-center text-[8px] font-black border ${d.available ? 'bg-green-500/10 border-green-500/20 text-green-400' : 'bg-red-500/10 border-red-500/20 text-red-900 opacity-30'}`}>{d.day}</div>
                         ))}
                      </div>
