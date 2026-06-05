@@ -32,8 +32,6 @@ export default function AdSpace({ isPremium, type = 'banner' }: AdSpaceProps) {
         const geoData = geoRes ? await geoRes.json().catch(() => ({ countryCode: 'PE' })) : { countryCode: 'PE' };
         const country = geoData.countryCode || 'PE';
 
-        console.log(`[HAWKIN ADS] Solicitando pauta para: ${placement} en ${country}`);
-        
         // 2. Consultar API con país
         const res = await fetch(`/api/ads?placement=${placement}&country=${country}`);
         const data = await res.json();
@@ -42,15 +40,31 @@ export default function AdSpace({ isPremium, type = 'banner' }: AdSpaceProps) {
           setAd(data[Math.floor(Math.random() * data.length)]);
         } else {
           // 3. Fallback: Si no hay en esa ubicación o país, traer CUALQUIER pauta activa
-          console.log(`[HAWKIN ADS] Sin pauta específica. Buscando disponibilidad global...`);
           const resGlobal = await fetch(`/api/ads`);
           const dataGlobal = await resGlobal.json();
           if (Array.isArray(dataGlobal) && dataGlobal.length > 0) {
             setAd(dataGlobal[Math.floor(Math.random() * dataGlobal.length)]);
+          } else {
+            // 4. Fallback Estático Final (Garantía Visual)
+            setAd({
+              id: "hawkin-internal-01",
+              companyName: "HAWKIN ACADEMY",
+              bannerUrl: "https://images.unsplash.com/photo-1639762681485-074b7f938ba0?auto=format&fit=crop&q=80&w=2000",
+              targetUrl: "/academy",
+              placement: placement || "NEWS_FEED"
+            });
           }
         }
       } catch (e) {
         console.error("[HAWKIN ADS] Error de conexión:", e);
+        // Fallback en caso de error de red
+        setAd({
+          id: "hawkin-internal-err",
+          companyName: "HAWKIN INTELLIGENCE",
+          bannerUrl: "https://images.unsplash.com/photo-1451187580459-43490279c0fa?auto=format&fit=crop&q=80&w=2000",
+          targetUrl: "/",
+          placement: "TOP_BANNER"
+        });
       } finally {
         setLoading(false);
       }

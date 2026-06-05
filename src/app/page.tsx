@@ -23,6 +23,7 @@ const CommandCenterTop10 = dynamic(() => import('@/components/intelligence/Comma
 const MarketTalentTerminal = dynamic(() => import('@/components/intelligence/MarketTalentTerminal'), { ssr: false });
 const ExecutiveBrief = dynamic(() => import('@/components/intelligence/ExecutiveBrief'), { ssr: false });
 const LiveStatusBar = dynamic(() => import('@/components/intelligence/LiveStatusBar'), { ssr: false });
+const FounderSection = dynamic(() => import('@/components/FounderSection'), { ssr: false });
 
 export default function Home() {
   const [isMounted, setIsMounted] = useState(false);
@@ -52,6 +53,8 @@ export default function Home() {
         </div>
 
         <Hero />
+
+        <FounderSection />
 
         <GlobalAIPulse />
 

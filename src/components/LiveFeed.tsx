@@ -58,6 +58,12 @@ export default function LiveFeed() {
            <LoaderCircle className="animate-spin text-cyan-500" size={40} />
            <p className="text-[10px] font-black uppercase tracking-[0.5em] text-gray-700 animate-pulse">Interceptando flujos de datos...</p>
         </div>
+      ) : news.length === 0 ? (
+        <div className="py-40 text-center space-y-6 bg-white/[0.01] border-2 border-dashed border-white/5 rounded-[60px]">
+           <ShieldAlert className="mx-auto text-gray-800" size={48} />
+           <p className="text-sm font-black text-gray-600 uppercase tracking-widest">No se detectan señales en este cuadrante.</p>
+           <button onClick={() => window.location.reload()} className="text-[10px] underline font-black uppercase text-cyan-500">Forzar Escaneo</button>
+        </div>
       ) : (
         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
           <AnimatePresence>

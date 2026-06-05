@@ -26,12 +26,15 @@ export default function Header() {
     <header className="fixed top-0 left-0 w-full z-[1000] p-6">
       <nav className="max-w-6xl mx-auto flex items-center justify-between glass-card bg-black/40 backdrop-blur-xl border-white/5 py-4 px-8 rounded-full shadow-[0_20px_50px_rgba(0,0,0,0.5)]">
         
-        {/* LOGO */}
-        <Link href="/" className="flex items-center gap-2 group">
-          <div className="w-8 h-8 bg-gradient-to-tr from-cyan-400 to-purple-600 rounded-lg flex items-center justify-center group-hover:rotate-12 transition-transform">
-             <Shield className="text-white fill-white" size={18} />
+        {/* LOGO INSTITUCIONAL */}
+        <Link href="/" className="flex items-center gap-4 group">
+          <div className="w-10 h-10 bg-gradient-to-tr from-cyan-400 to-purple-600 rounded-xl flex items-center justify-center group-hover:rotate-12 transition-transform shadow-[0_0_20px_rgba(6,182,212,0.3)]">
+             <Shield className="text-white fill-white" size={24} />
           </div>
-          <span className="text-xl font-black tracking-tighter uppercase italic">HAWKIN</span>
+          <div className="flex flex-col text-left">
+             <span className="text-2xl font-black tracking-tighter uppercase italic leading-none">HAWKIN</span>
+             <span className="text-[6px] font-black tracking-[0.4em] text-cyan-500 uppercase leading-none mt-1">Intelligence</span>
+          </div>
         </Link>
 
         {/* NAV LINKS DESKTOP */}
