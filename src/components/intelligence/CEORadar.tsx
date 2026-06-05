@@ -36,7 +36,7 @@ const CEOS = [
   { 
     name: 'Dario Amodei', company: 'Anthropic', role: 'CEO', 
     logo: 'https://upload.wikimedia.org/wikipedia/commons/thumb/7/78/Anthropic_logo.svg/2560px-Anthropic_logo.svg.png',
-    photo: 'https://images.crunchbase.com/image/upload/c_thumb,h_256,w_256,f_auto,g_faces,z_0.7/u6y1v6f7z7l6m8m4h8u0', 
+    photo: 'https://upload.wikimedia.org/wikipedia/commons/1/1d/Dario_Amodei_2024.jpg', 
     influence: 93, momentum: '+4.5', confidence: 89, 
     lastMove: 'Lanzamiento de Claude 3.5 Sonnet superando benchmarks.', color: '#d97757' 
   },
@@ -84,9 +84,9 @@ function CEOImage({ src, alt, logo }: { src: string, alt: string, logo?: string 
     <div className="relative w-32 h-32 mx-auto mb-8">
        <div className="w-full h-full rounded-[40px] overflow-hidden border-2 border-white/10 group-hover:border-cyan-500/50 transition-all shadow-2xl bg-gray-900 flex items-center justify-center">
           {error ? (
-            <div className="w-full h-full flex flex-col items-center justify-center p-6">
+            <div className="w-full h-full flex flex-col items-center justify-center p-6 bg-black">
                {logo ? (
-                 <img src={logo} className="w-full h-full object-contain brightness-0 invert opacity-20" alt="logo fallback" />
+                 <img src={logo} className="w-full h-full object-contain brightness-0 invert opacity-60" alt="logo fallback" />
                ) : (
                  <User size={60} className="text-gray-800" />
                )}
@@ -95,7 +95,7 @@ function CEOImage({ src, alt, logo }: { src: string, alt: string, logo?: string 
             <img 
               src={src} 
               alt={alt} 
-              className="w-full h-full object-cover opacity-80 group-hover:opacity-100 transition-all duration-700" 
+              className="w-full h-full object-cover opacity-90 group-hover:opacity-100 transition-all duration-700" 
               onError={() => setError(true)}
             />
           )}

@@ -31,10 +31,7 @@ export default function Header() {
           <div className="w-10 h-10 bg-gradient-to-tr from-cyan-400 to-purple-600 rounded-xl flex items-center justify-center group-hover:rotate-12 transition-transform shadow-[0_0_20px_rgba(6,182,212,0.3)]">
              <Shield className="text-white fill-white" size={24} />
           </div>
-          <div className="flex flex-col text-left">
-             <span className="text-2xl font-black tracking-tighter uppercase italic leading-none">HAWKIN</span>
-             <span className="text-[6px] font-black tracking-[0.4em] text-cyan-500 uppercase leading-none mt-1">Intelligence</span>
-          </div>
+          <span className="text-2xl font-black tracking-tighter uppercase italic leading-none">HAWKIN</span>
         </Link>
 
         {/* NAV LINKS DESKTOP */}

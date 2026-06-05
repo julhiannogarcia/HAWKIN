@@ -54,8 +54,6 @@ export default function Home() {
 
         <Hero />
 
-        <FounderSection />
-
         <GlobalAIPulse />
 
         <HISRanking />
