@@ -28,7 +28,7 @@ export default function AdSpace({ isPremium, type = 'banner' }: AdSpaceProps) {
       try {
         const placement = TYPE_MAP[type] || "TOP_BANNER";
         
-        // Intentar obtener anuncios desde la API
+        // 1. Intentar obtener anuncios desde la API
         const res = await fetch(`/api/ads?placement=${placement}`);
         if (res.ok) {
           const data = await res.json();
@@ -39,7 +39,7 @@ export default function AdSpace({ isPremium, type = 'banner' }: AdSpaceProps) {
           }
         }
         
-        // Si la API falla o no hay datos, usar el respaldo institucional
+        // 2. FALLBACK INSTITUCIONAL PRO (EL COMERCIAL ORIGINAL)
         setAd({
           id: "hawkin-academy-default",
           companyName: "HAWKIN ACADEMY",
@@ -61,17 +61,13 @@ export default function AdSpace({ isPremium, type = 'banner' }: AdSpaceProps) {
   const handleAdClick = async () => {
     if (!ad?.id) return;
     if (ad.targetUrl) window.open(ad.targetUrl, '_blank');
-    fetch('/api/ads', {
-      method: 'POST',
-      headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify({ id: ad.id })
-    }).catch(console.error);
   };
 
   const getUrlType = (url: string) => {
     if (!url) return 'none';
     const u = url.toLowerCase();
     if (u.match(/\.(mp4|webm|ogg)$/)) return 'direct-video';
+    if (u.includes('youtube.com/embed') || u.includes('player.vimeo.com/video')) return 'embed';
     if (u.includes('youtube.com/watch') || u.includes('youtu.be')) return 'youtube';
     if (u.includes('vimeo.com')) return 'vimeo';
     if (u.match(/\.(jpg|jpeg|png|webp|gif|svg)$/) || u.includes('images.unsplash')) return 'image';
@@ -79,6 +75,7 @@ export default function AdSpace({ isPremium, type = 'banner' }: AdSpaceProps) {
   };
 
   const getYouTubeEmbed = (url: string) => {
+    if (url.includes('embed')) return url;
     let id = '';
     if (url.includes('v=')) id = url.split('v=')[1].split('&')[0];
     else if (url.includes('youtu.be/')) id = url.split('youtu.be/')[1].split('?')[0];
@@ -86,6 +83,7 @@ export default function AdSpace({ isPremium, type = 'banner' }: AdSpaceProps) {
   };
 
   const getVimeoEmbed = (url: string) => {
+    if (url.includes('video/')) return url;
     const id = url.split('vimeo.com/')[1].split('?')[0];
     return `https://player.vimeo.com/video/${id}?autoplay=1&muted=1&loop=1&background=1`;
   };
@@ -112,15 +110,24 @@ export default function AdSpace({ isPremium, type = 'banner' }: AdSpaceProps) {
     switch (urlType) {
       case 'direct-video':
         return (
-          <video autoPlay loop muted playsInline className="absolute inset-0 w-full h-full object-cover group-hover:scale-105 transition-transform duration-[10s]">
+          <video autoPlay loop muted playsInline className="absolute inset-0 w-full h-full object-cover">
             <source src={ad.bannerUrl} type="video/mp4" />
           </video>
+        );
+      case 'embed':
+        return (
+          <iframe 
+            src={ad.bannerUrl}
+            className="absolute inset-0 w-full h-full pointer-events-none"
+            frameBorder="0"
+            allow="autoplay; fullscreen"
+          />
         );
       case 'youtube':
         return (
           <iframe 
             src={getYouTubeEmbed(ad.bannerUrl)}
-            className="absolute inset-0 w-full h-[150%] -top-[25%] pointer-events-none group-hover:scale-105 transition-transform duration-[10s]"
+            className="absolute inset-0 w-full h-[150%] -top-[25%] pointer-events-none"
             frameBorder="0"
             allow="autoplay; fullscreen"
           />
@@ -129,70 +136,28 @@ export default function AdSpace({ isPremium, type = 'banner' }: AdSpaceProps) {
         return (
           <iframe 
             src={getVimeoEmbed(ad.bannerUrl)}
-            className="absolute inset-0 w-full h-full pointer-events-none group-hover:scale-105 transition-transform duration-[10s]"
+            className="absolute inset-0 w-full h-full pointer-events-none"
             frameBorder="0"
             allow="autoplay; fullscreen"
           />
         );
       case 'image':
       default:
-        return <img src={ad.bannerUrl} className="absolute inset-0 w-full h-full object-cover group-hover:scale-105 transition-transform duration-[10s]" alt="Ad Banner" />;
+        return <img src={ad.bannerUrl} className="absolute inset-0 w-full h-full object-cover" alt="Ad Banner" />;
     }
   };
 
-  // FORMATO 1: PLUS STREAMING (LIMPIO DE BRANDING HAWKIN)
-  if (type === 'banner' || type === 'video-hero') {
-    return (
-      <motion.div 
-        initial={{ opacity: 0 }} animate={{ opacity: 1 }}
-        onClick={handleAdClick}
-        className="relative w-full min-h-[500px] md:min-h-[600px] rounded-[60px] overflow-hidden group cursor-pointer shadow-2xl border border-white/5 bg-black"
-      >
-        {renderBackground()}
-        
-        <div className="absolute inset-0 bg-gradient-to-t from-black/60 via-transparent to-transparent group-hover:bg-black/10 transition-colors" />
-
-        <div className="absolute bottom-12 left-12 z-10 opacity-0 group-hover:opacity-100 transition-opacity">
-           <h4 className="text-4xl font-black text-white uppercase italic tracking-tighter drop-shadow-2xl">
-             {ad.companyName}
-           </h4>
-        </div>
-
-        {(urlType === 'direct-video' || urlType === 'youtube' || urlType === 'vimeo') && (
-          <div className="absolute top-8 right-8 bg-red-600 px-4 py-1.5 rounded-full flex items-center gap-2 animate-pulse shadow-xl">
-             <div className="w-1.5 h-1.5 bg-white rounded-full" />
-             <span className="text-[8px] font-black text-white uppercase tracking-widest">LIVE STREAM</span>
-          </div>
-        )}
-      </motion.div>
-    );
-  }
-
-  // FORMATO 2: NATIVE
-  if (type === 'inline') {
-    return (
-      <motion.div 
-        initial={{ opacity: 0 }} animate={{ opacity: 1 }}
-        onClick={handleAdClick}
-        className="w-full h-96 rounded-[50px] overflow-hidden border-2 border-white/5 hover:border-blue-500/40 transition-all cursor-pointer relative group shadow-2xl my-16 bg-black"
-      >
-        {renderBackground()}
-        <div className="absolute inset-0 bg-gradient-to-t from-black/80 via-transparent to-transparent flex flex-col justify-end p-12">
-           <h4 className="text-3xl font-black text-white uppercase italic tracking-tighter">{ad.companyName}</h4>
-           <p className="text-blue-400 text-[10px] font-black uppercase tracking-[0.4em] mt-2">Socio Patrocinador</p>
-        </div>
-      </motion.div>
-    );
-  }
-
-  // FORMATO 3: SIDEBAR
   return (
-    <div 
+    <motion.div 
+      initial={{ opacity: 0 }} animate={{ opacity: 1 }}
       onClick={handleAdClick}
-      className="w-full aspect-square bg-black border border-white/5 rounded-3xl overflow-hidden group hover:border-blue-500/40 transition-all cursor-pointer relative shadow-xl"
+      className={`relative w-full ${type === 'inline' ? 'h-96' : 'min-h-[400px] md:min-h-[500px]'} rounded-[50px] overflow-hidden group cursor-pointer shadow-2xl border border-white/5 bg-black`}
     >
       {renderBackground()}
-      <div className="absolute inset-0 bg-black/40 group-hover:bg-transparent transition-all" />
-    </div>
+      <div className="absolute inset-0 bg-gradient-to-t from-black/80 via-transparent to-transparent flex flex-col justify-end p-12">
+         <h4 className="text-3xl font-black text-white uppercase italic tracking-tighter">{ad.companyName}</h4>
+         <p className="text-blue-400 text-[10px] font-black uppercase tracking-[0.4em] mt-2">Socio Patrocinador</p>
+      </div>
+    </motion.div>
   );
 }
