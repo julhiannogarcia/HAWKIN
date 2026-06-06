@@ -46,7 +46,7 @@ const COMPANIES = [
     weights: { innovation: 35, talent: 20, capital: 10, execution: 10, impact: 10, adoption: 10, future: 5 }
   },
   { 
-    id: 'microsoft', name: 'Microsoft', logo: 'https://unavatar.io/twitter/Microsoft', 
+    id: 'microsoft', name: 'Microsoft', logo: 'https://logo.clearbit.com/microsoft.com', 
     his: 91.5, confidence: 95, change: +0.8, 
     why: 'Adopción empresarial de Copilot y mega-clústeres Azure.', 
     ceo: 'Satya Nadella', 
@@ -55,7 +55,7 @@ const COMPANIES = [
     weights: { innovation: 15, talent: 15, capital: 25, execution: 20, impact: 15, adoption: 5, future: 5 }
   },
   { 
-    id: 'meta', name: 'Meta AI', logo: 'https://unavatar.io/twitter/Meta', 
+    id: 'meta', name: 'Meta AI', logo: 'https://logo.clearbit.com/meta.com', 
     his: 89.2, confidence: 91, change: +2.4, 
     why: 'Llama 3 establece el estándar open-source. Adopción global.', 
     ceo: 'Mark Zuckerberg', 
@@ -73,7 +73,7 @@ const COMPANIES = [
     weights: { innovation: 25, talent: 15, capital: 15, execution: 25, impact: 10, adoption: 5, future: 5 }
   },
   { 
-    id: 'amazon', name: 'Amazon AI', logo: 'https://unavatar.io/twitter/amazon', 
+    id: 'amazon', name: 'Amazon AI', logo: 'https://logo.clearbit.com/amazon.com', 
     his: 86.4, confidence: 90, change: -1.2, 
     why: 'Retrasos en modelos propios, dependencia estratégica de Anthropic.', 
     ceo: 'Andy Jassy', 
@@ -82,7 +82,7 @@ const COMPANIES = [
     weights: { innovation: 15, talent: 15, capital: 25, execution: 15, impact: 15, adoption: 10, future: 5 }
   },
   { 
-    id: 'apple', name: 'Apple', logo: 'https://unavatar.io/twitter/Apple', 
+    id: 'apple', name: 'Apple', logo: 'https://logo.clearbit.com/apple.com', 
     his: 85.9, confidence: 88, change: +3.0, 
     why: 'Apple Intelligence lleva IA local a millones de usuarios.', 
     ceo: 'Tim Cook', 
@@ -100,7 +100,7 @@ const COMPANIES = [
     weights: { innovation: 30, talent: 15, capital: 10, execution: 15, impact: 10, adoption: 15, future: 5 }
   },
   { 
-    id: 'figure', name: 'Figure AI', logo: 'https://unavatar.io/twitter/figure_ai', 
+    id: 'figure', name: 'Figure AI', logo: 'https://unavatar.io/twitter/Figure_robot', 
     his: 81.5, confidence: 78, change: +5.4, 
     why: 'Despliegue de humanoides en líneas de producción reales.', 
     ceo: 'Brett Adcock', 
@@ -131,7 +131,7 @@ function CompanyLogo({ src, alt }: { src: string, alt: string }) {
          <img 
            src={src} 
            alt={alt} 
-           className="w-full h-full object-contain brightness-0 invert opacity-60 group-hover:opacity-100 group-hover:scale-110 transition-all duration-700 relative z-10" 
+           className="w-full h-full object-contain brightness-125 opacity-80 group-hover:opacity-100 group-hover:scale-110 transition-all duration-700 relative z-10" 
            onError={() => setError(true)}
          />
        )}
