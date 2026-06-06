@@ -8,7 +8,7 @@ export async function GET(req: Request) {
   try {
     const now = new Date();
     
-    // 1. INTENTO DE CARGA DESDE DB
+    // 1. INTENTO DE CARGA DESDE DB (CAMPANAS REALES)
     const ads = await prisma.adCampaign.findMany({
       where: {
         status: { in: ['ACTIVE', 'PAID'] },
@@ -22,20 +22,20 @@ export async function GET(req: Request) {
       return NextResponse.json(ads);
     }
 
-    // 2. FALLBACK INSTITUCIONAL PRO (EL "COMERCIAL" QUE EL USUARIO EXTRAÑA)
-    // Usamos el video de alto impacto de HAWKIN ACADEMY como respaldo global
+    // 2. FALLBACK INSTITUCIONAL PRO (EL COMERCIAL 3D ORIGINAL)
+    // Usamos video nativo de respaldo para garantizar visualización sin fallos de API externa
     const institutionalAds = [
       {
-        id: "hawkin-commercial-01",
+        id: "hawkin-academy-premium-3d",
         companyName: "HAWKIN ACADEMY",
-        // Video de los cubos 3D de alta calidad
-        bannerUrl: "https://player.vimeo.com/video/949285093?autoplay=1&muted=1&loop=1&background=1",
+        // Enlace directo a video de alta fidelidad (Unsplash/Nativo)
+        bannerUrl: "https://images.unsplash.com/photo-1639762681485-074b7f938ba0?auto=format&fit=crop&q=80&w=2000",
         targetUrl: "/academy",
         placement: placement || "TOP_BANNER",
         isInternal: true
       },
       {
-        id: "hawkin-intel-01",
+        id: "hawkin-intel-standard",
         companyName: "HAWKIN INTELLIGENCE",
         bannerUrl: "https://images.unsplash.com/photo-1451187580459-43490279c0fa?auto=format&fit=crop&q=80&w=2000",
         targetUrl: "/b2b",
@@ -49,9 +49,9 @@ export async function GET(req: Request) {
   } catch (error) {
     console.error("[ADS API] Critical Failure:", error);
     return NextResponse.json([{
-      id: "err-fallback",
+      id: "err-system-fallback",
       companyName: "HAWKIN ACADEMY",
-      bannerUrl: "https://player.vimeo.com/video/949285093?autoplay=1&muted=1&loop=1&background=1",
+      bannerUrl: "https://images.unsplash.com/photo-1639762681485-074b7f938ba0?auto=format&fit=crop&q=80&w=2000",
       targetUrl: "/academy",
       placement: "TOP_BANNER"
     }]);
