@@ -6,101 +6,105 @@ import { Target, TrendingUp, TrendingDown, Users, Globe, Zap, ShieldCheck, Activ
 
 const CEOS = [
   { 
-    name: 'Sam Altman', company: 'OpenAI', role: 'CEO', 
-    logo: 'https://upload.wikimedia.org/wikipedia/commons/4/4d/OpenAI_Logo.svg',
-    photo: 'https://images.openai.com/blob/6130513a-0792-4980-9731-15e2695bf58b/sam-altman.jpg', 
-    influence: 98, momentum: '+4.2', confidence: 95, 
+    id: 1, name: "Sam Altman", role: "CEO @ OpenAI", company: "OpenAI",
+    influence: 98, momentum: "+4.2", confidence: 95,
+    photo: "/avatars/sam-altman.jpg",
+    logo: "https://upload.wikimedia.org/wikipedia/commons/4/4d/OpenAI_Logo.svg",
     lastMove: 'Alianza global con Apple Intelligence. Despliegue de GPT-4o.', color: '#10a37f' 
   },
   { 
-    name: 'Jensen Huang', company: 'NVIDIA', role: 'CEO', 
-    logo: 'https://upload.wikimedia.org/wikipedia/sco/2/21/Nvidia_logo.svg',
-    photo: 'https://cdn.statically.io/img/upload.wikimedia.org/wikipedia/commons/thumb/c/c4/Jensen_Huang_at_Computex_2023.jpg/800px-Jensen_Huang_at_Computex_2023.jpg', 
-    influence: 99, momentum: '+5.5', confidence: 98, 
+    id: 2, name: "Jensen Huang", role: "CEO @ NVIDIA", company: "NVIDIA",
+    influence: 99, momentum: "+5.5", confidence: 98,
+    photo: "/avatars/jensen-huang.jpg",
+    logo: "https://upload.wikimedia.org/wikipedia/sco/2/21/Nvidia_logo.svg",
     lastMove: 'Anuncio de arquitectura Vera Rubin. Dominio absoluto de mercado.', color: '#76b900' 
   },
   { 
-    name: 'Elon Musk', company: 'xAI', role: 'Founder', 
-    logo: 'https://upload.wikimedia.org/wikipedia/commons/b/b2/X_logo_2023.svg',
-    photo: 'https://www.tesla.com/sites/default/files/about/executives/elon-musk.jpg', 
-    influence: 96, momentum: '+6.1', confidence: 90, 
+    id: 3, name: "Elon Musk", role: "Founder @ xAI", company: "xAI",
+    influence: 96, momentum: "+6.1", confidence: 90,
+    photo: "/avatars/elon-musk.jpg",
+    logo: "https://upload.wikimedia.org/wikipedia/commons/b/b2/X_logo_2023.svg",
     lastMove: 'Fusión de capacidades xAI con Starlink. Mega-clúster en Memphis.', color: '#ffffff' 
   },
   { 
-    name: 'Demis Hassabis', company: 'Google DeepMind', role: 'CEO', 
-    logo: 'https://upload.wikimedia.org/wikipedia/commons/5/53/Google_G_Logo.svg',
-    photo: 'https://cdn.statically.io/img/upload.wikimedia.org/wikipedia/commons/thumb/5/5d/Demis_Hassabis_%282024%29.jpg/800px-Demis_Hassabis_%282024%29.jpg', 
-    influence: 95, momentum: '+3.8', confidence: 92, 
+    id: 4, name: "Demis Hassabis", role: "CEO @ Google DeepMind", company: "Google DeepMind",
+    influence: 95, momentum: "+3.8", confidence: 92,
+    photo: "/avatars/demis-hassabis.jpg",
+    logo: "https://upload.wikimedia.org/wikipedia/commons/5/53/Google_G_Logo.svg",
     lastMove: 'Avances en biología computacional (AlphaFold 3).', color: '#4285F4' 
   },
   { 
-    name: 'Dario Amodei', company: 'Anthropic', role: 'CEO', 
-    logo: 'https://upload.wikimedia.org/wikipedia/commons/thumb/7/78/Anthropic_logo.svg/2560px-Anthropic_logo.svg.png',
-    photo: 'https://cdn.statically.io/img/upload.wikimedia.org/wikipedia/commons/thumb/e/e4/Dario_Amodei_at_TechCrunch_Disrupt_2023_01_%28cropped%29.jpg/800px-Dario_Amodei_at_TechCrunch_Disrupt_2023_01_%28cropped%29.jpg', 
-    influence: 93, momentum: '+4.5', confidence: 89, 
+    id: 5, name: "Dario Amodei", role: "CEO @ Anthropic", company: "Anthropic",
+    influence: 93, momentum: "+4.5", confidence: 89,
+    photo: "/avatars/dario-amodei.jpg",
+    logo: "https://upload.wikimedia.org/wikipedia/commons/thumb/7/78/Anthropic_logo.svg/2560px-Anthropic_logo.svg.png",
     lastMove: 'Lanzamiento de Claude 3.5 Sonnet superando benchmarks.', color: '#d97757' 
   },
   { 
-    name: 'Satya Nadella', company: 'Microsoft', role: 'CEO', 
-    logo: 'https://upload.wikimedia.org/wikipedia/commons/4/44/Microsoft_logo.svg',
-    photo: 'https://news.microsoft.com/wp-content/uploads/prod/sites/45/2014/01/Satya-Nadella-Portrait.jpg', 
-    influence: 97, momentum: '+2.1', confidence: 96, 
+    id: 6, name: "Satya Nadella", role: "CEO @ Microsoft", company: "Microsoft",
+    influence: 97, momentum: "+2.1", confidence: 96,
+    photo: "/avatars/satya-nadella.jpg",
+    logo: "https://upload.wikimedia.org/wikipedia/commons/4/44/Microsoft_logo.svg",
     lastMove: 'Integración agresiva de Copilot en todo el ecosistema Windows.', color: '#00a4ef' 
   },
   { 
-    name: 'Mark Zuckerberg', company: 'Meta', role: 'CEO', 
-    logo: 'https://upload.wikimedia.org/wikipedia/commons/7/7b/Meta_Platforms_Inc._logo.svg',
-    photo: 'https://cdn.statically.io/img/upload.wikimedia.org/wikipedia/commons/thumb/1/18/Mark_Zuckerberg_F8_2019_Keynote_%2832830578717%29_%28cropped%29.jpg/800px-Mark_Zuckerberg_F8_2019_Keynote_%2832830578717%29_%28cropped%29.jpg', 
-    influence: 94, momentum: '+5.0', confidence: 93, 
+    id: 7, name: "Mark Zuckerberg", role: "CEO @ Meta", company: "Meta",
+    influence: 94, momentum: "+5.0", confidence: 93,
+    photo: "/avatars/mark-zuckerberg.jpg",
+    logo: "https://upload.wikimedia.org/wikipedia/commons/7/7b/Meta_Platforms_Inc._logo.svg",
     lastMove: 'Llama 3 Open Source disrumpiendo el modelo de negocio cerrado.', color: '#0668E1' 
   },
   { 
-    name: 'Sundar Pichai', company: 'Alphabet', role: 'CEO', 
-    logo: 'https://upload.wikimedia.org/wikipedia/commons/5/53/Google_G_Logo.svg',
-    photo: 'https://cdn.statically.io/img/upload.wikimedia.org/wikipedia/commons/thumb/6/6d/Sundar_Pichai_%282023%29.jpg/800px-Sundar_Pichai_%282023%29.jpg', 
-    influence: 95, momentum: '+1.5', confidence: 91, 
+    id: 8, name: "Sundar Pichai", role: "CEO @ Alphabet", company: "Alphabet",
+    influence: 95, momentum: "+1.5", confidence: 91,
+    photo: "/avatars/sundar-pichai.jpg",
+    logo: "https://upload.wikimedia.org/wikipedia/commons/5/53/Google_G_Logo.svg",
     lastMove: 'Reestructuración interna para acelerar Gemini.', color: '#4285F4' 
   },
   { 
-    name: 'Ilya Sutskever', company: 'SSI', role: 'Founder', 
-    logo: 'https://images.crunchbase.com/image/upload/c_thumb,h_256,w_256,f_auto,g_faces,z_0.7/v1500000000/i6v6v6h8o8z8l8u8p8u0.jpg',
-    photo: 'https://cdn.statically.io/img/upload.wikimedia.org/wikipedia/commons/thumb/5/5e/Ilya_Sutskever_%282023%29.jpg/800px-Ilya_Sutskever_%282023%29.jpg', 
-    influence: 92, momentum: '+8.0', confidence: 85, 
+    id: 9, name: "Ilya Sutskever", role: "Founder @ SSI", company: "SSI",
+    influence: 92, momentum: "+8.0", confidence: 85,
+    photo: "/avatars/ilya-sutskever.jpg",
+    logo: "https://images.crunchbase.com/image/upload/c_thumb,h_256,w_256,f_auto,g_faces,z_0.7/v1500000000/i6v6v6h8o8z8l8u8p8u0.jpg",
     lastMove: 'Fundación de Safe Superintelligence Inc. tras salida de OpenAI.', color: '#888888' 
   },
   { 
-    name: 'Alexandr Wang', company: 'Scale AI', role: 'CEO', 
-    logo: 'https://images.unsplash.com/photo-1550751827-4bd374c3f58b?auto=format&fit=crop&q=80&w=100',
-    photo: 'https://cdn.statically.io/img/upload.wikimedia.org/wikipedia/commons/thumb/0/0a/Alexandr_Wang_at_the_2023_World_Economic_Forum.jpg/800px-Alexandr_Wang_at_the_2023_World_Economic_Forum.jpg', 
-    influence: 90, momentum: '+4.0', confidence: 88, 
+    id: 10, name: "Alexandr Wang", role: "CEO @ Scale AI", company: "Scale AI",
+    influence: 90, momentum: "+4.0", confidence: 88,
+    photo: "/avatars/alexandr-wang.jpg",
+    logo: "https://images.unsplash.com/photo-1550751827-4bd374c3f58b?auto=format&fit=crop&q=80&w=100",
     lastMove: 'Levantamiento de $1B en Series F para dominio de datos.', color: '#aa00ff' 
   }
 ];
 
-function CEOImage({ src, alt, logo }: { src: string, alt: string, logo?: string }) {
+function CEOImage({ src, alt, logo, ceoName }: { src: string, alt: string, logo?: string, ceoName: string }) {
   const [error, setError] = useState(false);
+
+  // Mapeo de fallbacks oficiales de alta disponibilidad por si las locales no existen
+  const FALLBACKS: Record<string, string> = {
+    "Sam Altman": "https://images.openai.com/blob/6130513a-0792-4980-9731-15e2695bf58b/sam-altman.jpg",
+    "Jensen Huang": "https://images.weserv.nl/?url=https://upload.wikimedia.org/wikipedia/commons/e/e6/Jen-Hsun_Huang_2025.jpg&w=400&h=400&fit=cover",
+    "Elon Musk": "https://www.tesla.com/sites/default/files/about/executives/elon-musk.jpg",
+    "Satya Nadella": "https://news.microsoft.com/wp-content/uploads/prod/sites/45/2014/01/Satya-Nadella-Portrait.jpg",
+    "Mark Zuckerberg": "https://images.weserv.nl/?url=https://upload.wikimedia.org/wikipedia/commons/d/d5/Mark_Zuckerberg_F8_2018_Keynote_%28cropped_2%29.jpg&w=400&h=400&fit=cover",
+    "Sundar Pichai": "https://images.weserv.nl/?url=https://upload.wikimedia.org/wikipedia/commons/6/6d/Sundar_Pichai_%282023%29.jpg&w=400&h=400&fit=cover",
+    "Demis Hassabis": "https://images.weserv.nl/?url=https://upload.wikimedia.org/wikipedia/commons/5/5d/Demis_Hassabis_%282024%29.jpg&w=400&h=400&fit=cover",
+    "Dario Amodei": "https://images.weserv.nl/?url=https://upload.wikimedia.org/wikipedia/commons/thumb/e/e4/Dario_Amodei_at_TechCrunch_Disrupt_2023_01_%28cropped%29.jpg/960px-Dario_Amodei_at_TechCrunch_Disrupt_2023_01_%28cropped%29.jpg&w=400&h=400&fit=cover",
+    "Ilya Sutskever": "https://images.weserv.nl/?url=https://upload.wikimedia.org/wikipedia/commons/thumb/d/d4/Ilya_Sutskever_and_Sam_Altman_in_TAU_%28cropped%29.jpg/960px-Ilya_Sutskever_and_Sam_Altman_in_TAU_%28cropped%29.jpg&w=400&h=400&fit=cover",
+    "Alexandr Wang": "https://images.weserv.nl/?url=https://upload.wikimedia.org/wikipedia/commons/thumb/0/0a/Alexandr_Wang_at_the_2023_World_Economic_Forum.jpg/640px-Alexandr_Wang_at_the_2023_World_Economic_Forum.jpg&w=400&h=400&fit=cover"
+  };
 
   return (
     <div className="relative w-32 h-32 mx-auto mb-8">
        <div className="w-full h-full rounded-[40px] overflow-hidden border-2 border-white/10 group-hover:border-cyan-500/50 transition-all shadow-2xl bg-gray-900 flex items-center justify-center">
-          {error ? (
-            <div className="w-full h-full flex flex-col items-center justify-center p-6 bg-black">
-               {logo ? (
-                 <img src={logo} className="w-full h-full object-contain brightness-0 invert opacity-60" alt="logo fallback" />
-               ) : (
-                 <User size={60} className="text-gray-800" />
-               )}
-            </div>
-          ) : (
-            <img 
-              src={src} 
-              alt={alt} 
-              className="w-full h-full object-cover opacity-100 transition-all duration-700" 
-              onError={() => setError(true)}
-            />
-          )}
+          <img 
+            src={error ? (FALLBACKS[ceoName] || logo || "") : src} 
+            alt={alt} 
+            className="w-full h-full object-cover opacity-90 group-hover:opacity-100 transition-all duration-700" 
+            onError={() => setError(true)}
+          />
        </div>
-       {logo && !error && (
+       {logo && (
          <div className="absolute -bottom-2 -right-2 w-12 h-12 bg-black border border-white/10 rounded-2xl flex items-center justify-center p-3 shadow-xl z-20">
             <img src={logo} className="w-full h-full object-contain brightness-0 invert" alt="" />
          </div>
@@ -130,7 +134,7 @@ export default function CEORadar() {
         <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-5 gap-4 md:gap-6">
           {CEOS.map((ceo, index) => (
             <motion.div 
-              key={index}
+              key={ceo.id}
               initial={{ opacity: 0, y: 20 }}
               whileInView={{ opacity: 1, y: 0 }}
               transition={{ delay: index * 0.05 }}
@@ -140,11 +144,11 @@ export default function CEORadar() {
                 #{index + 1}
               </div>
               
-              <CEOImage src={ceo.photo} alt={ceo.name} logo={ceo.logo} />
+              <CEOImage src={ceo.photo} alt={ceo.name} logo={ceo.logo} ceoName={ceo.name} />
 
               <div className="text-center mb-4 md:mb-6">
                  <h3 className="text-base md:text-lg font-black uppercase italic tracking-tighter text-white">{ceo.name}</h3>
-                 <p className="text-[7px] md:text-[8px] font-black text-gray-500 uppercase tracking-widest mt-0.5">{ceo.role} @ {ceo.company}</p>
+                 <p className="text-[7px] md:text-[8px] font-black text-gray-500 uppercase tracking-widest mt-0.5">{ceo.role}</p>
               </div>
 
               <div className="grid grid-cols-2 gap-1.5 md:gap-2 mb-4 md:mb-6">
