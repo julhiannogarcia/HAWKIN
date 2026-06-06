@@ -8,7 +8,7 @@ const CEOS = [
   { 
     id: 1, name: "Sam Altman", role: "CEO @ OpenAI", company: "OpenAI",
     influence: 98, momentum: "+4.2", confidence: 95,
-    photo: "https://commons.wikimedia.org/wiki/Special:FilePath/Sam_Altman_in_2023.jpg",
+    photo: "https://avatars.githubusercontent.com/u/16012?v=4",
     logo: "https://unavatar.io/twitter/OpenAI",
     lastMove: 'Alianza global con Apple Intelligence. Despliegue de GPT-4o.', color: '#10a37f' 
   },
@@ -44,7 +44,7 @@ const CEOS = [
     id: 6, name: "Satya Nadella", role: "CEO @ Microsoft", company: "Microsoft",
     influence: 97, momentum: "+2.1", confidence: 96,
     photo: "https://commons.wikimedia.org/wiki/Special:FilePath/MS-Exec-Nadella-Satya-2017-08-31-22_(cropped).jpg",
-    logo: "https://logo.clearbit.com/microsoft.com",
+    logo: "https://unavatar.io/twitter/Microsoft",
     lastMove: 'Integración agresiva de Copilot en todo el ecosistema Windows.', color: '#00a4ef' 
   },
   { 
