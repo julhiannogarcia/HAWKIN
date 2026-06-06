@@ -8,7 +8,7 @@ const CEOS = [
   { 
     id: 1, name: "Sam Altman", role: "CEO @ OpenAI", company: "OpenAI",
     influence: 98, momentum: "+4.2", confidence: 95,
-    photo: "https://commons.wikimedia.org/wiki/Special:FilePath/Sam_Altman_in_2023.jpg",
+    photo: "https://unavatar.io/twitter/sama",
     logo: "https://upload.wikimedia.org/wikipedia/commons/4/4d/OpenAI_Logo.svg",
     lastMove: 'Alianza global con Apple Intelligence. Despliegue de GPT-4o.', color: '#10a37f' 
   },
@@ -50,28 +50,28 @@ const CEOS = [
   { 
     id: 7, name: "Mark Zuckerberg", role: "CEO @ Meta", company: "Meta",
     influence: 94, momentum: "+5.0", confidence: 93,
-    photo: "https://commons.wikimedia.org/wiki/Special:FilePath/Mark_Zuckerberg_F8_2019_Keynote_(32830578711)_(cropped).jpg",
+    photo: "https://unavatar.io/twitter/finkd",
     logo: "https://upload.wikimedia.org/wikipedia/commons/7/7b/Meta_Platforms_Inc._logo.svg",
     lastMove: 'Llama 3 Open Source disrumpiendo el modelo de negocio cerrado.', color: '#0668E1' 
   },
   { 
     id: 8, name: "Sundar Pichai", role: "CEO @ Alphabet", company: "Alphabet",
     influence: 95, momentum: "+1.5", confidence: 91,
-    photo: "https://commons.wikimedia.org/wiki/Special:FilePath/Sundar_Pichai_(2023)_hosted_by_Prezident.sk_(cropped).jpg",
+    photo: "https://unavatar.io/twitter/sundarpichai",
     logo: "https://upload.wikimedia.org/wikipedia/commons/5/53/Google_G_Logo.svg",
     lastMove: 'Reestructuración interna para acelerar Gemini.', color: '#4285F4' 
   },
   { 
     id: 9, name: "Ilya Sutskever", role: "Founder @ SSI", company: "SSI",
     influence: 92, momentum: "+8.0", confidence: 85,
-    photo: "https://commons.wikimedia.org/wiki/Special:FilePath/Ilya_Sutskever_2023.jpg",
+    photo: "https://unavatar.io/twitter/ilyasut",
     logo: "https://images.crunchbase.com/image/upload/c_thumb,h_256,w_256,f_auto,g_faces,z_0.7/v1500000000/i6v6v6h8o8z8l8u8p8u0.jpg",
     lastMove: 'Fundación de Safe Superintelligence Inc. tras salida de OpenAI.', color: '#888888' 
   },
   { 
     id: 10, name: "Alexandr Wang", role: "CEO @ Scale AI", company: "Scale AI",
     influence: 90, momentum: "+4.0", confidence: 88,
-    photo: "https://commons.wikimedia.org/wiki/Special:FilePath/Alexandr_Wang.jpg",
+    photo: "https://unavatar.io/twitter/alexandr_wang",
     logo: "https://images.unsplash.com/photo-1550751827-4bd374c3f58b?auto=format&fit=crop&q=80&w=100",
     lastMove: 'Levantamiento de $1B en Series F para dominio de datos.', color: '#aa00ff' 
   }
