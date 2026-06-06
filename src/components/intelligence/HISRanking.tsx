@@ -4,12 +4,12 @@ import React, { useState } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
 import { 
   TrendingUp, TrendingDown, ShieldCheck, CircleGauge, 
-  Info, ChevronRight, Zap, Target
+  Info, ChevronRight, Zap, Target, Building2
 } from 'lucide-react';
 
 const COMPANIES = [
   { 
-    id: 'openai', name: 'OpenAI', logo: 'https://upload.wikimedia.org/wikipedia/commons/4/4d/OpenAI_Logo.svg', 
+    id: 'openai', name: 'OpenAI', logo: 'https://unavatar.io/twitter/OpenAI', 
     his: 98.4, confidence: 94, change: +3.5, 
     why: 'Lanzamiento inminente de GPT-5. Dominio absoluto en percepción AGI.', 
     ceo: 'Sam Altman', 
@@ -19,7 +19,7 @@ const COMPANIES = [
     weights: { innovation: 30, talent: 20, capital: 15, execution: 15, impact: 10, adoption: 5, future: 5 }
   },
   { 
-    id: 'nvidia', name: 'NVIDIA', logo: 'https://upload.wikimedia.org/wikipedia/sco/2/21/Nvidia_logo.svg', 
+    id: 'nvidia', name: 'NVIDIA', logo: 'https://unavatar.io/twitter/nvidia', 
     his: 97.8, confidence: 98, change: +2.9, 
     why: 'Monopolio de hardware de inferencia y anuncio de Vera Rubin.', 
     ceo: 'Jensen Huang', 
@@ -28,7 +28,7 @@ const COMPANIES = [
     weights: { innovation: 25, talent: 15, capital: 20, execution: 20, impact: 15, adoption: 3, future: 2 }
   },
   { 
-    id: 'google', name: 'DeepMind', logo: 'https://upload.wikimedia.org/wikipedia/commons/5/53/Google_G_Logo.svg', 
+    id: 'google', name: 'DeepMind', logo: 'https://unavatar.io/twitter/GoogleDeepMind', 
     his: 94.5, confidence: 92, change: +1.8, 
     why: 'Integración masiva de Gemini en ecosistema global de Android.', 
     ceo: 'Demis Hassabis', 
@@ -37,7 +37,7 @@ const COMPANIES = [
     weights: { innovation: 20, talent: 25, capital: 15, execution: 15, impact: 10, adoption: 10, future: 5 }
   },
   { 
-    id: 'anthropic', name: 'Anthropic', logo: 'https://upload.wikimedia.org/wikipedia/commons/thumb/7/78/Anthropic_logo.svg/2560px-Anthropic_logo.svg.png', 
+    id: 'anthropic', name: 'Anthropic', logo: 'https://unavatar.io/twitter/AnthropicAI', 
     his: 92.1, confidence: 89, change: +4.2, 
     why: 'Claude 3.5 Sonnet liderando benchmarks de razonamiento.', 
     ceo: 'Dario Amodei', 
@@ -46,7 +46,7 @@ const COMPANIES = [
     weights: { innovation: 35, talent: 20, capital: 10, execution: 10, impact: 10, adoption: 10, future: 5 }
   },
   { 
-    id: 'microsoft', name: 'Microsoft', logo: 'https://upload.wikimedia.org/wikipedia/commons/4/44/Microsoft_logo.svg', 
+    id: 'microsoft', name: 'Microsoft', logo: 'https://unavatar.io/twitter/Microsoft', 
     his: 91.5, confidence: 95, change: +0.8, 
     why: 'Adopción empresarial de Copilot y mega-clústeres Azure.', 
     ceo: 'Satya Nadella', 
@@ -55,7 +55,7 @@ const COMPANIES = [
     weights: { innovation: 15, talent: 15, capital: 25, execution: 20, impact: 15, adoption: 5, future: 5 }
   },
   { 
-    id: 'meta', name: 'Meta AI', logo: 'https://upload.wikimedia.org/wikipedia/commons/7/7b/Meta_Platforms_Inc._logo.svg', 
+    id: 'meta', name: 'Meta AI', logo: 'https://unavatar.io/twitter/Meta', 
     his: 89.2, confidence: 91, change: +2.4, 
     why: 'Llama 3 establece el estándar open-source. Adopción global.', 
     ceo: 'Mark Zuckerberg', 
@@ -64,7 +64,7 @@ const COMPANIES = [
     weights: { innovation: 20, talent: 15, capital: 15, execution: 20, impact: 20, adoption: 5, future: 5 }
   },
   { 
-    id: 'xai', name: 'xAI', logo: 'https://upload.wikimedia.org/wikipedia/commons/b/b2/X_logo_2023.svg', 
+    id: 'xai', name: 'xAI', logo: 'https://unavatar.io/twitter/xai', 
     his: 88.7, confidence: 85, change: +6.1, 
     why: 'Integración con SpaceX y X. Mega-clúster en construcción.', 
     ceo: 'Elon Musk', 
@@ -73,7 +73,7 @@ const COMPANIES = [
     weights: { innovation: 25, talent: 15, capital: 15, execution: 25, impact: 10, adoption: 5, future: 5 }
   },
   { 
-    id: 'amazon', name: 'Amazon AI', logo: 'https://upload.wikimedia.org/wikipedia/commons/a/a9/Amazon_logo.svg', 
+    id: 'amazon', name: 'Amazon AI', logo: 'https://unavatar.io/twitter/amazon', 
     his: 86.4, confidence: 90, change: -1.2, 
     why: 'Retrasos en modelos propios, dependencia estratégica de Anthropic.', 
     ceo: 'Andy Jassy', 
@@ -82,7 +82,7 @@ const COMPANIES = [
     weights: { innovation: 15, talent: 15, capital: 25, execution: 15, impact: 15, adoption: 10, future: 5 }
   },
   { 
-    id: 'apple', name: 'Apple', logo: 'https://upload.wikimedia.org/wikipedia/commons/f/fa/Apple_logo_black.svg', 
+    id: 'apple', name: 'Apple', logo: 'https://unavatar.io/twitter/Apple', 
     his: 85.9, confidence: 88, change: +3.0, 
     why: 'Apple Intelligence lleva IA local a millones de usuarios.', 
     ceo: 'Tim Cook', 
@@ -91,7 +91,7 @@ const COMPANIES = [
     weights: { innovation: 15, talent: 15, capital: 20, execution: 15, impact: 15, adoption: 15, future: 5 }
   },
   { 
-    id: 'mistral', name: 'Mistral', logo: 'https://upload.wikimedia.org/wikipedia/commons/thumb/c/ca/Mistral_AI_logo.svg/2560px-Mistral_AI_logo.svg.png', 
+    id: 'mistral', name: 'Mistral', logo: 'https://unavatar.io/twitter/MistralAI', 
     his: 83.2, confidence: 82, change: +1.5, 
     why: 'Alternativa europea eficiente. Fuertes alianzas en la UE.', 
     ceo: 'Arthur Mensch', 
@@ -100,7 +100,7 @@ const COMPANIES = [
     weights: { innovation: 30, talent: 15, capital: 10, execution: 15, impact: 10, adoption: 15, future: 5 }
   },
   { 
-    id: 'figure', name: 'Figure AI', logo: 'https://images.unsplash.com/photo-1485827404703-89b55fcc595e?auto=format&fit=crop&q=80&w=100', 
+    id: 'figure', name: 'Figure AI', logo: 'https://unavatar.io/twitter/figure_ai', 
     his: 81.5, confidence: 78, change: +5.4, 
     why: 'Despliegue de humanoides en líneas de producción reales.', 
     ceo: 'Brett Adcock', 
@@ -109,7 +109,7 @@ const COMPANIES = [
     weights: { innovation: 35, talent: 20, capital: 15, execution: 10, impact: 10, adoption: 5, future: 5 }
   },
   { 
-    id: 'scale', name: 'Scale AI', logo: 'https://images.unsplash.com/photo-1550751827-4bd374c3f58b?auto=format&fit=crop&q=80&w=100', 
+    id: 'scale', name: 'Scale AI', logo: 'https://unavatar.io/twitter/scale_AI', 
     his: 80.1, confidence: 85, change: +4.8, 
     why: 'Monopolio silencioso en anotación de datos para la AGI.', 
     ceo: 'Alexandr Wang', 
@@ -118,6 +118,26 @@ const COMPANIES = [
     weights: { innovation: 20, talent: 30, capital: 20, execution: 15, impact: 10, adoption: 3, future: 2 }
   }
 ];
+
+function CompanyLogo({ src, alt }: { src: string, alt: string }) {
+  const [error, setError] = useState(false);
+
+  return (
+    <div className="w-20 h-20 md:w-24 md:h-24 bg-white/5 rounded-[25px] md:rounded-[30px] flex items-center justify-center p-4 md:p-6 border border-white/5 group-hover:bg-white/10 transition-all shadow-xl relative overflow-hidden shrink-0">
+       <div className="absolute inset-0 bg-gradient-to-br from-cyan-500/10 to-transparent opacity-0 group-hover:opacity-100 transition-opacity" />
+       {error ? (
+         <Building2 size={32} className="text-gray-700 relative z-10" />
+       ) : (
+         <img 
+           src={src} 
+           alt={alt} 
+           className="w-full h-full object-contain brightness-0 invert opacity-60 group-hover:opacity-100 group-hover:scale-110 transition-all duration-700 relative z-10" 
+           onError={() => setError(true)}
+         />
+       )}
+    </div>
+  );
+}
 
 export default function HISRanking() {
   const [showFormula, setShowFormula] = useState<string | null>(null);
@@ -151,10 +171,7 @@ export default function HISRanking() {
                    
                    <div className="flex items-center gap-6 md:gap-8 lg:w-1/3">
                       <div className="text-2xl md:text-3xl font-black text-gray-800 italic w-6 md:w-10">#{index + 1}</div>
-                      <div className="w-20 h-20 md:w-24 md:h-24 bg-white/5 rounded-[25px] md:rounded-[30px] flex items-center justify-center p-4 md:p-6 border border-white/5 group-hover:bg-white/10 transition-all shadow-xl relative overflow-hidden shrink-0">
-                         <div className="absolute inset-0 bg-gradient-to-br from-cyan-500/10 to-transparent opacity-0 group-hover:opacity-100 transition-opacity" />
-                         <img src={company.logo} alt={company.name} className="w-full h-full object-contain brightness-0 invert opacity-60 group-hover:opacity-100 group-hover:scale-110 transition-all duration-700 relative z-10" />
-                      </div>
+                      <CompanyLogo src={company.logo} alt={company.name} />
                       <div>
                          <h3 className="text-xl md:text-2xl font-black uppercase italic tracking-tighter text-white">{company.name}</h3>
                          <p className="text-[8px] md:text-[9px] font-black text-gray-600 uppercase tracking-widest mt-1 flex items-center gap-2">
