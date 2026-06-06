@@ -293,3 +293,52 @@ model VerificationToken {
   expires    DateTime
   @@unique([identifier, token])
 }
+
+// ============================================================================
+// HAWKIN ADMIN V10 - METRICS & AUDIT
+// ============================================================================
+
+model AuditLog {
+  id        String   @id @default(cuid())
+  action    String
+  userId    String?
+  userName  String?
+  details   String?  @db.Text
+  ipAddress String?
+  status    String   @default("SUCCESS")
+  createdAt DateTime @default(now())
+}
+
+model RevenueMetric {
+  id            String   @id @default(cuid())
+  date          DateTime @default(now())
+  amount        Float
+  source        String   // PAYPAL, STRIPE, BTC
+  type          String   // SUBSCRIPTION, ADVERTISING, DONATION
+  status        String   @default("COMPLETED")
+  transactionId String?
+  userId        String?
+}
+
+model AgentLog {
+  id             String   @id @default(cuid())
+  agentType      String   // ANALYST, SCOUT, TRUST_SCORE
+  action         String
+  processedCount Int      @default(0)
+  tokensUsed     Int      @default(0)
+  status         String   // SUCCESS, FAILED
+  errorDetails   String?  @db.Text
+  executionTime  Float?   // in seconds
+  createdAt      DateTime @default(now())
+}
+
+model VisitorMetric {
+  id        String   @id @default(cuid())
+  date      DateTime @default(now())
+  active    Int      @default(0)
+  daily     Int      @default(0)
+  weekly    Int      @default(0)
+  monthly   Int      @default(0)
+  newUsers  Int      @default(0)
+  returning Int      @default(0)
+}

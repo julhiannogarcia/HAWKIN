@@ -3,30 +3,39 @@ import { prisma } from "@/lib/prisma";
 
 export async function GET() {
   try {
-    // 1. Contar usuarios totales
     const userCount = await prisma.user.count();
-    
-    // 2. Usuarios activos (Sesiones + tráfico simulado para "sensación de imperio")
-    const realSessions = await prisma.session.count();
-    const activeNow = realSessions + Math.floor(Math.random() * 45) + 12;
-
-    // 3. Métricas de contenido
+    const activeSessions = await prisma.session.count();
     const newsCount = await prisma.news.count();
-
-    // 4. Ingresos Automatizados (Publicidad Pagada)
-    const paidAds = await prisma.adCampaign.findMany({
-      where: { status: 'PAID' }
+    
+    // Sum real revenue metrics
+    const revenueMetrics = await prisma.revenueMetric.aggregate({
+      _sum: { amount: true }
     });
-    const revenue = paidAds.reduce((acc, ad) => acc + 265, 12500); // Base + nuevas ventas
+    
+    // Active campaigns
+    const activeAds = await prisma.adCampaign.count({
+      where: { status: 'ACTIVE' }
+    });
+
+    // Subscriptions
+    const activeSubscriptions = await prisma.subscription.count({
+      where: { status: 'active' }
+    });
+
+    const revenue = revenueMetrics._sum.amount || 0;
 
     return NextResponse.json({
-      totalUsers: userCount + 1420, // Sumamos base histórica
-      activeNow: activeNow,
+      totalUsers: userCount,
+      activeNow: activeSessions,
       newsCount: newsCount,
+      activeAds: activeAds,
+      activeSubscriptions: activeSubscriptions,
       revenue: `USD $${revenue.toLocaleString()}`,
+      rawRevenue: revenue,
+      mrr: revenue * 0.1 // Base calculation if we derive MRR from DB (requires better subscription logic later)
     });
   } catch (error) {
     console.error("Stats API Error:", error);
-    return NextResponse.json({ error: "Fallo al obtener métricas" }, { status: 500 });
+    return NextResponse.json({ error: "Fallo al obtener métricas reales" }, { status: 500 });
   }
 }

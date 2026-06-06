@@ -1,15 +1,30 @@
 'use client';
 
-import React from 'react';
-import { FileText, Shield, User, Globe } from 'lucide-react';
+import React, { useState, useEffect } from 'react';
+import { FileText, Shield, User, Globe, LoaderCircle } from 'lucide-react';
+import { useAlpha } from '@/context/AlphaContext';
 
 export default function AuditLogs() {
-  const logs = [
-    { id: 'log_901', action: 'CREATE_AD_CAMPAIGN', user: 'Julhianno G.', ip: '192.168.1.1', date: 'Hace 10 min' },
-    { id: 'log_900', action: 'UPDATE_SYSTEM_SETTINGS', user: 'Julhianno G.', ip: '192.168.1.1', date: 'Hace 2 horas' },
-    { id: 'log_899', action: 'DELETE_USER_ACCOUNT', user: 'System Auto', ip: 'Internal', date: 'Hace 5 horas' },
-    { id: 'log_898', action: 'FORCE_GLOBAL_SCAN', user: 'Julhianno G.', ip: '192.168.1.1', date: 'Ayer' },
-  ];
+  const { fetchAlpha } = useAlpha();
+  const [logs, setLogs] = useState<any[]>([]);
+  const [loading, setLoading] = useState(true);
+
+  useEffect(() => {
+    const loadLogs = async () => {
+      try {
+        const res = await fetchAlpha('/api/admin/audit');
+        if (res.ok) {
+          const data = await res.json();
+          setLogs(data);
+        }
+      } catch (e) {
+        console.error("Failed to load audit logs", e);
+      } finally {
+        setLoading(false);
+      }
+    };
+    loadLogs();
+  }, [fetchAlpha]);
 
   return (
     <div className="space-y-12">
@@ -38,13 +53,26 @@ export default function AuditLogs() {
                </tr>
             </thead>
             <tbody className="divide-y divide-white/5">
-               {logs.map((log, i) => (
+               {loading ? (
+                  <tr>
+                    <td colSpan={5} className="p-12 text-center">
+                      <LoaderCircle className="animate-spin text-gray-500 mx-auto" size={24} />
+                      <p className="text-[10px] text-gray-500 mt-4 uppercase tracking-widest font-bold">Obteniendo registros inmutables...</p>
+                    </td>
+                  </tr>
+               ) : logs.length === 0 ? (
+                  <tr>
+                    <td colSpan={5} className="p-12 text-center text-[10px] text-gray-500 uppercase tracking-widest font-bold">
+                      No hay registros auditables.
+                    </td>
+                  </tr>
+               ) : logs.map((log, i) => (
                  <tr key={i} className="hover:bg-white/[0.02] transition-colors">
-                    <td className="p-6 text-[10px] font-mono text-gray-600">{log.id}</td>
+                    <td className="p-6 text-[10px] font-mono text-gray-600">{log.id.slice(0, 10)}...</td>
                     <td className="p-6 text-xs font-black text-white">{log.action}</td>
-                    <td className="p-6 text-[10px] font-bold text-gray-400 flex items-center gap-2"><User size={12}/> {log.user}</td>
-                    <td className="p-6 text-[10px] font-mono text-gray-500 flex items-center gap-2"><Globe size={12}/> {log.ip}</td>
-                    <td className="p-6 text-right text-[10px] text-gray-500 uppercase tracking-widest">{log.date}</td>
+                    <td className="p-6 text-[10px] font-bold text-gray-400 flex items-center gap-2"><User size={12}/> {log.userName || log.userId || 'System'}</td>
+                    <td className="p-6 text-[10px] font-mono text-gray-500 flex items-center gap-2"><Globe size={12}/> {log.ipAddress || 'Internal'}</td>
+                    <td className="p-6 text-right text-[10px] text-gray-500 uppercase tracking-widest">{new Date(log.createdAt).toLocaleString()}</td>
                  </tr>
                ))}
             </tbody>
