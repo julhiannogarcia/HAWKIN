@@ -28,8 +28,13 @@ export default function AdSpace({ isPremium, type = 'banner' }: AdSpaceProps) {
       try {
         const placement = TYPE_MAP[type] || "TOP_BANNER";
         
-        // 1. Intentar obtener anuncios desde la API
-        const res = await fetch(`/api/ads?placement=${placement}`);
+        // 1. Intentar obtener anuncios desde la API con timeout
+        const controller = new AbortController();
+        const timeoutId = setTimeout(() => controller.abort(), 3000);
+        
+        const res = await fetch(`/api/ads?placement=${placement}`, { signal: controller.signal });
+        clearTimeout(timeoutId);
+
         if (res.ok) {
           const data = await res.json();
           if (Array.isArray(data) && data.length > 0) {
@@ -39,7 +44,7 @@ export default function AdSpace({ isPremium, type = 'banner' }: AdSpaceProps) {
           }
         }
         
-        // 2. FALLBACK INSTITUCIONAL PRO (EL COMERCIAL ORIGINAL)
+        // 2. FALLBACK ULTRA-ESTABLE (IMAGEN NATIVA UNPLASH)
         setAd({
           id: "hawkin-academy-default",
           companyName: "HAWKIN ACADEMY",
@@ -49,7 +54,14 @@ export default function AdSpace({ isPremium, type = 'banner' }: AdSpaceProps) {
         });
 
       } catch (e) {
-        console.error("[HAWKIN ADS] Critical Error:", e);
+        // FALLBACK DE EMERGENCIA TOTAL
+        setAd({
+          id: "hawkin-emergency",
+          companyName: "HAWKIN INTELLIGENCE",
+          bannerUrl: "https://images.unsplash.com/photo-1451187580459-43490279c0fa?auto=format&fit=crop&q=80&w=2000",
+          targetUrl: "/",
+          placement: "TOP_BANNER"
+        });
       } finally {
         setLoading(false);
       }
@@ -58,105 +70,31 @@ export default function AdSpace({ isPremium, type = 'banner' }: AdSpaceProps) {
     fetchAd();
   }, [isPremium, type]);
 
-  const handleAdClick = async () => {
+  const handleAdClick = () => {
     if (!ad?.id) return;
     if (ad.targetUrl) window.open(ad.targetUrl, '_blank');
   };
 
-  const getUrlType = (url: string) => {
-    if (!url) return 'none';
-    const u = url.toLowerCase();
-    if (u.match(/\.(mp4|webm|ogg)$/)) return 'direct-video';
-    if (u.includes('youtube.com/embed') || u.includes('player.vimeo.com/video')) return 'embed';
-    if (u.includes('youtube.com/watch') || u.includes('youtu.be')) return 'youtube';
-    if (u.includes('vimeo.com')) return 'vimeo';
-    if (u.match(/\.(jpg|jpeg|png|webp|gif|svg)$/) || u.includes('images.unsplash')) return 'image';
-    return 'unknown';
-  };
-
-  const getYouTubeEmbed = (url: string) => {
-    if (url.includes('embed')) return url;
-    let id = '';
-    if (url.includes('v=')) id = url.split('v=')[1].split('&')[0];
-    else if (url.includes('youtu.be/')) id = url.split('youtu.be/')[1].split('?')[0];
-    return `https://www.youtube.com/embed/${id}?autoplay=1&mute=1&loop=1&playlist=${id}&controls=0&showinfo=0&rel=0&modestbranding=1`;
-  };
-
-  const getVimeoEmbed = (url: string) => {
-    if (url.includes('video/')) return url;
-    const id = url.split('vimeo.com/')[1].split('?')[0];
-    return `https://player.vimeo.com/video/${id}?autoplay=1&muted=1&loop=1&background=1`;
-  };
-
   if (isPremium) return null;
 
-  if (!ad && !loading) {
-    return (
-      <div className={`w-full ${type === 'inline' ? 'my-12 p-8 h-40' : 'h-24'} bg-white/[0.01] border border-dashed border-white/5 rounded-[30px] flex items-center justify-center group hover:border-blue-500/30 transition-all cursor-pointer relative overflow-hidden`}>
-         <a href="/b2b" className="flex items-center gap-4 text-gray-800 group-hover:text-blue-500 transition-colors">
-            <Building2 size={20} />
-            <span className="text-[10px] font-black uppercase tracking-widest">Reserva este espacio de alto impacto</span>
-            <ExternalLink size={12} />
-         </a>
-      </div>
-    );
+  if (loading) {
+    return <div className="w-full h-40 bg-white/[0.01] animate-pulse rounded-[30px]" />;
   }
-
-  if (loading) return null;
-
-  const urlType = getUrlType(ad.bannerUrl);
-
-  const renderBackground = () => {
-    switch (urlType) {
-      case 'direct-video':
-        return (
-          <video autoPlay loop muted playsInline className="absolute inset-0 w-full h-full object-cover">
-            <source src={ad.bannerUrl} type="video/mp4" />
-          </video>
-        );
-      case 'embed':
-        return (
-          <iframe 
-            src={ad.bannerUrl}
-            className="absolute inset-0 w-full h-full pointer-events-none"
-            frameBorder="0"
-            allow="autoplay; fullscreen"
-          />
-        );
-      case 'youtube':
-        return (
-          <iframe 
-            src={getYouTubeEmbed(ad.bannerUrl)}
-            className="absolute inset-0 w-full h-[150%] -top-[25%] pointer-events-none"
-            frameBorder="0"
-            allow="autoplay; fullscreen"
-          />
-        );
-      case 'vimeo':
-        return (
-          <iframe 
-            src={getVimeoEmbed(ad.bannerUrl)}
-            className="absolute inset-0 w-full h-full pointer-events-none"
-            frameBorder="0"
-            allow="autoplay; fullscreen"
-          />
-        );
-      case 'image':
-      default:
-        return <img src={ad.bannerUrl} className="absolute inset-0 w-full h-full object-cover" alt="Ad Banner" />;
-    }
-  };
 
   return (
     <motion.div 
       initial={{ opacity: 0 }} animate={{ opacity: 1 }}
       onClick={handleAdClick}
-      className={`relative w-full ${type === 'inline' ? 'h-96' : 'min-h-[400px] md:min-h-[500px]'} rounded-[50px] overflow-hidden group cursor-pointer shadow-2xl border border-white/5 bg-black`}
+      className={`relative w-full ${type === 'inline' ? 'h-96' : 'min-h-[250px] md:min-h-[400px]'} rounded-[40px] overflow-hidden group cursor-pointer shadow-2xl border border-white/5 bg-[#050505]`}
     >
-      {renderBackground()}
-      <div className="absolute inset-0 bg-gradient-to-t from-black/80 via-transparent to-transparent flex flex-col justify-end p-12">
-         <h4 className="text-3xl font-black text-white uppercase italic tracking-tighter">{ad.companyName}</h4>
-         <p className="text-blue-400 text-[10px] font-black uppercase tracking-[0.4em] mt-2">Socio Patrocinador</p>
+      <img 
+        src={ad.bannerUrl} 
+        className="absolute inset-0 w-full h-full object-cover group-hover:scale-105 transition-transform duration-[10s] opacity-60 group-hover:opacity-100" 
+        alt="Ad" 
+      />
+      <div className="absolute inset-0 bg-gradient-to-t from-black via-transparent to-transparent flex flex-col justify-end p-10">
+         <h4 className="text-2xl font-black text-white uppercase italic tracking-tighter">{ad.companyName}</h4>
+         <p className="text-cyan-400 text-[8px] font-black uppercase tracking-[0.4em] mt-2">Socio Patrocinador</p>
       </div>
     </motion.div>
   );
