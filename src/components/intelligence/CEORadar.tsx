@@ -8,7 +8,7 @@ const CEOS = [
   { 
     id: 1, name: "Sam Altman", role: "CEO @ OpenAI", company: "OpenAI",
     influence: 98, momentum: "+4.2", confidence: 95,
-    photo: "https://unavatar.io/github/sama",
+    photo: "https://commons.wikimedia.org/wiki/Special:FilePath/Sam_Altman_in_2023.jpg",
     logo: "https://unavatar.io/twitter/OpenAI",
     lastMove: 'Alianza global con Apple Intelligence. Despliegue de GPT-4o.', color: '#10a37f' 
   },
