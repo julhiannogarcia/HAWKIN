@@ -44,7 +44,7 @@ export default function ContactPage() {
                 </div>
                 <div>
                   <p className="text-[10px] font-black text-gray-600 uppercase tracking-widest">Canal Oficial</p>
-                  <p className="text-sm font-bold text-white">inteligencia@aihawkin.com</p>
+                  <p className="text-sm font-bold text-white">julhianno@aihawkin.com</p>
                 </div>
               </div>
               
