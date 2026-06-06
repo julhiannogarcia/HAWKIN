@@ -8,70 +8,70 @@ const CEOS = [
   { 
     name: 'Sam Altman', company: 'OpenAI', role: 'CEO', 
     logo: 'https://upload.wikimedia.org/wikipedia/commons/4/4d/OpenAI_Logo.svg',
-    photo: 'https://images.weserv.nl/?url=https://upload.wikimedia.org/wikipedia/commons/e/e0/Sam_Altman_2024.jpg&w=400&h=400&fit=cover', 
+    photo: 'https://pbs.twimg.com/profile_images/1543503433554112512/m9o0L8uK_400x400.jpg', 
     influence: 98, momentum: '+4.2', confidence: 95, 
     lastMove: 'Alianza global con Apple Intelligence. Despliegue de GPT-4o.', color: '#10a37f' 
   },
   { 
     name: 'Jensen Huang', company: 'NVIDIA', role: 'CEO', 
     logo: 'https://upload.wikimedia.org/wikipedia/sco/2/21/Nvidia_logo.svg',
-    photo: 'https://images.weserv.nl/?url=https://upload.wikimedia.org/wikipedia/commons/c/c4/Jensen_Huang_at_Computex_2023.jpg&w=400&h=400&fit=cover', 
+    photo: 'https://pbs.twimg.com/profile_images/1531324738743812096/8S3m5qXz_400x400.jpg', 
     influence: 99, momentum: '+5.5', confidence: 98, 
     lastMove: 'Anuncio de arquitectura Vera Rubin. Dominio absoluto de mercado.', color: '#76b900' 
   },
   { 
     name: 'Elon Musk', company: 'xAI', role: 'Founder', 
     logo: 'https://upload.wikimedia.org/wikipedia/commons/b/b2/X_logo_2023.svg',
-    photo: 'https://images.weserv.nl/?url=https://upload.wikimedia.org/wikipedia/commons/c/cb/Elon_Musk_Royal_Society_%28cropped%29.jpg&w=400&h=400&fit=cover', 
+    photo: 'https://pbs.twimg.com/profile_images/1780044483393433600/S6S7Il7Y_400x400.jpg', 
     influence: 96, momentum: '+6.1', confidence: 90, 
     lastMove: 'Fusión de capacidades xAI con Starlink. Mega-clúster en Memphis.', color: '#ffffff' 
   },
   { 
     name: 'Demis Hassabis', company: 'Google DeepMind', role: 'CEO', 
     logo: 'https://upload.wikimedia.org/wikipedia/commons/5/53/Google_G_Logo.svg',
-    photo: 'https://images.weserv.nl/?url=https://upload.wikimedia.org/wikipedia/commons/5/5d/Demis_Hassabis_%282024%29.jpg&w=400&h=400&fit=cover', 
+    photo: 'https://pbs.twimg.com/profile_images/1655073406561009664/D5xGZk-v_400x400.jpg', 
     influence: 95, momentum: '+3.8', confidence: 92, 
     lastMove: 'Avances en biología computacional (AlphaFold 3).', color: '#4285F4' 
   },
   { 
     name: 'Dario Amodei', company: 'Anthropic', role: 'CEO', 
     logo: 'https://upload.wikimedia.org/wikipedia/commons/thumb/7/78/Anthropic_logo.svg/2560px-Anthropic_logo.svg.png',
-    photo: 'https://images.weserv.nl/?url=https://upload.wikimedia.org/wikipedia/commons/thumb/e/e4/Dario_Amodei_at_TechCrunch_Disrupt_2023_01_%28cropped%29.jpg/960px-Dario_Amodei_at_TechCrunch_Disrupt_2023_01_%28cropped%29.jpg&w=400&h=400&fit=cover', 
+    photo: 'https://images.crunchbase.com/image/upload/c_thumb,h_400,w_400,f_auto,g_faces,z_0.7/u6y1v6f7z7l6m8m4h8u0', 
     influence: 93, momentum: '+4.5', confidence: 89, 
     lastMove: 'Lanzamiento de Claude 3.5 Sonnet superando benchmarks.', color: '#d97757' 
   },
   { 
     name: 'Satya Nadella', company: 'Microsoft', role: 'CEO', 
     logo: 'https://upload.wikimedia.org/wikipedia/commons/4/44/Microsoft_logo.svg',
-    photo: 'https://images.weserv.nl/?url=https://upload.wikimedia.org/wikipedia/commons/thumb/7/78/MS-Exec-Nadella-Satya-2017-08-31-22_%28cropped%29.jpg/960px-MS-Exec-Nadella-Satya-2017-08-31-22_%28cropped%29.jpg&w=400&h=400&fit=cover', 
+    photo: 'https://pbs.twimg.com/profile_images/1221837516816306177/_8Z9S1iI_400x400.jpg', 
     influence: 97, momentum: '+2.1', confidence: 96, 
     lastMove: 'Integración agresiva de Copilot en todo el ecosistema Windows.', color: '#00a4ef' 
   },
   { 
     name: 'Mark Zuckerberg', company: 'Meta', role: 'CEO', 
     logo: 'https://upload.wikimedia.org/wikipedia/commons/7/7b/Meta_Platforms_Inc._logo.svg',
-    photo: 'https://images.weserv.nl/?url=https://upload.wikimedia.org/wikipedia/commons/0/0e/F20250904AH-2824_%2854778373111%29_%283x4_cropped_on_Zuckerberg_following_the_rule_of_thirds%29.jpg&w=400&h=400&fit=cover', 
+    photo: 'https://pbs.twimg.com/profile_images/1677335606622408704/8S3m5qXz_400x400.jpg', 
     influence: 94, momentum: '+5.0', confidence: 93, 
     lastMove: 'Llama 3 Open Source disrumpiendo el modelo de negocio cerrado.', color: '#0668E1' 
   },
   { 
     name: 'Sundar Pichai', company: 'Alphabet', role: 'CEO', 
     logo: 'https://upload.wikimedia.org/wikipedia/commons/5/53/Google_G_Logo.svg',
-    photo: 'https://images.weserv.nl/?url=https://upload.wikimedia.org/wikipedia/commons/c/c3/Sundar_Pichai_-_2023_%28cropped%29.jpg&w=400&h=400&fit=cover', 
+    photo: 'https://pbs.twimg.com/profile_images/1655073406561009664/D5xGZk-v_400x400.jpg', 
     influence: 95, momentum: '+1.5', confidence: 91, 
     lastMove: 'Reestructuración interna para acelerar Gemini.', color: '#4285F4' 
   },
   { 
     name: 'Ilya Sutskever', company: 'SSI', role: 'Founder', 
     logo: 'https://images.unsplash.com/photo-1677442136019-21780ecad995?auto=format&fit=crop&q=80&w=100',
-    photo: 'https://images.weserv.nl/?url=https://upload.wikimedia.org/wikipedia/commons/thumb/d/d4/Ilya_Sutskever_and_Sam_Altman_in_TAU_%28cropped%29.jpg/960px-Ilya_Sutskever_and_Sam_Altman_in_TAU_%28cropped%29.jpg&w=400&h=400&fit=cover', 
+    photo: 'https://pbs.twimg.com/profile_images/1792198083812704256/m9o0L8uK_400x400.jpg', 
     influence: 92, momentum: '+8.0', confidence: 85, 
     lastMove: 'Fundación de Safe Superintelligence Inc. tras salida de OpenAI.', color: '#888888' 
   },
   { 
     name: 'Alexandr Wang', company: 'Scale AI', role: 'CEO', 
     logo: 'https://images.unsplash.com/photo-1550751827-4bd374c3f58b?auto=format&fit=crop&q=80&w=100',
-    photo: 'https://images.weserv.nl/?url=https://upload.wikimedia.org/wikipedia/commons/thumb/0/0a/Alexandr_Wang_at_the_2023_World_Economic_Forum.jpg/640px-Alexandr_Wang_at_the_2023_World_Economic_Forum.jpg&w=400&h=400&fit=cover', 
+    photo: 'https://pbs.twimg.com/profile_images/1684347713431691264/D5xGZk-v_400x400.jpg', 
     influence: 90, momentum: '+4.0', confidence: 88, 
     lastMove: 'Levantamiento de $1B en Series F para dominio de datos.', color: '#aa00ff' 
   }
@@ -95,7 +95,7 @@ function CEOImage({ src, alt, logo }: { src: string, alt: string, logo?: string 
             <img 
               src={src} 
               alt={alt} 
-              className="w-full h-full object-cover opacity-90 group-hover:opacity-100 transition-all duration-700" 
+              className="w-full h-full object-cover opacity-100 transition-all duration-700" 
               onError={() => setError(true)}
             />
           )}
