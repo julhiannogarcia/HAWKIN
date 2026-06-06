@@ -10,10 +10,10 @@ export default function CeoDashboard() {
         <div>
            <div className="flex items-center gap-3 mb-2">
              <UserCircle size={16} className="text-blue-500" />
-             <span className="text-[10px] font-black text-blue-500 uppercase tracking-widest">Founder Access</span>
+             <span className="text-[10px] font-black text-blue-500 uppercase tracking-widest">Master Access</span>
            </div>
            <h1 className="text-4xl font-black uppercase italic tracking-tighter text-white">
-             CEO <span className="text-blue-500">Dashboard.</span>
+             Master <span className="text-blue-500">Dashboard.</span>
            </h1>
            <p className="text-[10px] font-black text-gray-500 uppercase tracking-widest mt-2">Visión Estratégica Global (HAWKIN)</p>
         </div>
@@ -23,11 +23,11 @@ export default function CeoDashboard() {
          <div className="absolute top-0 right-0 p-12 opacity-10">
             <Award size={150} className="text-blue-500" />
          </div>
-         <div className="w-32 h-32 rounded-3xl overflow-hidden shadow-2xl border-4 border-blue-500/20 shrink-0">
-            <img src="https://images.unsplash.com/photo-1507003211169-0a1dd7228f2d?auto=format&fit=crop&q=80&w=600" className="w-full h-full object-cover" alt="Julhianno Garcia" />
+         <div className="w-32 h-32 rounded-3xl overflow-hidden shadow-2xl border-4 border-blue-500/20 shrink-0 bg-gray-900 flex items-center justify-center">
+            <UserCircle size={80} className="text-gray-700" />
          </div>
          <div className="space-y-4 z-10">
-            <h2 className="text-4xl font-black italic text-white uppercase tracking-tighter">Bienvenido, Julhianno</h2>
+            <h2 className="text-4xl font-black italic text-white uppercase tracking-tighter">Panel de Control Alpha</h2>
             <p className="text-gray-400 font-light leading-relaxed max-w-2xl">
                "El sistema opera a su máxima capacidad. El MRR ha crecido un 15.4% este mes y no se detectan vulnerabilidades críticas en el ecosistema. La fase V11 de HAWKIN está en completo despliegue."
             </p>

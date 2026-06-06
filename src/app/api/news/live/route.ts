@@ -90,7 +90,7 @@ export async function GET() {
       'http://export.arxiv.org/rss/cs.AI',
       'https://www.sciencedaily.com/rss/computers_math/artificial_intelligence.xml',
       'https://www.reutersagency.com/feed/?best-topics=technology&post_type=best',
-      'https://news.google.com/rss/search?q=Artificial+Intelligence+Business+NVIDIA+OpenAI&hl=en-US&gl=US&ceid=US:en'
+      'https://news.google.com/rss/search?q=Artificial+Intelligence+Business+NVIDIA+OpenAI+Anthropic&hl=en-US&gl=US&ceid=US:en'
     ];
 
     const feedResults = await Promise.all(FEEDS.map(url => parser.parseURL(url).catch(() => ({ items: [] }))));
@@ -119,7 +119,7 @@ export async function GET() {
 
     const finalSelection = scoredItems
       .sort((a, b) => b.titanScore - a.titanScore)
-      .slice(0, 20);
+      .slice(0, 40);
 
     const processedNews = await Promise.all(finalSelection.map(async (item) => {
       const uniqueId = generateShortId(item.link || item.title || "");
@@ -170,13 +170,13 @@ export async function GET() {
     }));
 
     let newsPool = [...processedNews];
-    if (newsPool.length < 10) {
-      newsPool = [...newsPool, ...FALLBACK_NEWS.slice(0, 10 - newsPool.length)];
+    if (newsPool.length < 20) {
+      newsPool = [...newsPool, ...FALLBACK_NEWS];
     }
 
     return NextResponse.json({
-      news: newsPool.slice(0, 15),
-      status: "Titan Analyst v7.5 Online",
+      news: newsPool.slice(0, 30),
+      status: "Titan Analyst v8.0 Online",
       cacheTTL: "300s"
     });
   } catch (error) {

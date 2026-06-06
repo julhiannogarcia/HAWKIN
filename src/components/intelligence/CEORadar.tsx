@@ -8,70 +8,70 @@ const CEOS = [
   { 
     name: 'Sam Altman', company: 'OpenAI', role: 'CEO', 
     logo: 'https://upload.wikimedia.org/wikipedia/commons/4/4d/OpenAI_Logo.svg',
-    photo: 'https://images.crunchbase.com/image/upload/c_thumb,h_256,w_256,f_auto,g_faces,z_0.7/v1503417743/p5e9y6o6h1n8b0z3l7u0.jpg', 
+    photo: 'https://upload.wikimedia.org/wikipedia/commons/5/5a/Meeting_with_Masayoshi_Son_and_Sam_Altman_%28February_3%2C_2025%29_%283x4_cropped_on_Altman%29.jpg', 
     influence: 98, momentum: '+4.2', confidence: 95, 
     lastMove: 'Alianza global con Apple Intelligence. Despliegue de GPT-4o.', color: '#10a37f' 
   },
   { 
     name: 'Jensen Huang', company: 'NVIDIA', role: 'CEO', 
     logo: 'https://upload.wikimedia.org/wikipedia/sco/2/21/Nvidia_logo.svg',
-    photo: 'https://images.crunchbase.com/image/upload/c_thumb,h_256,w_256,f_auto,g_faces,z_0.7/v1483512431/j6v6v6h8o8z8l8u8p8u0.jpg', 
+    photo: 'https://upload.wikimedia.org/wikipedia/commons/e/e6/Jen-Hsun_Huang_2025.jpg', 
     influence: 99, momentum: '+5.5', confidence: 98, 
     lastMove: 'Anuncio de arquitectura Vera Rubin. Dominio absoluto de mercado.', color: '#76b900' 
   },
   { 
     name: 'Elon Musk', company: 'xAI', role: 'Founder', 
     logo: 'https://upload.wikimedia.org/wikipedia/commons/b/b2/X_logo_2023.svg',
-    photo: 'https://images.crunchbase.com/image/upload/c_thumb,h_256,w_256,f_auto,g_faces,z_0.7/v1456223232/e8v8v8h8o8z8l8u8p8u0.jpg', 
+    photo: 'https://upload.wikimedia.org/wikipedia/commons/thumb/5/5e/Elon_Musk_-_54820081119_%28cropped%29.jpg/960px-Elon_Musk_-_54820081119_%28cropped%29.jpg', 
     influence: 96, momentum: '+6.1', confidence: 90, 
     lastMove: 'Fusión de capacidades xAI con Starlink. Mega-clúster en Memphis.', color: '#ffffff' 
   },
   { 
     name: 'Demis Hassabis', company: 'Google DeepMind', role: 'CEO', 
     logo: 'https://upload.wikimedia.org/wikipedia/commons/5/53/Google_G_Logo.svg',
-    photo: 'https://images.crunchbase.com/image/upload/c_thumb,h_256,w_256,f_auto,g_faces,z_0.7/v1407474440/d6v6v6h8o8z8l8u8p8u0.jpg', 
+    photo: 'https://upload.wikimedia.org/wikipedia/commons/thumb/2/2b/Demis_Hassabis%2C_2024_Nobel_Prize_Laureate_in_Chemistry_7_%28cropped%29.jpg/960px-Demis_Hassabis%2C_2024_Nobel_Prize_Laureate_in_Chemistry_7_%28cropped%29.jpg', 
     influence: 95, momentum: '+3.8', confidence: 92, 
     lastMove: 'Avances en biología computacional (AlphaFold 3).', color: '#4285F4' 
   },
   { 
     name: 'Dario Amodei', company: 'Anthropic', role: 'CEO', 
     logo: 'https://upload.wikimedia.org/wikipedia/commons/thumb/7/78/Anthropic_logo.svg/2560px-Anthropic_logo.svg.png',
-    photo: 'https://images.crunchbase.com/image/upload/c_thumb,h_256,w_256,f_auto,g_faces,z_0.7/u6y1v6f7z7l6m8m4h8u0', 
+    photo: 'https://upload.wikimedia.org/wikipedia/commons/thumb/e/e4/Dario_Amodei_at_TechCrunch_Disrupt_2023_01_%28cropped%29.jpg/960px-Dario_Amodei_at_TechCrunch_Disrupt_2023_01_%28cropped%29.jpg', 
     influence: 93, momentum: '+4.5', confidence: 89, 
     lastMove: 'Lanzamiento de Claude 3.5 Sonnet superando benchmarks.', color: '#d97757' 
   },
   { 
     name: 'Satya Nadella', company: 'Microsoft', role: 'CEO', 
     logo: 'https://upload.wikimedia.org/wikipedia/commons/4/44/Microsoft_logo.svg',
-    photo: 'https://images.crunchbase.com/image/upload/c_thumb,h_256,w_256,f_auto,g_faces,z_0.7/v1403956485/s6v6v6h8o8z8l8u8p8u0.jpg', 
+    photo: 'https://upload.wikimedia.org/wikipedia/commons/thumb/7/78/MS-Exec-Nadella-Satya-2017-08-31-22_%28cropped%29.jpg/960px-MS-Exec-Nadella-Satya-2017-08-31-22_%28cropped%29.jpg', 
     influence: 97, momentum: '+2.1', confidence: 96, 
     lastMove: 'Integración agresiva de Copilot en todo el ecosistema Windows.', color: '#00a4ef' 
   },
   { 
     name: 'Mark Zuckerberg', company: 'Meta', role: 'CEO', 
     logo: 'https://upload.wikimedia.org/wikipedia/commons/7/7b/Meta_Platforms_Inc._logo.svg',
-    photo: 'https://images.crunchbase.com/image/upload/c_thumb,h_256,w_256,f_auto,g_faces,z_0.7/v1444036070/m6v6v6h8o8z8l8u8p8u0.jpg', 
+    photo: 'https://upload.wikimedia.org/wikipedia/commons/0/0e/F20250904AH-2824_%2854778373111%29_%283x4_cropped_on_Zuckerberg_following_the_rule_of_thirds%29.jpg', 
     influence: 94, momentum: '+5.0', confidence: 93, 
     lastMove: 'Llama 3 Open Source disrumpiendo el modelo de negocio cerrado.', color: '#0668E1' 
   },
   { 
     name: 'Sundar Pichai', company: 'Alphabet', role: 'CEO', 
     logo: 'https://upload.wikimedia.org/wikipedia/commons/5/53/Google_G_Logo.svg',
-    photo: 'https://images.crunchbase.com/image/upload/c_thumb,h_256,w_256,f_auto,g_faces,z_0.7/v1403956488/p6v6v6h8o8z8l8u8p8u0.jpg', 
+    photo: 'https://upload.wikimedia.org/wikipedia/commons/c/c3/Sundar_Pichai_-_2023_%28cropped%29.jpg', 
     influence: 95, momentum: '+1.5', confidence: 91, 
     lastMove: 'Reestructuración interna para acelerar Gemini.', color: '#4285F4' 
   },
   { 
     name: 'Ilya Sutskever', company: 'SSI', role: 'Founder', 
-    logo: 'https://images.crunchbase.com/image/upload/c_thumb,h_256,w_256,f_auto,g_faces,z_0.7/v1500000000/i6v6v6h8o8z8l8u8p8u0.jpg',
-    photo: 'https://images.crunchbase.com/image/upload/c_thumb,h_256,w_256,f_auto,g_faces,z_0.7/v1481111111/s6v6v6h8o8z8l8u8p8u0.jpg', 
+    logo: 'https://images.unsplash.com/photo-1677442136019-21780ecad995?auto=format&fit=crop&q=80&w=100',
+    photo: 'https://upload.wikimedia.org/wikipedia/commons/d/d4/Ilya_Sutskever_and_Sam_Altman_in_TAU_%28cropped%29.jpg', 
     influence: 92, momentum: '+8.0', confidence: 85, 
     lastMove: 'Fundación de Safe Superintelligence Inc. tras salida de OpenAI.', color: '#888888' 
   },
   { 
     name: 'Alexandr Wang', company: 'Scale AI', role: 'CEO', 
     logo: 'https://images.unsplash.com/photo-1550751827-4bd374c3f58b?auto=format&fit=crop&q=80&w=100',
-    photo: 'https://images.crunchbase.com/image/upload/c_thumb,h_256,w_256,f_auto,g_faces,z_0.7/v1493026348/a6v6v6h8o8z8l8u8p8u0.jpg', 
+    photo: 'https://upload.wikimedia.org/wikipedia/commons/0/0a/Alexandr_Wang_at_the_2023_World_Economic_Forum.jpg', 
     influence: 90, momentum: '+4.0', confidence: 88, 
     lastMove: 'Levantamiento de $1B en Series F para dominio de datos.', color: '#aa00ff' 
   }

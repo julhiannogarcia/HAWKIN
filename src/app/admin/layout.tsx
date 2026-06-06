@@ -18,7 +18,7 @@ export default function AdminLayout({ children }: { children: React.ReactNode })
     { name: 'Security Shield', href: '/admin/security', icon: <ShieldAlert size={16} /> },
     { name: 'Business Valuation', href: '/admin/valuation', icon: <TrendingUp size={16} /> },
     { name: 'Audit Logs', href: '/admin/audit', icon: <FileText size={16} /> },
-    { name: 'CEO Dashboard', href: '/admin/ceo', icon: <UserCircle size={16} /> },
+    { name: 'Master Dashboard', href: '/admin/ceo', icon: <UserCircle size={16} /> },
   ];
 
   return (
@@ -53,11 +53,11 @@ export default function AdminLayout({ children }: { children: React.ReactNode })
         <div className="p-8 border-t border-white/5 bg-white/[0.01]">
           <div className="flex items-center justify-between">
             <div>
-               <p className="text-[10px] font-black uppercase tracking-widest text-white">Julhianno Garcia</p>
+               <p className="text-[10px] font-black uppercase tracking-widest text-white">ADMIN_ALPHA_NODE</p>
                <p className="text-[8px] font-bold text-gray-500 uppercase tracking-widest mt-1">Soberano del Sistema</p>
             </div>
-            <div className="w-10 h-10 bg-gradient-to-tr from-cyan-500 to-purple-600 rounded-xl flex items-center justify-center text-white shadow-lg">
-               JG
+            <div className="w-10 h-10 bg-white/5 rounded-xl flex items-center justify-center text-gray-400 shadow-lg">
+               <UserCircle size={20} />
             </div>
           </div>
         </div>
