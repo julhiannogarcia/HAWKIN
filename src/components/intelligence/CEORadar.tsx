@@ -8,70 +8,70 @@ const CEOS = [
   { 
     id: 1, name: "Sam Altman", role: "CEO @ OpenAI", company: "OpenAI",
     influence: 98, momentum: "+4.2", confidence: 95,
-    photo: "/avatars/sam-altman.jpg",
+    photo: "https://commons.wikimedia.org/wiki/Special:FilePath/Sam_Altman_in_2023.jpg",
     logo: "https://upload.wikimedia.org/wikipedia/commons/4/4d/OpenAI_Logo.svg",
     lastMove: 'Alianza global con Apple Intelligence. Despliegue de GPT-4o.', color: '#10a37f' 
   },
   { 
     id: 2, name: "Jensen Huang", role: "CEO @ NVIDIA", company: "NVIDIA",
     influence: 99, momentum: "+5.5", confidence: 98,
-    photo: "/avatars/jensen-huang.jpg",
+    photo: "https://images.weserv.nl/?url=https://upload.wikimedia.org/wikipedia/commons/e/e6/Jen-Hsun_Huang_2025.jpg&w=400&h=400&fit=cover",
     logo: "https://upload.wikimedia.org/wikipedia/sco/2/21/Nvidia_logo.svg",
     lastMove: 'Anuncio de arquitectura Vera Rubin. Dominio absoluto de mercado.', color: '#76b900' 
   },
   { 
     id: 3, name: "Elon Musk", role: "Founder @ xAI", company: "xAI",
     influence: 96, momentum: "+6.1", confidence: 90,
-    photo: "/avatars/elon-musk.jpg",
+    photo: "https://commons.wikimedia.org/wiki/Special:FilePath/Elon_Musk_Royal_Society_(crop1).jpg",
     logo: "https://upload.wikimedia.org/wikipedia/commons/b/b2/X_logo_2023.svg",
     lastMove: 'Fusión de capacidades xAI con Starlink. Mega-clúster en Memphis.', color: '#ffffff' 
   },
   { 
     id: 4, name: "Demis Hassabis", role: "CEO @ Google DeepMind", company: "Google DeepMind",
     influence: 95, momentum: "+3.8", confidence: 92,
-    photo: "/avatars/demis-hassabis.jpg",
+    photo: "https://commons.wikimedia.org/wiki/Special:FilePath/Demis_Hassabis_Royal_Society.jpg",
     logo: "https://upload.wikimedia.org/wikipedia/commons/5/53/Google_G_Logo.svg",
     lastMove: 'Avances en biología computacional (AlphaFold 3).', color: '#4285F4' 
   },
   { 
     id: 5, name: "Dario Amodei", role: "CEO @ Anthropic", company: "Anthropic",
     influence: 93, momentum: "+4.5", confidence: 89,
-    photo: "/avatars/dario-amodei.jpg",
+    photo: "https://images.weserv.nl/?url=https://upload.wikimedia.org/wikipedia/commons/thumb/e/e4/Dario_Amodei_at_TechCrunch_Disrupt_2023_01_%28cropped%29.jpg/960px-Dario_Amodei_at_TechCrunch_Disrupt_2023_01_%28cropped%29.jpg&w=400&h=400&fit=cover",
     logo: "https://upload.wikimedia.org/wikipedia/commons/thumb/7/78/Anthropic_logo.svg/2560px-Anthropic_logo.svg.png",
     lastMove: 'Lanzamiento de Claude 3.5 Sonnet superando benchmarks.', color: '#d97757' 
   },
   { 
     id: 6, name: "Satya Nadella", role: "CEO @ Microsoft", company: "Microsoft",
     influence: 97, momentum: "+2.1", confidence: 96,
-    photo: "/avatars/satya-nadella.jpg",
+    photo: "https://commons.wikimedia.org/wiki/Special:FilePath/MS-Exec-Nadella-Satya-2017-08-31-22_(cropped).jpg",
     logo: "https://upload.wikimedia.org/wikipedia/commons/4/44/Microsoft_logo.svg",
     lastMove: 'Integración agresiva de Copilot en todo el ecosistema Windows.', color: '#00a4ef' 
   },
   { 
     id: 7, name: "Mark Zuckerberg", role: "CEO @ Meta", company: "Meta",
     influence: 94, momentum: "+5.0", confidence: 93,
-    photo: "/avatars/mark-zuckerberg.jpg",
+    photo: "https://commons.wikimedia.org/wiki/Special:FilePath/Mark_Zuckerberg_F8_2019_Keynote_(32830578711)_(cropped).jpg",
     logo: "https://upload.wikimedia.org/wikipedia/commons/7/7b/Meta_Platforms_Inc._logo.svg",
     lastMove: 'Llama 3 Open Source disrumpiendo el modelo de negocio cerrado.', color: '#0668E1' 
   },
   { 
     id: 8, name: "Sundar Pichai", role: "CEO @ Alphabet", company: "Alphabet",
     influence: 95, momentum: "+1.5", confidence: 91,
-    photo: "/avatars/sundar-pichai.jpg",
+    photo: "https://commons.wikimedia.org/wiki/Special:FilePath/Sundar_Pichai_(2023)_hosted_by_Prezident.sk_(cropped).jpg",
     logo: "https://upload.wikimedia.org/wikipedia/commons/5/53/Google_G_Logo.svg",
     lastMove: 'Reestructuración interna para acelerar Gemini.', color: '#4285F4' 
   },
   { 
     id: 9, name: "Ilya Sutskever", role: "Founder @ SSI", company: "SSI",
     influence: 92, momentum: "+8.0", confidence: 85,
-    photo: "/avatars/ilya-sutskever.jpg",
+    photo: "https://commons.wikimedia.org/wiki/Special:FilePath/Ilya_Sutskever_2023.jpg",
     logo: "https://images.crunchbase.com/image/upload/c_thumb,h_256,w_256,f_auto,g_faces,z_0.7/v1500000000/i6v6v6h8o8z8l8u8p8u0.jpg",
     lastMove: 'Fundación de Safe Superintelligence Inc. tras salida de OpenAI.', color: '#888888' 
   },
   { 
     id: 10, name: "Alexandr Wang", role: "CEO @ Scale AI", company: "Scale AI",
     influence: 90, momentum: "+4.0", confidence: 88,
-    photo: "/avatars/alexandr-wang.jpg",
+    photo: "https://commons.wikimedia.org/wiki/Special:FilePath/Alexandr_Wang.jpg",
     logo: "https://images.unsplash.com/photo-1550751827-4bd374c3f58b?auto=format&fit=crop&q=80&w=100",
     lastMove: 'Levantamiento de $1B en Series F para dominio de datos.', color: '#aa00ff' 
   }
@@ -80,25 +80,11 @@ const CEOS = [
 function CEOImage({ src, alt, logo, ceoName }: { src: string, alt: string, logo?: string, ceoName: string }) {
   const [error, setError] = useState(false);
 
-  // Mapeo de fallbacks oficiales de alta disponibilidad por si las locales no existen
-  const FALLBACKS: Record<string, string> = {
-    "Sam Altman": "https://images.openai.com/blob/6130513a-0792-4980-9731-15e2695bf58b/sam-altman.jpg",
-    "Jensen Huang": "https://images.weserv.nl/?url=https://upload.wikimedia.org/wikipedia/commons/e/e6/Jen-Hsun_Huang_2025.jpg&w=400&h=400&fit=cover",
-    "Elon Musk": "https://www.tesla.com/sites/default/files/about/executives/elon-musk.jpg",
-    "Satya Nadella": "https://news.microsoft.com/wp-content/uploads/prod/sites/45/2014/01/Satya-Nadella-Portrait.jpg",
-    "Mark Zuckerberg": "https://images.weserv.nl/?url=https://upload.wikimedia.org/wikipedia/commons/d/d5/Mark_Zuckerberg_F8_2018_Keynote_%28cropped_2%29.jpg&w=400&h=400&fit=cover",
-    "Sundar Pichai": "https://images.weserv.nl/?url=https://upload.wikimedia.org/wikipedia/commons/6/6d/Sundar_Pichai_%282023%29.jpg&w=400&h=400&fit=cover",
-    "Demis Hassabis": "https://images.weserv.nl/?url=https://upload.wikimedia.org/wikipedia/commons/5/5d/Demis_Hassabis_%282024%29.jpg&w=400&h=400&fit=cover",
-    "Dario Amodei": "https://images.weserv.nl/?url=https://upload.wikimedia.org/wikipedia/commons/thumb/e/e4/Dario_Amodei_at_TechCrunch_Disrupt_2023_01_%28cropped%29.jpg/960px-Dario_Amodei_at_TechCrunch_Disrupt_2023_01_%28cropped%29.jpg&w=400&h=400&fit=cover",
-    "Ilya Sutskever": "https://images.weserv.nl/?url=https://upload.wikimedia.org/wikipedia/commons/thumb/d/d4/Ilya_Sutskever_and_Sam_Altman_in_TAU_%28cropped%29.jpg/960px-Ilya_Sutskever_and_Sam_Altman_in_TAU_%28cropped%29.jpg&w=400&h=400&fit=cover",
-    "Alexandr Wang": "https://images.weserv.nl/?url=https://upload.wikimedia.org/wikipedia/commons/thumb/0/0a/Alexandr_Wang_at_the_2023_World_Economic_Forum.jpg/640px-Alexandr_Wang_at_the_2023_World_Economic_Forum.jpg&w=400&h=400&fit=cover"
-  };
-
   return (
     <div className="relative w-32 h-32 mx-auto mb-8">
        <div className="w-full h-full rounded-[40px] overflow-hidden border-2 border-white/10 group-hover:border-cyan-500/50 transition-all shadow-2xl bg-gray-900 flex items-center justify-center">
           <img 
-            src={error ? (FALLBACKS[ceoName] || logo || "") : src} 
+            src={src} 
             alt={alt} 
             className="w-full h-full object-cover opacity-90 group-hover:opacity-100 transition-all duration-700" 
             onError={() => setError(true)}
