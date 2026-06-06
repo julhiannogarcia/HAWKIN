@@ -12,7 +12,7 @@ const GlobalTicker = dynamic(() => import('@/components/Ticker'), { ssr: false }
 const FounderZone = dynamic(() => import('@/components/FounderZone'), { ssr: false });
 const Pricing = dynamic(() => import('@/components/Pricing'), { ssr: false });
 const LiveFeed = dynamic(() => import('@/components/LiveFeed'), { ssr: false });
-const AdSpace = dynamic(() => import('@/components/AdSpace'), { ssr: false });
+const SponsorSpace = dynamic(() => import('@/components/SponsorSpace'), { ssr: false });
 const GlobalAIPulse = dynamic(() => import('@/components/intelligence/GlobalAIPulse'), { ssr: false });
 const HISRanking = dynamic(() => import('@/components/intelligence/HISRanking'), { ssr: false });
 const CEORadar = dynamic(() => import('@/components/intelligence/CEORadar'), { ssr: false });
@@ -48,7 +48,7 @@ export default function Home() {
         <Intro />
         
         <div className="w-full mt-10">
-          <AdSpace isPremium={false} type="banner" />
+          <SponsorSpace isPremium={false} type="banner" />
         </div>
 
         <Hero />
@@ -72,7 +72,7 @@ export default function Home() {
         <MarketTalentTerminal />
 
         <div className="max-w-6xl mx-auto w-full px-4 py-20">
-           <AdSpace isPremium={false} type="inline" />
+           <SponsorSpace isPremium={false} type="inline" />
         </div>
 
         <Pricing />

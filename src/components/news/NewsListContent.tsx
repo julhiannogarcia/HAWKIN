@@ -7,7 +7,7 @@ import GlobalTicker from '@/components/Ticker';
 import LiveFeed from '@/components/LiveFeed';
 import NewsCard from '@/components/NewsCard';
 import MasterIntel from '@/components/news/MasterIntel';
-import AdSpace from '@/components/AdSpace';
+import SponsorSpace from '@/components/SponsorSpace';
 import { LoaderCircle, Radio } from 'lucide-react';
 
 export default function NewsPage() {
@@ -65,7 +65,7 @@ export default function NewsPage() {
               <div className="sticky top-40 space-y-12">
                  <div className="space-y-6">
                     <h3 className="text-[10px] font-black uppercase tracking-[0.4em] text-gray-500 border-b border-white/5 pb-4">Patrocinador Alpha</h3>
-                    <AdSpace isPremium={false} type="sidebar" />
+                    <SponsorSpace isPremium={false} type="sidebar" />
                  </div>
 
                  <div className="p-10 rounded-[50px] bg-white/[0.02] border border-white/5 space-y-8">

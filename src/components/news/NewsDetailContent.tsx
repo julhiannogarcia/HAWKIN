@@ -11,7 +11,7 @@ import {
   ShieldCheck, Zap, Globe, TrendingUp, ShoppingBag
 } from 'lucide-react';
 import Link from 'next/link';
-import AdSpace from '@/components/AdSpace';
+import SponsorSpace from '@/components/SponsorSpace';
 import { useAlpha } from '@/context/AlphaContext';
 
 interface NewsDetailContentProps {
@@ -284,7 +284,7 @@ export default function NewsDetailContent({ newsId }: NewsDetailContentProps) {
                  <h4 className="text-2xl font-black uppercase italic tracking-tighter text-white/80">Ecosistema Global de Socios</h4>
               </div>
               <div className="w-full max-w-5xl">
-                <AdSpace isPremium={false} type="inline" />
+                <SponsorSpace isPremium={false} type="inline" />
               </div>
            </div>
         </div>

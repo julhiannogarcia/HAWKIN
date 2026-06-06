@@ -5,7 +5,7 @@ import { useState, useEffect, useRef } from 'react';
 import Header from '@/components/Header';
 import Footer from '@/components/Footer';
 import GlobalTicker from '@/components/Ticker';
-import AdSpace from '@/components/AdSpace';
+import SponsorSpace from '@/components/SponsorSpace';
 import { useAlpha } from '@/context/AlphaContext';
 import { Heart, Globe, Users, Zap, Mail, ShieldCheck, Info, LoaderCircle } from 'lucide-react';
 
@@ -85,7 +85,7 @@ export default function DonacionPage() {
               </div>
 
               <div className="pt-10">
-                 <AdSpace isPremium={!!user} type="inline" />
+                 <SponsorSpace isPremium={!!user} type="inline" />
               </div>
            </div>
 

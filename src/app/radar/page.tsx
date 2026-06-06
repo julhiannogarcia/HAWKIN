@@ -10,7 +10,7 @@ const Footer = dynamic(() => import('@/components/Footer'), { ssr: false });
 const GlobalTicker = dynamic(() => import('@/components/Ticker'), { ssr: false });
 const LiveFeed = dynamic(() => import('@/components/LiveFeed'), { ssr: false });
 const LiveStatusBar = dynamic(() => import('@/components/intelligence/LiveStatusBar'), { ssr: false });
-const AdSpace = dynamic(() => import('@/components/AdSpace'), { ssr: false });
+const SponsorSpace = dynamic(() => import('@/components/SponsorSpace'), { ssr: false });
 
 function Top10Sidebar() {
   const [intel, setIntel] = useState<any>(null);
@@ -123,7 +123,7 @@ export default function RadarPage() {
           </div>
 
           <div className="mb-20">
-             <AdSpace isPremium={false} type="banner" />
+             <SponsorSpace isPremium={false} type="banner" />
           </div>
 
           {/* GRID TÁCTICO: NOTICIAS + SIDEBAR TOP 10 */}
@@ -145,7 +145,7 @@ export default function RadarPage() {
                   
                   <div className="space-y-6">
                     <h3 className="text-[10px] font-black uppercase tracking-[0.4em] text-gray-500 border-b border-white/5 pb-4">Patrocinador Alpha</h3>
-                    <AdSpace isPremium={false} type="sidebar" />
+                    <SponsorSpace isPremium={false} type="sidebar" />
                   </div>
 
                   <div className="p-10 rounded-[50px] bg-white/[0.01] border border-white/5 space-y-8">
@@ -165,7 +165,7 @@ export default function RadarPage() {
         </section>
 
         <div className="max-w-7xl mx-auto w-full px-6 py-32">
-           <AdSpace isPremium={false} type="inline" />
+           <SponsorSpace isPremium={false} type="inline" />
         </div>
 
         <Footer />

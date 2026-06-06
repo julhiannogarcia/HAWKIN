@@ -6,7 +6,7 @@ import { ShieldAlert, Lock, EyeOff, Terminal, Zap, ShieldCheck, ExternalLink, La
 import Header from '@/components/Header';
 import Footer from '@/components/Footer';
 import GlobalTicker from '@/components/Ticker';
-import AdSpace from '@/components/AdSpace';
+import SponsorSpace from '@/components/SponsorSpace';
 import { useAlpha } from '@/context/AlphaContext';
 import Link from 'next/link';
 
@@ -120,7 +120,7 @@ export default function ShieldPage() {
 
             {/* PUBLICIDAD DE IMPACTO SIDEBAR */}
             <div className="mt-8">
-               <AdSpace isPremium={!!user} type="sidebar" />
+               <SponsorSpace isPremium={!!user} type="sidebar" />
             </div>
           </div>
 

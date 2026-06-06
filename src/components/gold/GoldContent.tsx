@@ -7,7 +7,7 @@ import dynamic from 'next/dynamic';
 import Header from '@/components/Header';
 import Footer from '@/components/Footer';
 import GlobalTicker from '@/components/Ticker';
-import AdSpace from '@/components/AdSpace';
+import SponsorSpace from '@/components/SponsorSpace';
 import { useAlpha } from '@/context/AlphaContext';
 import { 
   Activity, ShieldCheck, Zap, Globe, Clock, Bell, BellRing, 
@@ -93,7 +93,7 @@ export default function GoldPage() {
         
         {/* PUBLICIDAD DE ALTO IMPACTO GOLD */}
         <div className="mb-16">
-           <AdSpace isPremium={!!user} type="banner" />
+           <SponsorSpace isPremium={!!user} type="banner" />
         </div>
 
         <header className="flex flex-col xl:flex-row justify-between items-start xl:items-end mb-16 gap-12 border-l-4 border-[#FFD700] pl-8">
@@ -202,7 +202,7 @@ export default function GoldPage() {
 
            {/* PUBLICIDAD DE IMPACTO GOLD */}
            <div className="pt-10">
-              <AdSpace isPremium={!!user} type="inline" />
+              <SponsorSpace isPremium={!!user} type="inline" />
            </div>
         </div>
 

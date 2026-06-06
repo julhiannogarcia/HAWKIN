@@ -3,7 +3,7 @@
 import React, { useState, useEffect } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
 import NewsCard from '@/components/NewsCard';
-import AdSpace from '@/components/AdSpace';
+import SponsorSpace from '@/components/SponsorSpace';
 import { Globe, Coins, ShieldAlert, Laptop, ChevronDown, Sparkles, LoaderCircle } from 'lucide-react';
 import { useAlpha } from '@/context/AlphaContext';
 
