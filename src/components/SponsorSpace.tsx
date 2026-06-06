@@ -1,7 +1,7 @@
 'use client';
 
 import { motion } from 'framer-motion';
-import { ExternalLink, Zap, Building2, LoaderCircle } from 'lucide-react';
+import { Building2 } from 'lucide-react';
 import { useState, useEffect } from 'react';
 
 interface SponsorSpaceProps {
@@ -24,32 +24,25 @@ export default function SponsorSpace({ isPremium, type = 'banner' }: SponsorSpac
     if (isPremium) return;
 
     const fetchPromo = async () => {
-      setLoading(true);
       try {
         const zone = TYPE_MAP[type] || "TOP_BANNER";
-        
-        // Usamos un endpoint neutral para evitar bloqueadores
         const res = await fetch(`/api/promotions?placement=${zone}`);
-        if (res.ok) {
-          const data = await res.json();
-          if (Array.isArray(data) && data.length > 0) {
-            setPromo(data[Math.floor(Math.random() * data.length)]);
-            setLoading(false);
-            return;
-          }
-        }
+        const data = await res.json();
         
-        // FALLBACK INSTITUCIONAL (Siempre visible)
-        setPromo({
-          id: "hawkin-academy-default",
-          companyName: "HAWKIN ACADEMY",
-          bannerUrl: "https://images.unsplash.com/photo-1639762681485-074b7f938ba0?auto=format&fit=crop&q=80&w=2000",
-          targetUrl: "/academy"
-        });
-
+        if (Array.isArray(data) && data.length > 0) {
+          setPromo(data[0]); // Seleccionamos el primero para estabilidad
+        } else {
+          // Fallback manual si no hay datos
+          setPromo({
+            id: "fallback",
+            companyName: "HAWKIN ACADEMY",
+            bannerUrl: "https://images.unsplash.com/photo-1639762681485-074b7f938ba0?auto=format&fit=crop&q=80&w=2000",
+            targetUrl: "/academy"
+          });
+        }
       } catch (e) {
         setPromo({
-          id: "hawkin-emergency",
+          id: "error",
           companyName: "HAWKIN INTELLIGENCE",
           bannerUrl: "https://images.unsplash.com/photo-1451187580459-43490279c0fa?auto=format&fit=crop&q=80&w=2000",
           targetUrl: "/"
@@ -63,20 +56,12 @@ export default function SponsorSpace({ isPremium, type = 'banner' }: SponsorSpac
   }, [isPremium, type]);
 
   if (isPremium) return null;
-
-  if (loading) {
-    return <div className="w-full h-40 bg-white/[0.01] animate-pulse rounded-[30px]" />;
-  }
-
-  const handleInteraction = () => {
-    if (promo?.targetUrl) window.open(promo.targetUrl, '_blank');
-  };
+  if (loading || !promo) return <div className="w-full h-40 bg-white/[0.01] animate-pulse rounded-[40px]" />;
 
   return (
-    <motion.div 
-      initial={{ opacity: 0 }} animate={{ opacity: 1 }}
-      onClick={handleInteraction}
-      className={`relative w-full ${type === 'inline' ? 'h-96' : 'min-h-[300px] md:min-h-[500px]'} rounded-[50px] overflow-hidden group cursor-pointer shadow-2xl border border-white/5 bg-[#050505]`}
+    <div 
+      onClick={() => promo.targetUrl && window.open(promo.targetUrl, '_blank')}
+      className={`relative w-full ${type === 'inline' ? 'h-96' : 'min-h-[300px] md:min-h-[450px]'} rounded-[50px] overflow-hidden group cursor-pointer shadow-2xl border border-white/5 bg-black`}
     >
       <img 
         src={promo.bannerUrl} 
@@ -89,9 +74,8 @@ export default function SponsorSpace({ isPremium, type = 'banner' }: SponsorSpac
             <div className="px-3 py-1 bg-cyan-500/10 border border-cyan-500/20 rounded-full">
                <p className="text-cyan-400 text-[8px] font-black uppercase tracking-[0.3em]">Socio Patrocinador</p>
             </div>
-            <div className="w-1.5 h-1.5 rounded-full bg-cyan-500 animate-pulse" />
          </div>
       </div>
-    </motion.div>
+    </div>
   );
 }

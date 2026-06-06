@@ -1,6 +1,9 @@
 import { NextResponse } from "next/server";
 import { prisma } from "@/lib/prisma";
 
+export const dynamic = 'force-dynamic';
+export const revalidate = 0;
+
 export async function GET(req: Request) {
   const { searchParams } = new URL(req.url);
   const placement = searchParams.get('placement');
@@ -8,7 +11,7 @@ export async function GET(req: Request) {
   try {
     const now = new Date();
     
-    // 1. INTENTO DE CARGA DESDE DB (CAMPANAS REALES)
+    // 1. INTENTO DE CARGA DESDE DB
     const ads = await prisma.adCampaign.findMany({
       where: {
         status: { in: ['ACTIVE', 'PAID'] },
@@ -18,36 +21,24 @@ export async function GET(req: Request) {
       },
     });
 
-    if (ads.length > 0) {
+    if (ads && ads.length > 0) {
       return NextResponse.json(ads);
     }
 
-    // 2. FALLBACK INSTITUCIONAL PRO (EL COMERCIAL 3D ORIGINAL)
-    // Usamos video nativo de respaldo para garantizar visualización sin fallos de API externa
+    // 2. FALLBACK INSTITUCIONAL PRO
     const institutionalAds = [
       {
-        id: "hawkin-academy-premium-3d",
+        id: "hawkin-academy-default",
         companyName: "HAWKIN ACADEMY",
-        // Enlace directo a video de alta fidelidad (Unsplash/Nativo)
         bannerUrl: "https://images.unsplash.com/photo-1639762681485-074b7f938ba0?auto=format&fit=crop&q=80&w=2000",
         targetUrl: "/academy",
-        placement: placement || "TOP_BANNER",
-        isInternal: true
-      },
-      {
-        id: "hawkin-intel-standard",
-        companyName: "HAWKIN INTELLIGENCE",
-        bannerUrl: "https://images.unsplash.com/photo-1451187580459-43490279c0fa?auto=format&fit=crop&q=80&w=2000",
-        targetUrl: "/b2b",
-        placement: placement || "SIDEBAR",
-        isInternal: true
+        placement: placement || "TOP_BANNER"
       }
     ];
 
     return NextResponse.json(institutionalAds);
 
   } catch (error) {
-    console.error("[ADS API] Critical Failure:", error);
     return NextResponse.json([{
       id: "err-system-fallback",
       companyName: "HAWKIN ACADEMY",
