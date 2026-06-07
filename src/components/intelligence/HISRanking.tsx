@@ -9,7 +9,7 @@ import {
 
 const COMPANIES = [
   { 
-    id: 'openai', name: 'OpenAI', logo: 'https://unavatar.io/twitter/OpenAI', 
+    id: 'openai', name: 'OpenAI', logo: '/logos/openai.png', 
     his: 98.4, confidence: 94, change: +3.5, 
     why: 'Lanzamiento inminente de GPT-5. Dominio absoluto en percepción AGI.', 
     ceo: 'Sam Altman', 
@@ -19,7 +19,7 @@ const COMPANIES = [
     weights: { innovation: 30, talent: 20, capital: 15, execution: 15, impact: 10, adoption: 5, future: 5 }
   },
   { 
-    id: 'nvidia', name: 'NVIDIA', logo: 'https://unavatar.io/twitter/nvidia', 
+    id: 'nvidia', name: 'NVIDIA', logo: '/logos/nvidia.png', 
     his: 97.8, confidence: 98, change: +2.9, 
     why: 'Monopolio de hardware de inferencia y anuncio de Vera Rubin.', 
     ceo: 'Jensen Huang', 
@@ -28,7 +28,7 @@ const COMPANIES = [
     weights: { innovation: 25, talent: 15, capital: 20, execution: 20, impact: 15, adoption: 3, future: 2 }
   },
   { 
-    id: 'google', name: 'DeepMind', logo: 'https://unavatar.io/twitter/GoogleDeepMind', 
+    id: 'google', name: 'DeepMind', logo: '/logos/deepmind.png', 
     his: 94.5, confidence: 92, change: +1.8, 
     why: 'Integración masiva de Gemini en ecosistema global de Android.', 
     ceo: 'Demis Hassabis', 
@@ -37,7 +37,7 @@ const COMPANIES = [
     weights: { innovation: 20, talent: 25, capital: 15, execution: 15, impact: 10, adoption: 10, future: 5 }
   },
   { 
-    id: 'anthropic', name: 'Anthropic', logo: 'https://unavatar.io/twitter/AnthropicAI', 
+    id: 'anthropic', name: 'Anthropic', logo: '/logos/anthropic.png', 
     his: 92.1, confidence: 89, change: +4.2, 
     why: 'Claude 3.5 Sonnet liderando benchmarks de razonamiento.', 
     ceo: 'Dario Amodei', 
@@ -46,7 +46,7 @@ const COMPANIES = [
     weights: { innovation: 35, talent: 20, capital: 10, execution: 10, impact: 10, adoption: 10, future: 5 }
   },
   { 
-    id: 'microsoft', name: 'Microsoft', logo: 'https://logo.clearbit.com/microsoft.com', 
+    id: 'microsoft', name: 'Microsoft', logo: '/logos/microsoft.png', 
     his: 91.5, confidence: 95, change: +0.8, 
     why: 'Adopción empresarial de Copilot y mega-clústeres Azure.', 
     ceo: 'Satya Nadella', 
@@ -55,7 +55,7 @@ const COMPANIES = [
     weights: { innovation: 15, talent: 15, capital: 25, execution: 20, impact: 15, adoption: 5, future: 5 }
   },
   { 
-    id: 'meta', name: 'Meta AI', logo: 'https://logo.clearbit.com/meta.com', 
+    id: 'meta', name: 'Meta AI', logo: '/logos/meta.png', 
     his: 89.2, confidence: 91, change: +2.4, 
     why: 'Llama 3 establece el estándar open-source. Adopción global.', 
     ceo: 'Mark Zuckerberg', 
@@ -64,7 +64,7 @@ const COMPANIES = [
     weights: { innovation: 20, talent: 15, capital: 15, execution: 20, impact: 20, adoption: 5, future: 5 }
   },
   { 
-    id: 'xai', name: 'xAI', logo: 'https://unavatar.io/twitter/xai', 
+    id: 'xai', name: 'xAI', logo: '/logos/xai.png', 
     his: 88.7, confidence: 85, change: +6.1, 
     why: 'Integración con SpaceX y X. Mega-clúster en construcción.', 
     ceo: 'Elon Musk', 
@@ -73,7 +73,7 @@ const COMPANIES = [
     weights: { innovation: 25, talent: 15, capital: 15, execution: 25, impact: 10, adoption: 5, future: 5 }
   },
   { 
-    id: 'amazon', name: 'Amazon AI', logo: 'https://logo.clearbit.com/amazon.com', 
+    id: 'amazon', name: 'Amazon AI', logo: '/logos/amazon.png', 
     his: 86.4, confidence: 90, change: -1.2, 
     why: 'Retrasos en modelos propios, dependencia estratégica de Anthropic.', 
     ceo: 'Andy Jassy', 
@@ -82,7 +82,7 @@ const COMPANIES = [
     weights: { innovation: 15, talent: 15, capital: 25, execution: 15, impact: 15, adoption: 10, future: 5 }
   },
   { 
-    id: 'apple', name: 'Apple', logo: 'https://logo.clearbit.com/apple.com', 
+    id: 'apple', name: 'Apple', logo: '/logos/apple.png', 
     his: 85.9, confidence: 88, change: +3.0, 
     why: 'Apple Intelligence lleva IA local a millones de usuarios.', 
     ceo: 'Tim Cook', 
@@ -91,7 +91,7 @@ const COMPANIES = [
     weights: { innovation: 15, talent: 15, capital: 20, execution: 15, impact: 15, adoption: 15, future: 5 }
   },
   { 
-    id: 'mistral', name: 'Mistral', logo: 'https://unavatar.io/twitter/MistralAI', 
+    id: 'mistral', name: 'Mistral', logo: '/logos/mistral.png', 
     his: 83.2, confidence: 82, change: +1.5, 
     why: 'Alternativa europea eficiente. Fuertes alianzas en la UE.', 
     ceo: 'Arthur Mensch', 
@@ -100,7 +100,7 @@ const COMPANIES = [
     weights: { innovation: 30, talent: 15, capital: 10, execution: 15, impact: 10, adoption: 15, future: 5 }
   },
   { 
-    id: 'figure', name: 'Figure AI', logo: 'https://unavatar.io/twitter/Figure_robot', 
+    id: 'figure', name: 'Figure AI', logo: '/logos/figure.png', 
     his: 81.5, confidence: 78, change: +5.4, 
     why: 'Despliegue de humanoides en líneas de producción reales.', 
     ceo: 'Brett Adcock', 
@@ -109,7 +109,7 @@ const COMPANIES = [
     weights: { innovation: 35, talent: 20, capital: 15, execution: 10, impact: 10, adoption: 5, future: 5 }
   },
   { 
-    id: 'scale', name: 'Scale AI', logo: 'https://unavatar.io/twitter/scale_AI', 
+    id: 'scale', name: 'Scale AI', logo: '/logos/scale.png', 
     his: 80.1, confidence: 85, change: +4.8, 
     why: 'Monopolio silencioso en anotación de datos para la AGI.', 
     ceo: 'Alexandr Wang', 
