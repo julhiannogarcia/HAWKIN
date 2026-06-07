@@ -26,14 +26,14 @@ export default function SponsorSpace({ isPremium, type = 'banner' }: SponsorSpac
     const fetchPromo = async () => {
       try {
         const zone = TYPE_MAP[type] || "TOP_BANNER";
-        const res = await fetch(`/api/promotions?placement=${zone}`);
+        // Nueva ruta indetectable para AdBlockers
+        const res = await fetch(`/api/v1/internal/content?placement=${zone}`);
         const data = await res.json();
         
         if (Array.isArray(data) && data.length > 0) {
-          // Seleccionamos uno aleatorio
           setPromo(data[Math.floor(Math.random() * data.length)]);
         } else {
-          // Fallback institucional si no hay datos
+          // Fallback institucional maestro (IMAGEN LOCAL O UNPLASH GARANTIZADA)
           setPromo({
             id: "fallback",
             companyName: "HAWKIN ACADEMY",
@@ -58,78 +58,58 @@ export default function SponsorSpace({ isPremium, type = 'banner' }: SponsorSpac
 
   if (isPremium || !promo) return null;
 
-  // Normalización y Blindaje de URL
-  const getSecureMediaUrl = (url: string) => {
+  // PROXY DE IMAGEN PARA EVITAR BLOQUEOS DE HOTLINKING (FONDO NEGRO)
+  const getSecureUrl = (url: string) => {
     if (!url) return '';
+    if (url.includes('youtube.com') || url.includes('vimeo.com') || url.match(/\.(mp4|webm|ogg)$/i)) return url;
+    if (url.startsWith('/') || url.startsWith('logos/')) return url.startsWith('/') ? url : `/${url}`;
     
-    // 1. Si es video MP4 o embebido, pasar directo
-    const isVideo = url.match(/\.(mp4|webm|ogg)$/i) || url.includes('vimeo') || url.includes('youtube');
-    if (isVideo) return url;
-
-    // 2. Si es una ruta local, pasar directo
-    if (url.startsWith('/') || url.startsWith('logos/')) {
-        return url.startsWith('/') ? url : `/${url}`;
-    }
-
-    // 3. PROXY MAESTRO (weserv.nl): Rompe cualquier bloqueo de hotlinking
-    // Esto es lo que soluciona el fondo negro de Pepsi
-    return `https://images.weserv.nl/?url=${encodeURIComponent(url)}&w=1920&fit=cover&error=https://images.unsplash.com/photo-1451187580459-43490279c0fa`;
+    // Forzamos el paso por proxy para cualquier link externo (como el de Pepsi)
+    return `https://images.weserv.nl/?url=${encodeURIComponent(url)}&w=1920&fit=cover`;
   };
 
-  const cleanUrl = getSecureMediaUrl(promo.bannerUrl);
-  const isVideo = cleanUrl.match(/\.(mp4|webm|ogg)$/i) || cleanUrl.includes('vimeo') || cleanUrl.includes('youtube');
+  const finalUrl = getSecureUrl(promo.bannerUrl);
+  const isVideo = finalUrl.match(/\.(mp4|webm|ogg)$/i) || finalUrl.includes('vimeo') || finalUrl.includes('youtube');
 
   const renderMedia = () => {
     if (mediaError) {
-      return (
-        <img 
-          src="https://images.unsplash.com/photo-1451187580459-43490279c0fa?auto=format&fit=crop&q=80&w=2000" 
-          className="absolute inset-0 w-full h-full object-cover opacity-30" 
-          alt="System Fallback" 
-        />
-      );
+      return <div className="absolute inset-0 bg-gradient-to-br from-gray-900 to-black" />;
     }
 
     if (isVideo) {
-      if (cleanUrl.includes('vimeo.com')) {
-        const id = cleanUrl.split('/').pop()?.split('?')[0];
+      if (finalUrl.includes('vimeo.com')) {
+        const id = finalUrl.split('/').pop()?.split('?')[0];
         return (
           <iframe 
             src={`https://player.vimeo.com/video/${id}?autoplay=1&muted=1&loop=1&background=1`}
-            className="absolute inset-0 w-full h-full pointer-events-none"
-            frameBorder="0"
-            allow="autoplay; fullscreen"
+            className="absolute inset-0 w-full h-full pointer-events-none scale-[1.05]"
+            frameBorder="0" allow="autoplay; fullscreen"
           />
         );
       }
-      if (cleanUrl.includes('youtube.com') || cleanUrl.includes('youtu.be')) {
+      if (finalUrl.includes('youtube.com') || finalUrl.includes('youtu.be')) {
         let id = '';
-        if (cleanUrl.includes('v=')) id = cleanUrl.split('v=')[1].split('&')[0];
-        else id = cleanUrl.split('/').pop() || '';
+        if (finalUrl.includes('v=')) id = finalUrl.split('v=')[1].split('&')[0];
+        else id = finalUrl.split('/').pop() || '';
         return (
           <iframe 
             src={`https://www.youtube.com/embed/${id}?autoplay=1&mute=1&loop=1&playlist=${id}&controls=0&showinfo=0&rel=0&modestbranding=1`}
-            className="absolute inset-0 w-full h-full pointer-events-none"
-            frameBorder="0"
-            allow="autoplay; fullscreen"
+            className="absolute inset-0 w-full h-full pointer-events-none scale-[1.05]"
+            frameBorder="0" allow="autoplay; fullscreen"
           />
         );
       }
       return (
-        <video 
-          autoPlay loop muted playsInline 
-          className="absolute inset-0 w-full h-full object-cover"
-          onError={() => setMediaError(true)}
-        >
-          <source src={cleanUrl} type="video/mp4" />
+        <video autoPlay loop muted playsInline className="absolute inset-0 w-full h-full object-cover">
+          <source src={finalUrl} type="video/mp4" />
         </video>
       );
     }
 
     return (
       <img 
-        src={cleanUrl} 
-        className="absolute inset-0 w-full h-full object-cover opacity-80 group-hover:opacity-100 transition-opacity" 
+        src={finalUrl} 
+        className="absolute inset-0 w-full h-full object-cover opacity-90 group-hover:opacity-100 transition-all duration-[10s] group-hover:scale-105" 
         alt={promo.companyName} 
         onError={() => setMediaError(true)}
       />
@@ -139,19 +119,25 @@ export default function SponsorSpace({ isPremium, type = 'banner' }: SponsorSpac
   return (
     <div 
       onClick={() => promo.targetUrl && window.open(promo.targetUrl, '_blank')}
-      className={`relative w-full ${type === 'inline' ? 'h-96' : 'min-h-[300px] md:min-h-[450px]'} rounded-[50px] overflow-hidden group cursor-pointer shadow-2xl border border-white/5 bg-black transition-all hover:border-cyan-500/20`}
+      className={`relative w-full ${type === 'inline' ? 'h-[450px]' : 'min-h-[300px] md:min-h-[500px]'} rounded-[50px] overflow-hidden group cursor-pointer shadow-2xl border border-white/5 bg-[#050505] transition-all hover:border-cyan-500/30`}
     >
       {renderMedia()}
-      <div className="absolute inset-0 bg-gradient-to-t from-black via-transparent to-transparent flex flex-col justify-end p-12">
-         <h4 className="text-3xl md:text-6xl font-black text-white uppercase italic tracking-tighter drop-shadow-2xl">
-           {promo.companyName}
-         </h4>
-         <div className="flex items-center gap-3 mt-4">
-            <div className="px-4 py-1.5 bg-white/10 backdrop-blur-xl border border-white/10 rounded-full">
-               <p className="text-white text-[10px] font-black uppercase tracking-[0.3em]">Socio Patrocinador</p>
+      
+      {/* CAPA DE SOMBRA PARA VISIBILIDAD DE TEXTO */}
+      <div className="absolute inset-0 bg-gradient-to-t from-black via-black/20 to-transparent pointer-events-none" />
+      
+      <div className="absolute inset-0 flex flex-col justify-end p-12 md:p-16">
+         <motion.div initial={{ opacity: 0, y: 20 }} animate={{ opacity: 1, y: 0 }} className="space-y-6">
+            <h4 className="text-4xl md:text-7xl font-black text-white uppercase italic tracking-tighter drop-shadow-2xl">
+               {promo.companyName}
+            </h4>
+            <div className="flex items-center gap-4">
+               <div className="px-6 py-2 bg-white/10 backdrop-blur-xl border border-white/10 rounded-full">
+                  <p className="text-[11px] font-black uppercase tracking-[0.4em] text-white">Socio Patrocinador</p>
+               </div>
+               <div className="w-3 h-3 rounded-full bg-cyan-500 animate-pulse shadow-[0_0_20px_#06b6d4]" />
             </div>
-            <div className="w-2 h-2 rounded-full bg-cyan-500 animate-pulse shadow-[0_0_15px_#06b6d4]" />
-         </div>
+         </motion.div>
       </div>
     </div>
   );
