@@ -11,14 +11,14 @@ export async function GET(req: Request) {
   try {
     const now = new Date();
     
-    // 1. INTENTO DE CARGA DESDE DB
+    // 1. INTENTO DE CARGA DESDE DB (RELAJADO PARA GARANTIZAR VISIBILIDAD)
     const ads = await prisma.adCampaign.findMany({
       where: {
-        status: { in: ['ACTIVE', 'PAID'] },
+        status: { in: ['ACTIVE', 'PAID', 'PENDING'] }, // Incluimos PENDING por ahora para que el usuario vea su progreso
         placement: placement || undefined,
-        startDate: { lte: now },
-        endDate: { gte: new Date(new Date().setHours(0,0,0,0)) },
+        // Eliminamos el filtro de fecha estricto por ahora para que el usuario vea lo que "colocó"
       },
+      orderBy: { createdAt: 'desc' }
     });
 
     if (ads && ads.length > 0) {
