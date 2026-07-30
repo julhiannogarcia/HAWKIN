@@ -33,6 +33,8 @@ type ArenaModelView = {
   sourceUrl?: string;
   rank: number;
   rivalSlug: string;
+  releaseConfirmed?: boolean;
+  needsVerification?: boolean;
 };
 
 type ArenaRankingProps = {
@@ -277,6 +279,16 @@ export default function ArenaRanking({
                             >
                               {model.license}
                             </span>
+                            {model.needsVerification && (
+                              <span className="ml-1 px-1.5 py-0.5 rounded text-[7px] font-black bg-amber-500/10 text-amber-400">
+                                Verificar actualidad
+                              </span>
+                            )}
+                            {model.releaseConfirmed && !model.needsVerification && (
+                              <span className="ml-1 px-1.5 py-0.5 rounded text-[7px] font-black bg-cyan-500/10 text-cyan-400">
+                                Release confirmado
+                              </span>
+                            )}
                           </p>
                         </div>
                       </div>

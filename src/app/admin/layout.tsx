@@ -2,7 +2,7 @@ import Link from 'next/link';
 import { 
   LayoutDashboard, Activity, Target, Users, DollarSign, 
   CreditCard, BrainCircuit, HeartPulse, ShieldAlert, 
-  TrendingUp, FileText, UserCircle
+  TrendingUp, FileText, UserCircle, Trophy
 } from 'lucide-react';
 
 export default function AdminLayout({ children }: { children: React.ReactNode }) {
@@ -14,6 +14,7 @@ export default function AdminLayout({ children }: { children: React.ReactNode })
     { name: 'Financial Center', href: '/admin/financial', icon: <DollarSign size={16} /> },
     { name: 'Subscription Center', href: '/admin/subscriptions', icon: <CreditCard size={16} /> },
     { name: 'Intelligence Ops', href: '/admin/intelligence', icon: <BrainCircuit size={16} /> },
+    { name: 'Arena Releases', href: '/admin/arena', icon: <Trophy size={16} /> },
     { name: 'System Health', href: '/admin/system', icon: <HeartPulse size={16} /> },
     { name: 'Security Shield', href: '/admin/security', icon: <ShieldAlert size={16} /> },
     { name: 'Business Valuation', href: '/admin/valuation', icon: <TrendingUp size={16} /> },

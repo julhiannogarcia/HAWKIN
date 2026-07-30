@@ -10,12 +10,37 @@ export type ArenaModelMeta = {
   founder: string;
   country: string;
   logo: string;
-  /** Aliases específicos — sin cruces entre generaciones (ej. no mezclar Claude 3.5 con Claude 4) */
   aliases: string[];
   rivalSlug: string;
+  /** Fecha ISO del último release confirmado por HAWKIN (no inventar) */
+  releaseDate?: string;
+  /** URL fuente oficial del release */
+  releaseSource?: string;
+  /** Texto de novedad confirmado editorialmente */
+  whatsNewConfirmed?: string;
+  benefitsConfirmed?: string[];
+  tier: 'frontier' | 'archived';
 };
 
-/** Frontier IA — julio 2026. Logos verificados en /public/logos/ */
+/** Modelos fuera del ranking activo — visibles solo en admin/watch */
+export const ARENA_ARCHIVED_REGISTRY: ArenaModelMeta[] = [
+  {
+    slug: 'gemini-2-5-pro',
+    name: 'Gemini 2.5 Pro',
+    company: 'Google DeepMind',
+    region: 'USA',
+    license: 'CLOSED',
+    founder: 'Demis Hassabis',
+    country: 'USA',
+    logo: '/logos/DEEPMIND.jpeg',
+    aliases: ['gemini 2.5 pro', 'gemini 2.5'],
+    rivalSlug: 'gemini-3-6-flash',
+    releaseDate: '2025-03-01',
+    tier: 'archived',
+  },
+];
+
+/** Frontier IA activo — julio 2026 */
 export const ARENA_MODEL_REGISTRY: ArenaModelMeta[] = [
   {
     slug: 'claude-opus-4',
@@ -28,6 +53,7 @@ export const ARENA_MODEL_REGISTRY: ArenaModelMeta[] = [
     logo: '/logos/ANTHROPI.webp',
     aliases: ['claude opus 4', 'claude opus', 'opus 4'],
     rivalSlug: 'gpt-5',
+    tier: 'frontier',
   },
   {
     slug: 'claude-sonnet-4',
@@ -39,7 +65,8 @@ export const ARENA_MODEL_REGISTRY: ArenaModelMeta[] = [
     country: 'USA',
     logo: '/logos/ANTHROPI.webp',
     aliases: ['claude sonnet 4', 'claude 4 sonnet', 'sonnet 4'],
-    rivalSlug: 'gemini-2-5-pro',
+    rivalSlug: 'gemini-3-6-flash',
+    tier: 'frontier',
   },
   {
     slug: 'gpt-5',
@@ -52,18 +79,80 @@ export const ARENA_MODEL_REGISTRY: ArenaModelMeta[] = [
     logo: '/logos/openAI.png',
     aliases: ['gpt-5', 'gpt5', 'openai gpt-5', 'chatgpt-5'],
     rivalSlug: 'claude-opus-4',
+    tier: 'frontier',
   },
   {
-    slug: 'gemini-2-5-pro',
-    name: 'Gemini 2.5 Pro',
-    company: 'Google DeepMind',
+    slug: 'gemini-3-6-flash',
+    name: 'Gemini 3.6 Flash',
+    company: 'Google',
     region: 'USA',
     license: 'CLOSED',
     founder: 'Demis Hassabis',
     country: 'USA',
     logo: '/logos/DEEPMIND.jpeg',
-    aliases: ['gemini 2.5 pro', 'gemini 2.5', 'gemini pro'],
+    aliases: [
+      'gemini 3.6 flash',
+      'gemini 3.6',
+      'gemini 3.5 flash',
+      'google gemini',
+      'gemini flash',
+    ],
     rivalSlug: 'gpt-5',
+    releaseDate: '2026-07-21',
+    releaseSource: 'https://deepmind.google/blog/',
+    whatsNewConfirmed:
+      'Lanzamiento Google (21 jul 2026): Gemini 3.6 Flash — mayor eficiencia de tokens, coding reforzado, multimodal ampliado y precio optimizado para producción.',
+    benefitsConfirmed: [
+      'Menor costo por token vs generaciones anteriores',
+      'Mejor rendimiento en coding y flujos agentic',
+      'Multimodal nativo con latencia reducida',
+      'Pensado para escala en apps y APIs',
+    ],
+    tier: 'frontier',
+  },
+  {
+    slug: 'gemini-3-5-flash-lite',
+    name: 'Gemini 3.5 Flash-Lite',
+    company: 'Google',
+    region: 'USA',
+    license: 'CLOSED',
+    founder: 'Demis Hassabis',
+    country: 'USA',
+    logo: '/logos/DEEPMIND.jpeg',
+    aliases: ['gemini 3.5 flash-lite', 'gemini 3.5 flash lite', 'flash-lite'],
+    rivalSlug: 'gemini-3-6-flash',
+    releaseDate: '2026-07-21',
+    releaseSource: 'https://deepmind.google/blog/',
+    whatsNewConfirmed:
+      'Lanzamiento Google (21 jul 2026): variante Flash-Lite orientada a máxima eficiencia de costo y latencia en cargas de alto volumen.',
+    benefitsConfirmed: [
+      'Ideal para chatbots masivos y clasificación',
+      'Costo mínimo por millón de tokens',
+      'Latencia ultrabaja en edge y móvil',
+    ],
+    tier: 'frontier',
+  },
+  {
+    slug: 'gemini-3-5-flash-cyber',
+    name: 'Gemini 3.5 Flash Cyber',
+    company: 'Google',
+    region: 'USA',
+    license: 'CLOSED',
+    founder: 'Demis Hassabis',
+    country: 'USA',
+    logo: '/logos/DEEPMIND.jpeg',
+    aliases: ['gemini 3.5 flash cyber', 'gemini cyber', 'flash cyber'],
+    rivalSlug: 'claude-sonnet-4',
+    releaseDate: '2026-07-21',
+    releaseSource: 'https://deepmind.google/blog/',
+    whatsNewConfirmed:
+      'Lanzamiento Google (21 jul 2026): variante Cyber enfocada en detección de amenazas, análisis de logs y respuesta a incidentes.',
+    benefitsConfirmed: [
+      'Especializado en seguridad y threat intel',
+      'Análisis de vulnerabilidades y IOCs',
+      'Integración con flujos SOC y SIEM',
+    ],
+    tier: 'frontier',
   },
   {
     slug: 'kimi-k3',
@@ -76,6 +165,7 @@ export const ARENA_MODEL_REGISTRY: ArenaModelMeta[] = [
     logo: '/logos/moonshot-kimi.svg',
     aliases: ['kimi k3', 'kimi k-3', 'moonshot ai', 'moonshot kimi'],
     rivalSlug: 'deepseek-r1',
+    tier: 'frontier',
   },
   {
     slug: 'deepseek-r1',
@@ -88,6 +178,7 @@ export const ARENA_MODEL_REGISTRY: ArenaModelMeta[] = [
     logo: '/logos/deepseek.svg',
     aliases: ['deepseek r1', 'deepseek-r1', 'deepseek reasoning'],
     rivalSlug: 'kimi-k3',
+    tier: 'frontier',
   },
   {
     slug: 'deepseek-v3',
@@ -100,6 +191,7 @@ export const ARENA_MODEL_REGISTRY: ArenaModelMeta[] = [
     logo: '/logos/deepseek.svg',
     aliases: ['deepseek v3', 'deepseek-v3'],
     rivalSlug: 'qwen-3-max',
+    tier: 'frontier',
   },
   {
     slug: 'qwen-3-max',
@@ -112,6 +204,7 @@ export const ARENA_MODEL_REGISTRY: ArenaModelMeta[] = [
     logo: '/logos/alibaba-qwen.svg',
     aliases: ['qwen 3', 'qwen3', 'qwen 3 max', 'alibaba qwen'],
     rivalSlug: 'deepseek-v3',
+    tier: 'frontier',
   },
   {
     slug: 'llama-4',
@@ -124,6 +217,7 @@ export const ARENA_MODEL_REGISTRY: ArenaModelMeta[] = [
     logo: '/logos/META-AI.png',
     aliases: ['llama 4', 'llama4', 'meta llama 4'],
     rivalSlug: 'qwen-3-max',
+    tier: 'frontier',
   },
   {
     slug: 'grok-4',
@@ -136,6 +230,7 @@ export const ARENA_MODEL_REGISTRY: ArenaModelMeta[] = [
     logo: '/logos/XAI.webp',
     aliases: ['grok 4', 'grok4', 'xai grok 4'],
     rivalSlug: 'gpt-5',
+    tier: 'frontier',
   },
   {
     slug: 'mistral-large-2',
@@ -148,6 +243,7 @@ export const ARENA_MODEL_REGISTRY: ArenaModelMeta[] = [
     logo: '/logos/Mistral.png',
     aliases: ['mistral large 2', 'mistral large', 'mixtral'],
     rivalSlug: 'llama-4',
+    tier: 'frontier',
   },
   {
     slug: 'glm-4-plus',
@@ -160,30 +256,7 @@ export const ARENA_MODEL_REGISTRY: ArenaModelMeta[] = [
     logo: '/logos/zhipu.svg',
     aliases: ['glm-4', 'glm 4 plus', 'zhipu', 'chatglm'],
     rivalSlug: 'qwen-3-max',
-  },
-  {
-    slug: 'ernie-4-5',
-    name: 'ERNIE 4.5',
-    company: 'Baidu',
-    region: 'CN',
-    license: 'OPEN',
-    founder: 'Robin Li',
-    country: 'China',
-    logo: '/logos/baidu.svg',
-    aliases: ['ernie 4.5', 'ernie 4', 'baidu ernie'],
-    rivalSlug: 'glm-4-plus',
-  },
-  {
-    slug: 'yi-large',
-    name: 'Yi-Large',
-    company: '01.AI',
-    region: 'CN',
-    license: 'OPEN',
-    founder: 'Kai-Fu Lee',
-    country: 'China',
-    logo: '/logos/01ai.svg',
-    aliases: ['yi-large', 'yi large', '01.ai', 'zero one ai'],
-    rivalSlug: 'qwen-3-max',
+    tier: 'frontier',
   },
   {
     slug: 'doubao-pro',
@@ -196,12 +269,19 @@ export const ARENA_MODEL_REGISTRY: ArenaModelMeta[] = [
     logo: '/logos/bytedance.svg',
     aliases: ['doubao pro', 'doubao', 'bytedance ai', 'seed ai'],
     rivalSlug: 'kimi-k3',
+    tier: 'frontier',
   },
 ];
 
+export const ALL_ARENA_MODELS = [...ARENA_MODEL_REGISTRY, ...ARENA_ARCHIVED_REGISTRY];
+
+export function getActiveArenaModels() {
+  return ARENA_MODEL_REGISTRY.filter((m) => m.tier === 'frontier');
+}
+
 export function findArenaModel(slugOrName: string): ArenaModelMeta | undefined {
   const key = slugOrName.toLowerCase().trim();
-  return ARENA_MODEL_REGISTRY.find(
+  return ALL_ARENA_MODELS.find(
     (m) =>
       m.slug === key ||
       m.name.toLowerCase() === key ||
@@ -218,4 +298,21 @@ export function mentionScore(text: string, aliases: string[]) {
   }, 0);
 }
 
+export function daysSinceRelease(releaseDate?: string): number | null {
+  if (!releaseDate) return null;
+  return Math.floor((Date.now() - new Date(releaseDate).getTime()) / 86_400_000);
+}
+
+export function isModelStale(
+  meta: ArenaModelMeta,
+  hasRecentFeedMention: boolean
+): boolean {
+  const days = daysSinceRelease(meta.releaseDate);
+  if (days === null) return true;
+  if (days <= 90) return false;
+  return !hasRecentFeedMention;
+}
+
 export const ARENA_SCORE_LABEL = 'HAWKIN Index (estimado)';
+
+export const NO_RELEASE_CONFIRMED = 'Sin confirmación de release';

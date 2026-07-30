@@ -7,3 +7,8 @@
 
 [build.environment]
   NODE_VERSION = "20"
+
+# Scan diario de releases oficiales vs catálogo Arena (08:00 UTC)
+[[scheduled.functions]]
+  path = "/api/intelligence/releases-watch?cron=1"
+  schedule = "0 8 * * *"

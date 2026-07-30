@@ -2,12 +2,14 @@ import { NextResponse } from 'next/server';
 import { GoogleGenerativeAI } from '@google/generative-ai';
 import Groq from 'groq-sdk';
 import {
-  ARENA_MODEL_REGISTRY,
   ARENA_SCORE_LABEL,
   findArenaModel,
+  getActiveArenaModels,
   mentionScore,
+  NO_RELEASE_CONFIRMED,
   type ArenaModelMeta,
 } from '@/lib/arenaModels';
+import { enrichModelRelease } from '@/lib/releasesWatch';
 
 export const dynamic = 'force-dynamic';
 export const revalidate = 0;
@@ -35,6 +37,8 @@ export type ArenaModel = ArenaModelMeta & {
   debate: string;
   sourceUrl?: string;
   rank: number;
+  releaseConfirmed: boolean;
+  needsVerification: boolean;
 };
 
 let cached: { payload: unknown; at: number } | null = null;
@@ -70,7 +74,7 @@ function collectSnippets(masterIntel: any, newsLive: any): NewsSnippet[] {
 
 function buildFallbackRows(snippets: NewsSnippet[]): AiArenaRow[] {
   const baseScore = 1180;
-  return ARENA_MODEL_REGISTRY.map((meta) => {
+  return getActiveArenaModels().map((meta) => {
     let mentions = 0;
     let bestTitle = '';
     let bestUrl: string | undefined;
@@ -97,16 +101,19 @@ function buildFallbackRows(snippets: NewsSnippet[]): AiArenaRow[] {
       score,
       change24h,
       change7d,
-      whatsNew: bestTitle || 'Sin novedad verificada en titulares recientes.',
-      benefits: [
+      whatsNew: bestTitle || NO_RELEASE_CONFIRMED,
+      benefits:
+        meta.benefitsConfirmed && meta.benefitsConfirmed.length > 0
+          ? meta.benefitsConfirmed
+          : [
         meta.license === 'OPEN'
           ? 'Pesos abiertos: despliegue local y auditoría posible.'
           : 'Modelo propietario con integración de producto.',
         `Desarrollado por ${meta.company} (${meta.region}).`,
         mentions > 0
           ? 'Momentum detectado en cobertura mediática reciente.'
-          : 'Sin menciones destacadas en el ciclo actual — score estimado.',
-      ],
+              : 'Sin menciones destacadas en el ciclo actual — score estimado.',
+            ],
       debate:
         mentions > 0 && rival
           ? `Sube por cobertura reciente vs ${rival.name}. ${meta.license === 'OPEN' ? 'Ventaja en costo/despliegue local.' : 'Ventaja en producto integrado y escala.'}`
@@ -122,12 +129,13 @@ async function scoreWithGemini(snippets: NewsSnippet[]): Promise<AiArenaRow[] | 
   const apiKey = process.env.GEMINI_API_KEY;
   if (!apiKey || snippets.length === 0) return null;
 
-  const slugs = ARENA_MODEL_REGISTRY.map((m) => m.slug).join(', ');
+  const slugs = getActiveArenaModels().map((m) => m.slug).join(', ');
   const prompt = `Eres HAWKIN Arena. Analiza SOLO estas noticias REALES de IA.
 Calcula ranking estimado (HAWKIN Index 1000-1450, NO es Elo oficial LMSYS) para modelos: ${slugs}.
-Incluye sí o sí: kimi-k3, deepseek-r1, qwen-3-max, claude-opus-4, gpt-5, gemini-2-5-pro, llama-4, grok-4.
+Incluye sí o sí: kimi-k3, deepseek-r1, qwen-3-max, claude-opus-4, gpt-5, gemini-3-6-flash, gemini-3-5-flash-lite, llama-4, grok-4.
 Reglas:
 - NO inventes lanzamientos no mencionados en noticias.
+- Google frontier actual = Gemini 3.6 Flash (NO usar Gemini 2.5 Pro).
 - benefits: 3-5 bullets cortos en español para usuario final.
 - debate: 1 párrafo comparando vs rival directo (USA vs China si aplica).
 - whatsNew: última novedad REAL del titular más relevante.
@@ -181,48 +189,88 @@ async function scoreWithGroq(snippets: NewsSnippet[]): Promise<AiArenaRow[] | nu
   }
 }
 
-function mergeModels(aiRows: AiArenaRow[]): ArenaModel[] {
+function applyReleaseTruth(
+  meta: ArenaModelMeta,
+  row: AiArenaRow,
+  snippets: NewsSnippet[]
+): Pick<ArenaModel, 'whatsNew' | 'benefits' | 'sourceUrl' | 'releaseConfirmed' | 'needsVerification'> {
+  const release = enrichModelRelease(meta, snippets);
+  const benefits =
+    meta.benefitsConfirmed && meta.benefitsConfirmed.length > 0
+      ? meta.benefitsConfirmed
+      : Array.isArray(row.benefits)
+        ? row.benefits.slice(0, 5)
+        : [];
+
+  return {
+    whatsNew: release.whatsNew,
+    benefits,
+    sourceUrl: release.sourceUrl || row.sourceUrl,
+    releaseConfirmed: release.releaseConfirmed,
+    needsVerification: release.needsVerification,
+  };
+}
+
+function mergeModels(aiRows: AiArenaRow[], snippets: NewsSnippet[]): ArenaModel[] {
   const sorted = [...aiRows].sort((a, b) => b.score - a.score);
 
   return sorted
     .map((row, index) => {
       const meta = findArenaModel(row.slug);
-      if (!meta) return null;
+      if (!meta || meta.tier !== 'frontier') return null;
+      const truth = applyReleaseTruth(meta, row, snippets);
       return {
         ...meta,
         score: Math.round(Math.min(1500, Math.max(900, row.score))),
         change24h: Number(row.change24h.toFixed(1)),
         change7d: Number(row.change7d.toFixed(1)),
         scoreLabel: ARENA_SCORE_LABEL,
-        whatsNew: row.whatsNew || 'Sin novedad destacada en el ciclo actual.',
-        benefits: Array.isArray(row.benefits) ? row.benefits.slice(0, 5) : [],
+        whatsNew: truth.whatsNew,
+        benefits: truth.benefits,
         debate: row.debate || 'Análisis en curso.',
-        sourceUrl: row.sourceUrl,
+        sourceUrl: truth.sourceUrl,
+        releaseConfirmed: truth.releaseConfirmed,
+        needsVerification: truth.needsVerification,
         rank: index + 1,
       };
     })
     .filter(Boolean) as ArenaModel[];
 }
 
-function ensureRequiredModels(models: ArenaModel[], fallbackRows: AiArenaRow[]): ArenaModel[] {
+function ensureRequiredModels(
+  models: ArenaModel[],
+  fallbackRows: AiArenaRow[],
+  snippets: NewsSnippet[]
+): ArenaModel[] {
   const bySlug = new Map(models.map((m) => [m.slug, m]));
-  const required = ['kimi-k3', 'deepseek-r1', 'gpt-5', 'claude-opus-4', 'gemini-2-5-pro', 'qwen-3-max'];
+  const required = [
+    'kimi-k3',
+    'deepseek-r1',
+    'gpt-5',
+    'claude-opus-4',
+    'gemini-3-6-flash',
+    'gemini-3-5-flash-lite',
+    'qwen-3-max',
+  ];
 
   for (const slug of required) {
     if (!bySlug.has(slug)) {
       const fb = fallbackRows.find((r) => r.slug === slug);
       const meta = findArenaModel(slug);
-      if (fb && meta) {
+      if (fb && meta && meta.tier === 'frontier') {
+        const truth = applyReleaseTruth(meta, fb, snippets);
         bySlug.set(slug, {
           ...meta,
           score: fb.score,
           change24h: fb.change24h,
           change7d: fb.change7d,
           scoreLabel: ARENA_SCORE_LABEL,
-          whatsNew: fb.whatsNew,
-          benefits: fb.benefits,
+          whatsNew: truth.whatsNew,
+          benefits: truth.benefits,
           debate: fb.debate,
-          sourceUrl: fb.sourceUrl,
+          sourceUrl: truth.sourceUrl,
+          releaseConfirmed: truth.releaseConfirmed,
+          needsVerification: truth.needsVerification,
           rank: 0,
         });
       }
@@ -270,7 +318,7 @@ export async function GET() {
       source = 'news-mentions';
     }
 
-    const models = ensureRequiredModels(mergeModels(aiRows), fallbackRows);
+    const models = ensureRequiredModels(mergeModels(aiRows, snippets), fallbackRows, snippets);
 
     const payload = {
       models,

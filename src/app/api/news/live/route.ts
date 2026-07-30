@@ -14,6 +14,7 @@ const FEEDS = [
   'https://news.google.com/rss/search?q=Sam+Altman+OR+Elon+Musk+OR+Jensen+Huang+OR+tech+CEO+billionaire&hl=en-US&gl=US&ceid=US:en',
   'https://news.google.com/rss/search?q=artificial+intelligence+OpenAI+Anthropic+NVIDIA+breaking&hl=en-US&gl=US&ceid=US:en',
   'https://news.google.com/rss/search?q=AI+technology+startup+funding+AGI&hl=en-US&gl=US&ceid=US:en',
+  'https://news.google.com/rss/search?q=Gemini+3.6+OR+Gemini+3.5+Flash+Google+AI&hl=en-US&gl=US&ceid=US:en',
   'https://news.google.com/rss/search?q=DeepSeek+OR+Kimi+OR+Moonshot+OR+Qwen+OR+GLM+OR+Baidu+ERNIE+OR+ByteDance+AI&hl=en-US&gl=US&ceid=US:en',
   'https://news.google.com/rss/search?q=Chinese+AI+open+source+LLM+breaking&hl=en-US&gl=US&ceid=US:en',
   'https://techcrunch.com/category/artificial-intelligence/feed/',
@@ -34,8 +35,8 @@ const KEY_CEOS = [
   'pichai', 'wenfeng', 'zhilin', 'kai-fu', 'robin li',
 ];
 const HIGH_IMPACT = [
-  'agi', 'gpt', 'gemini', 'claude', 'blackwell', 'robot', 'chips', 'funding',
-  'llm', 'breaking', 'billion', 'ceo', 'kimi', 'deepseek', 'qwen', 'chinese ai',
+  'agi', 'gpt', 'gemini', 'gemini 3.6', 'gemini 3.5', 'claude', 'blackwell', 'robot', 'chips', 'funding',
+  'llm', 'breaking', 'billion', 'ceo', 'kimi', 'deepseek', 'qwen', 'chinese ai', 'flash cyber',
 ];
 
 function scoreItem(text: string) {
@@ -95,6 +96,11 @@ export async function GET() {
           if (gemini?.category) category = gemini.category;
           if (gemini?.importance) intelLevel = String(gemini.importance);
           if (gemini?.title) displayTitle = gemini.title;
+        }
+
+        const titleLower = `${displayTitle} ${snippet}`.toLowerCase();
+        if (titleLower.includes('gemini 3.6') || titleLower.includes('gemini 3.5 flash')) {
+          category = 'BREAKING';
         }
 
         return {
