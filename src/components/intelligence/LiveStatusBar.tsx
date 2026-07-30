@@ -9,7 +9,7 @@ export default function LiveStatusBar() {
     london: '--:--',
     sv: '--:--',
   });
-  const [metrics, setMetrics] = useState<{ signals: string; precision: string } | null>(null);
+  const [metrics, setMetrics] = useState<{ newsCount: string; adViews: string; adCtr: string } | null>(null);
 
   useEffect(() => {
     const updateTimes = () => {
@@ -39,10 +39,10 @@ export default function LiveStatusBar() {
       .then((res) => (res.ok ? res.json() : null))
       .then((data) => {
         if (!data || data.error) return;
-        const signals = (data.newsCount ?? 0) + (data.totalAdViews ?? 0);
         setMetrics({
-          signals: signals.toLocaleString(),
-          precision: data.adCtr || '0.0%',
+          newsCount: String(data.newsCount ?? 0),
+          adViews: String(data.totalAdViews ?? 0),
+          adCtr: data.adCtr || '0.0%',
         });
       })
       .catch(() => {});
@@ -77,14 +77,18 @@ export default function LiveStatusBar() {
       </div>
 
       {metrics && (
-        <div className="flex items-center gap-8 text-right">
+        <div className="flex items-center gap-6 text-right">
           <div className="hidden md:flex flex-col">
-            <span className="text-[6px] font-bold text-gray-600 uppercase">Señales Procesadas</span>
-            <span className="text-[9px] font-black text-white italic">{metrics.signals}</span>
+            <span className="text-[6px] font-bold text-gray-600 uppercase">Noticias en BD</span>
+            <span className="text-[9px] font-black text-white tabular-nums">{metrics.newsCount}</span>
+          </div>
+          <div className="hidden lg:flex flex-col border-l border-white/10 pl-6">
+            <span className="text-[6px] font-bold text-gray-600 uppercase">Vistas Ads</span>
+            <span className="text-[9px] font-black text-white tabular-nums">{metrics.adViews}</span>
           </div>
           <div className="flex flex-col border-l border-white/10 pl-6">
             <span className="text-[6px] font-bold text-gray-600 uppercase">CTR Ads</span>
-            <span className="text-[9px] font-black text-green-500">{metrics.precision}</span>
+            <span className="text-[9px] font-black text-green-500 tabular-nums">{metrics.adCtr}</span>
           </div>
         </div>
       )}

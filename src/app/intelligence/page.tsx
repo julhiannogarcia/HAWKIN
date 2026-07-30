@@ -11,8 +11,6 @@ const SponsorSpace = dynamic(() => import('@/components/SponsorSpace'), { ssr: f
 const HISRanking = dynamic(() => import('@/components/intelligence/HISRanking'), { ssr: false });
 const CEORadar = dynamic(() => import('@/components/intelligence/CEORadar'), { ssr: false });
 const AIWarRoom = dynamic(() => import('@/components/intelligence/AIWarRoom'), { ssr: false });
-const ExecutiveBrief = dynamic(() => import('@/components/intelligence/ExecutiveBrief'), { ssr: false });
-const MarketTalentTerminal = dynamic(() => import('@/components/intelligence/MarketTalentTerminal'), { ssr: false });
 const ArenaRanking = dynamic(() => import('@/components/arena/ArenaRanking'), { ssr: false });
 const LiveStatusBar = dynamic(() => import('@/components/intelligence/LiveStatusBar'), { ssr: false });
 
@@ -50,8 +48,12 @@ export default function Page() {
         <div className="mt-4 space-y-0">
           <CEORadar />
           <AIWarRoom />
-          <ExecutiveBrief />
-          <MarketTalentTerminal />
+        </div>
+
+        <div className="mt-8 p-4 border border-white/5 rounded-xl text-center">
+          <p className="text-[9px] text-gray-600 uppercase tracking-widest">
+            Executive Brief y Market Terminal — disponibles próximamente con datos verificados
+          </p>
         </div>
 
         <div className="mt-12 flex items-center justify-center gap-2 text-[9px] font-black uppercase tracking-[0.4em] text-gray-700">

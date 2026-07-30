@@ -12,6 +12,7 @@ import {
   Trophy,
 } from 'lucide-react';
 import type { ArenaRegion } from '@/lib/arenaModels';
+import { ARENA_SCORE_LABEL } from '@/lib/arenaModels';
 
 type ArenaModelView = {
   slug: string;
@@ -170,7 +171,7 @@ export default function ArenaRanking({
                 Quién lidera la <span className="text-amber-400">IA hoy</span>
               </h2>
               <p className="text-[9px] text-gray-600 mt-1 uppercase tracking-[0.3em]">
-                HAWKIN Index · estimado desde noticias en vivo · no Elo oficial LMSYS
+                {ARENA_SCORE_LABEL} · no es Elo oficial LMSYS
               </p>
             </div>
             {!loading && (

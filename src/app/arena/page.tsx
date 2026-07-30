@@ -39,7 +39,7 @@ export default function ArenaPage() {
               HAWKIN <span className="text-amber-400">Arena</span>
             </h1>
             <p className="text-gray-500 mt-2 text-[10px] sm:text-xs uppercase tracking-widest max-w-2xl">
-              Ranking #1–#15 de modelos · USA, China y Europa · actualización cada 120 segundos
+              Ranking #1–#15 frontier 2026 · HAWKIN Index (estimado) · actualización cada 120s
             </p>
           </div>
           <Link

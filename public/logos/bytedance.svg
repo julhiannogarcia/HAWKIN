@@ -1,0 +1,6 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 128 128" fill="none">
+  <rect width="128" height="128" rx="24" fill="#0f0f0f"/>
+  <path d="M48 32v64l32-32-32-32z" fill="#fe2c55"/>
+  <path d="M80 32v64l32-32-32-32z" fill="#25f4ee" opacity="0.85"/>
+  <text x="64" y="116" text-anchor="middle" fill="#888" font-family="system-ui,sans-serif" font-size="9" font-weight="600">ByteDance</text>
+</svg>

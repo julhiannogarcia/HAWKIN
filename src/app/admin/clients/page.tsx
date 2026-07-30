@@ -12,6 +12,10 @@ export default function ClientManagement() {
 
   return (
     <div className="space-y-12">
+      <div className="p-4 border border-amber-500/30 bg-amber-500/10 rounded-xl">
+        <p className="text-[10px] font-black uppercase tracking-widest text-amber-400">Modo demostración</p>
+        <p className="text-xs text-gray-400 mt-1">Los clientes y métricas mostrados aquí son datos de ejemplo — no reflejan usuarios reales.</p>
+      </div>
       <div className="flex flex-col md:flex-row justify-between items-start md:items-end gap-6 border-b border-white/5 pb-8">
         <div>
            <div className="flex items-center gap-3 mb-2">

@@ -3,6 +3,7 @@ import { GoogleGenerativeAI } from '@google/generative-ai';
 import Groq from 'groq-sdk';
 import {
   ARENA_MODEL_REGISTRY,
+  ARENA_SCORE_LABEL,
   findArenaModel,
   mentionScore,
   type ArenaModelMeta,
@@ -96,11 +97,15 @@ function buildFallbackRows(snippets: NewsSnippet[]): AiArenaRow[] {
       score,
       change24h,
       change7d,
-      whatsNew: bestTitle || `Sin release destacado en el radar de las últimas 24h.`,
+      whatsNew: bestTitle || 'Sin novedad verificada en titulares recientes.',
       benefits: [
-        `Rendimiento competitivo en su categoría (${meta.license === 'OPEN' ? 'pesos abiertos' : 'modelo propietario'}).`,
-        `Respaldado por ${meta.company} (${meta.region}).`,
-        mentions > 0 ? 'Momentum positivo en titulares recientes.' : 'Monitoreo activo en HAWKIN Arena.',
+        meta.license === 'OPEN'
+          ? 'Pesos abiertos: despliegue local y auditoría posible.'
+          : 'Modelo propietario con integración de producto.',
+        `Desarrollado por ${meta.company} (${meta.region}).`,
+        mentions > 0
+          ? 'Momentum detectado en cobertura mediática reciente.'
+          : 'Sin menciones destacadas en el ciclo actual — score estimado.',
       ],
       debate:
         mentions > 0 && rival
@@ -120,7 +125,7 @@ async function scoreWithGemini(snippets: NewsSnippet[]): Promise<AiArenaRow[] | 
   const slugs = ARENA_MODEL_REGISTRY.map((m) => m.slug).join(', ');
   const prompt = `Eres HAWKIN Arena. Analiza SOLO estas noticias REALES de IA.
 Calcula ranking estimado (HAWKIN Index 1000-1450, NO es Elo oficial LMSYS) para modelos: ${slugs}.
-Incluye sí o sí: kimi-k3, deepseek-r1, qwen-2-5-max, claude-4-sonnet, gpt-4o, gemini-2-5-pro, llama-4, grok-3.
+Incluye sí o sí: kimi-k3, deepseek-r1, qwen-3-max, claude-opus-4, gpt-5, gemini-2-5-pro, llama-4, grok-4.
 Reglas:
 - NO inventes lanzamientos no mencionados en noticias.
 - benefits: 3-5 bullets cortos en español para usuario final.
@@ -188,7 +193,7 @@ function mergeModels(aiRows: AiArenaRow[]): ArenaModel[] {
         score: Math.round(Math.min(1500, Math.max(900, row.score))),
         change24h: Number(row.change24h.toFixed(1)),
         change7d: Number(row.change7d.toFixed(1)),
-        scoreLabel: 'HAWKIN Index',
+        scoreLabel: ARENA_SCORE_LABEL,
         whatsNew: row.whatsNew || 'Sin novedad destacada en el ciclo actual.',
         benefits: Array.isArray(row.benefits) ? row.benefits.slice(0, 5) : [],
         debate: row.debate || 'Análisis en curso.',
@@ -201,7 +206,7 @@ function mergeModels(aiRows: AiArenaRow[]): ArenaModel[] {
 
 function ensureRequiredModels(models: ArenaModel[], fallbackRows: AiArenaRow[]): ArenaModel[] {
   const bySlug = new Map(models.map((m) => [m.slug, m]));
-  const required = ['kimi-k3', 'deepseek-r1', 'gpt-4o', 'claude-4-sonnet', 'gemini-2-5-pro'];
+  const required = ['kimi-k3', 'deepseek-r1', 'gpt-5', 'claude-opus-4', 'gemini-2-5-pro', 'qwen-3-max'];
 
   for (const slug of required) {
     if (!bySlug.has(slug)) {
@@ -213,7 +218,7 @@ function ensureRequiredModels(models: ArenaModel[], fallbackRows: AiArenaRow[]):
           score: fb.score,
           change24h: fb.change24h,
           change7d: fb.change7d,
-          scoreLabel: 'HAWKIN Index',
+          scoreLabel: ARENA_SCORE_LABEL,
           whatsNew: fb.whatsNew,
           benefits: fb.benefits,
           debate: fb.debate,
@@ -271,8 +276,8 @@ export async function GET() {
       models,
       updatedAt: new Date().toISOString(),
       source,
-      scoreLabel: 'HAWKIN Index',
-      disclaimer: 'Índice estimado HAWKIN — no es el Elo oficial de LMSYS Chatbot Arena.',
+      scoreLabel: ARENA_SCORE_LABEL,
+      disclaimer: 'HAWKIN Index (estimado) — no es el Elo oficial de LMSYS Chatbot Arena.',
       newsCount: snippets.length,
     };
 

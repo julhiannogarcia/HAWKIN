@@ -6,10 +6,7 @@ export default function UserDashboard() {
     { title: 'Excel para el Futuro', progress: 0, icon: '📊' },
   ];
 
-  const savedNews = [
-    { title: 'GPT-5: Rumores sobre la fecha de lanzamiento', date: 'Hace 2 horas' },
-    { title: 'NVIDIA presenta nuevos chips Blackwell', date: 'Ayer' },
-  ];
+  const savedNews: { title: string; date: string }[] = [];
 
   return (
     <div className="max-w-6xl mx-auto space-y-12 pb-20">
@@ -66,12 +63,16 @@ export default function UserDashboard() {
               <span className="text-purple-500">●</span> Guardado
             </h2>
             <div className="space-y-3">
-              {savedNews.map((news, i) => (
+              {savedNews.length === 0 ? (
+                <p className="text-xs text-gray-600 uppercase tracking-widest p-4">Sin noticias guardadas aún</p>
+              ) : (
+              savedNews.map((news, i) => (
                 <div key={i} className="p-4 bg-white/5 border border-white/5 rounded-xl hover:border-purple-500/30 transition-all cursor-pointer">
                   <p className="text-xs font-bold leading-tight">{news.title}</p>
                   <p className="text-[10px] text-gray-600 mt-2 uppercase tracking-tighter">{news.date}</p>
                 </div>
-              ))}
+              ))
+              )}
             </div>
           </div>
         </div>

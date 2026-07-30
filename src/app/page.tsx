@@ -14,7 +14,6 @@ const FounderZone = dynamic(() => import('@/components/FounderZone'), { ssr: fal
 const Pricing = dynamic(() => import('@/components/Pricing'), { ssr: false });
 const LiveFeed = dynamic(() => import('@/components/LiveFeed'), { ssr: false });
 const SponsorSpace = dynamic(() => import('@/components/SponsorSpace'), { ssr: false });
-const GlobalAIPulse = dynamic(() => import('@/components/intelligence/GlobalAIPulse'), { ssr: false });
 const HISRanking = dynamic(() => import('@/components/intelligence/HISRanking'), { ssr: false });
 const AIWarRoom = dynamic(() => import('@/components/intelligence/AIWarRoom'), { ssr: false });
 const SecurityShield = dynamic(() => import('@/components/intelligence/SecurityShield'), { ssr: false });
@@ -51,8 +50,6 @@ export default function Home() {
         </div>
 
         <Hero />
-
-        <GlobalAIPulse />
 
         <HISRanking limit={6} showViewAllLink />
 

@@ -26,7 +26,10 @@ const CEO_REGISTRY: CeoMeta[] = [
   { id: 'zuckerberg', name: 'Mark Zuckerberg', role: 'CEO @ Meta', company: 'Meta', photo: 'https://unavatar.io/twitter/finkd', logo: '/logos/META-AI.png', color: '#0668E1', aliases: ['mark zuckerberg', 'meta', 'llama'] },
   { id: 'pichai', name: 'Sundar Pichai', role: 'CEO @ Alphabet', company: 'Alphabet', photo: 'https://unavatar.io/twitter/sundarpichai', logo: '/logos/DEEPMIND.jpeg', color: '#4285F4', aliases: ['sundar pichai', 'alphabet', 'google'] },
   { id: 'wang', name: 'Alexandr Wang', role: 'CEO @ Scale AI', company: 'Scale AI', photo: 'https://unavatar.io/twitter/alexandr_wang', logo: '/logos/SCALE-AI.svg', color: '#aa00ff', aliases: ['alexandr wang', 'scale ai'] },
-  { id: 'yang', name: 'Yang Zhilin', role: 'Founder @ Moonshot', company: 'Moonshot AI', photo: 'https://unavatar.io/github/MoonshotAI', logo: '/logos/DEEPMIND.jpeg', color: '#ff4444', aliases: ['yang zhilin', 'moonshot', 'kimi'] },
+  { id: 'yang', name: 'Yang Zhilin', role: 'Founder @ Moonshot', company: 'Moonshot AI', photo: 'https://unavatar.io/github/MoonshotAI', logo: '/logos/moonshot-kimi.svg', color: '#ff4444', aliases: ['yang zhilin', 'moonshot', 'kimi k3'] },
+  { id: 'wenfeng', name: 'Liang Wenfeng', role: 'Founder @ DeepSeek', company: 'DeepSeek', photo: 'https://unavatar.io/github/deepseek-ai', logo: '/logos/deepseek.svg', color: '#4D6BFE', aliases: ['liang wenfeng', 'deepseek'] },
+  { id: 'zhou', name: 'Jingren Zhou', role: 'VP @ Alibaba Cloud', company: 'Alibaba', photo: 'https://unavatar.io/twitter/alibaba_cloud', logo: '/logos/alibaba-qwen.svg', color: '#FF6A00', aliases: ['jingren zhou', 'qwen', 'alibaba'] },
+  { id: 'kaifu', name: 'Kai-Fu Lee', role: 'Founder @ 01.AI', company: '01.AI', photo: 'https://unavatar.io/twitter/kaifulee', logo: '/logos/01ai.svg', color: '#22d3ee', aliases: ['kai-fu lee', '01.ai', 'yi-large'] },
 ];
 
 let cached: { payload: unknown; at: number } | null = null;

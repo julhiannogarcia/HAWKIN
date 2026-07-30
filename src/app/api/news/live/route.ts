@@ -14,6 +14,8 @@ const FEEDS = [
   'https://news.google.com/rss/search?q=Sam+Altman+OR+Elon+Musk+OR+Jensen+Huang+OR+tech+CEO+billionaire&hl=en-US&gl=US&ceid=US:en',
   'https://news.google.com/rss/search?q=artificial+intelligence+OpenAI+Anthropic+NVIDIA+breaking&hl=en-US&gl=US&ceid=US:en',
   'https://news.google.com/rss/search?q=AI+technology+startup+funding+AGI&hl=en-US&gl=US&ceid=US:en',
+  'https://news.google.com/rss/search?q=DeepSeek+OR+Kimi+OR+Moonshot+OR+Qwen+OR+GLM+OR+Baidu+ERNIE+OR+ByteDance+AI&hl=en-US&gl=US&ceid=US:en',
+  'https://news.google.com/rss/search?q=Chinese+AI+open+source+LLM+breaking&hl=en-US&gl=US&ceid=US:en',
   'https://techcrunch.com/category/artificial-intelligence/feed/',
   'https://www.theverge.com/ai-artificial-intelligence/rss/index.xml',
   'https://openai.com/news/rss.xml',
@@ -22,15 +24,19 @@ const FEEDS = [
   'https://venturebeat.com/category/ai/feed/',
 ];
 
-const FALLBACK_NEWS = [
-  { id: 'f1', title: 'NVIDIA Blackwell: Dominio del Hardware AGI', category: 'CHIPS', excerpt: 'Arquitectura Blackwell redefine la eficiencia en centros de datos IA.', author: 'HAWKIN Analyst', date: 'En vivo', image: 'https://images.unsplash.com/photo-1591488320449-011701bb6704?auto=format&fit=crop&q=80&w=800', url: '#', source: 'HAWKIN', intelLevel: '9.8', trustScore: 99, isBreaking: true },
-  { id: 'f2', title: 'OpenAI: Nueva frontera en modelos de razonamiento', category: 'MODELS', excerpt: 'La carrera por AGI acelera alianzas globales con hardware y nube.', author: 'HAWKIN Analyst', date: 'En vivo', image: 'https://images.unsplash.com/photo-1677442136019-21780ecad995?auto=format&fit=crop&q=80&w=800', url: '#', source: 'HAWKIN', intelLevel: '9.5', trustScore: 98, isBreaking: false },
-  { id: 'f3', title: 'DeepMind: Biología computacional en escala global', category: 'HEALTH', excerpt: 'AlphaFold impulsa descubrimiento de fármacos y salud digital.', author: 'HAWKIN Analyst', date: 'En vivo', image: 'https://images.unsplash.com/photo-1451187580459-43490279c0fa?auto=format&fit=crop&q=80&w=800', url: '#', source: 'HAWKIN', intelLevel: '9.2', trustScore: 97, isBreaking: false },
+const KEY_COMPANIES = [
+  'openai', 'nvidia', 'anthropic', 'deepmind', 'microsoft', 'meta', 'xai',
+  'deepseek', 'moonshot', 'kimi', 'qwen', 'alibaba', 'baidu', 'ernie',
+  'bytedance', 'doubao', 'zhipu', 'glm', 'mistral', 'figure', 'tesla',
 ];
-
-const KEY_COMPANIES = ['openai', 'nvidia', 'anthropic', 'deepmind', 'microsoft', 'meta', 'xai', 'amazon', 'apple', 'mistral', 'figure', 'tesla'];
-const KEY_CEOS = ['altman', 'musk', 'huang', 'hassabis', 'amodei', 'nadella', 'zuckerberg', 'pichai', 'sutskever', 'wang'];
-const HIGH_IMPACT = ['agi', 'gpt', 'gemini', 'claude', 'blackwell', 'robot', 'chips', 'funding', 'llm', 'breaking', 'billion', 'ceo'];
+const KEY_CEOS = [
+  'altman', 'musk', 'huang', 'hassabis', 'amodei', 'nadella', 'zuckerberg',
+  'pichai', 'wenfeng', 'zhilin', 'kai-fu', 'robin li',
+];
+const HIGH_IMPACT = [
+  'agi', 'gpt', 'gemini', 'claude', 'blackwell', 'robot', 'chips', 'funding',
+  'llm', 'breaking', 'billion', 'ceo', 'kimi', 'deepseek', 'qwen', 'chinese ai',
+];
 
 function scoreItem(text: string) {
   const t = text.toLowerCase();
@@ -63,17 +69,27 @@ export async function GET() {
       .sort((a, b) => b.titanScore - a.titanScore)
       .slice(0, 24);
 
+    if (ranked.length === 0) {
+      return NextResponse.json({
+        news: [],
+        status: 'Sin datos nuevos',
+        refreshedAt: new Date().toISOString(),
+        cacheTTL: '120s',
+        error: true,
+      });
+    }
+
     const processed = await Promise.all(
       ranked.map(async ({ item, titanScore }, index) => {
         const uniqueId = generateShortId(item.link || item.title || '');
         const title = item.title?.split(' - ')[0] || 'Señal detectada';
         const snippet = item.contentSnippet || '';
-        let excerpt = snippet.substring(0, 220) || 'Analizando flujo de inteligencia global...';
+        let excerpt = snippet.substring(0, 220) || '';
         let category = titanScore >= 40 ? 'BREAKING' : 'INTEL IA';
         let intelLevel = String(Math.min(9.9, 6 + titanScore / 15));
         let displayTitle = title;
 
-        if (index < 8) {
+        if (index < 8 && excerpt) {
           const gemini = await enrichWithGemini(title, snippet);
           if (gemini?.summary) excerpt = gemini.summary;
           if (gemini?.category) category = gemini.category;
@@ -85,34 +101,33 @@ export async function GET() {
           id: uniqueId,
           title: displayTitle,
           category,
-          excerpt,
-          author: 'HAWKIN Analyst',
+          excerpt: excerpt || snippet.substring(0, 120),
+          author: item.creator || item.author || 'Radar Global',
           date: formatLiveDate(item.pubDate),
           timestamp: new Date(item.pubDate || Date.now()).getTime(),
           image: resolveNewsImage(item as Record<string, unknown>, title, 'radar'),
           url: item.link,
-          source: item.creator || item.author || 'Radar Global',
+          source: item.creator || item.author || 'RSS',
           intelLevel,
-          trustScore: 96,
           isBreaking: titanScore >= 40,
+          isFallback: false,
         };
       })
     );
 
-    const news = processed.length >= 8 ? processed : [...processed, ...FALLBACK_NEWS];
-
     return NextResponse.json({
-      news: news.slice(0, 30),
-      status: 'HAWKIN Live Radar v9.0',
+      news: processed.slice(0, 30),
+      status: 'HAWKIN Live Radar',
       refreshedAt: new Date().toISOString(),
       cacheTTL: '120s',
     });
   } catch {
     return NextResponse.json({
-      news: FALLBACK_NEWS,
-      status: 'Modo respaldo activo',
+      news: [],
+      status: 'Sin datos nuevos',
       refreshedAt: new Date().toISOString(),
       cacheTTL: '0s',
+      error: true,
     });
   }
 }
