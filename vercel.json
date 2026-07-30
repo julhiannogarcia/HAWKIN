@@ -1,5 +1,7 @@
 {
   "version": 2,
   "framework": "nextjs",
-  "outputDirectory": ".next"
+  "buildCommand": "npm run build",
+  "installCommand": "npm install",
+  "regions": ["iad1"]
 }

@@ -109,7 +109,7 @@ const COMPANIES = [
     weights: { innovation: 35, talent: 20, capital: 15, execution: 10, impact: 10, adoption: 5, future: 5 }
   },
   { 
-    id: 'scale', name: 'Scale AI', logo: '/logos/SCALE-AI.png', 
+    id: 'scale', name: 'Scale AI', logo: '/logos/SCALE-AI.svg', 
     his: 80.1, confidence: 85, change: +4.8, 
     why: 'Monopolio silencioso en anotación de datos para la AGI.', 
     ceo: 'Alexandr Wang', 

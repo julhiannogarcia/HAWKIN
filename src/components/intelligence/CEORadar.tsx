@@ -157,7 +157,7 @@ const CEOS = [
     id: 10, name: "Alexandr Wang", role: "CEO @ Scale AI", company: "Scale AI",
     influence: 90, momentum: "+4.0", confidence: 88,
     photo: "https://unavatar.io/twitter/alexandr_wang",
-    logo: "/logos/SCALE-AI.png",
+    logo: "/logos/SCALE-AI.svg",
     lastMove: 'Levantamiento de $1B en Series F para dominio de datos.', color: '#aa00ff',
     dossier: {
       vision: 91, execution: 96, risk_tolerance: 90,
