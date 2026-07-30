@@ -2,6 +2,7 @@
 
 import React, { useState, useEffect } from 'react';
 import dynamic from 'next/dynamic';
+import Link from 'next/link';
 import { LoaderCircle, ChevronRight } from 'lucide-react';
 
 const Header = dynamic(() => import('@/components/Header'), { ssr: false });
@@ -15,13 +16,10 @@ const LiveFeed = dynamic(() => import('@/components/LiveFeed'), { ssr: false });
 const SponsorSpace = dynamic(() => import('@/components/SponsorSpace'), { ssr: false });
 const GlobalAIPulse = dynamic(() => import('@/components/intelligence/GlobalAIPulse'), { ssr: false });
 const HISRanking = dynamic(() => import('@/components/intelligence/HISRanking'), { ssr: false });
-const CEORadar = dynamic(() => import('@/components/intelligence/CEORadar'), { ssr: false });
 const AIWarRoom = dynamic(() => import('@/components/intelligence/AIWarRoom'), { ssr: false });
 const SecurityShield = dynamic(() => import('@/components/intelligence/SecurityShield'), { ssr: false });
 const TradingIntelligence = dynamic(() => import('@/components/intelligence/TradingIntelligence'), { ssr: false });
 const CommandCenterTop10 = dynamic(() => import('@/components/intelligence/CommandCenterTop10'), { ssr: false });
-const MarketTalentTerminal = dynamic(() => import('@/components/intelligence/MarketTalentTerminal'), { ssr: false });
-const ExecutiveBrief = dynamic(() => import('@/components/intelligence/ExecutiveBrief'), { ssr: false });
 const LiveStatusBar = dynamic(() => import('@/components/intelligence/LiveStatusBar'), { ssr: false });
 
 export default function Home() {
@@ -55,9 +53,7 @@ export default function Home() {
 
         <GlobalAIPulse />
 
-        <HISRanking />
-
-        <CEORadar />
+        <HISRanking limit={6} showViewAllLink />
 
         <AIWarRoom />
         
@@ -67,9 +63,17 @@ export default function Home() {
         
         <CommandCenterTop10 />
 
-        <ExecutiveBrief />
-
-        <MarketTalentTerminal />
+        <div className="max-w-4xl mx-auto px-4 py-8 text-center">
+          <Link
+            href="/intelligence"
+            className="inline-flex items-center gap-2 px-6 py-3 border border-cyan-500/30 rounded-full text-[10px] font-black uppercase tracking-[0.3em] text-cyan-400 hover:bg-cyan-500/10 transition-colors"
+          >
+            Ver Intelligence Hub completo <ChevronRight size={14} />
+          </Link>
+          <p className="text-[9px] text-gray-700 mt-3 uppercase tracking-widest">
+            CEO Radar · Executive Brief · Market Terminal
+          </p>
+        </div>
 
         <div className="max-w-6xl mx-auto w-full px-4 py-20">
            <SponsorSpace isPremium={false} type="inline" />

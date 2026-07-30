@@ -1,6 +1,5 @@
 'use client';
 
-import { motion } from 'framer-motion';
 import { useState, useEffect, useRef } from 'react';
 import { getSecureImageUrl, getVimeoEmbedId, getYoutubeEmbedId, getYoutubeStartSeconds, buildYoutubeEmbedUrl, isVideoUrl, isSocialMediaUrl } from '@/lib/adMediaUtils';
 
@@ -14,6 +13,36 @@ const TYPE_MAP: Record<string, string> = {
   inline: 'NEWS_FEED',
   sidebar: 'SIDEBAR',
   'video-hero': 'TOP_BANNER',
+};
+
+const TYPE_STYLES: Record<
+  NonNullable<SponsorSpaceProps['type']>,
+  { container: string; padding: string; title: string; label: string }
+> = {
+  banner: {
+    container: 'min-h-[240px] md:min-h-[340px] rounded-[32px]',
+    padding: 'px-4 pb-3 pt-2',
+    title: 'text-lg md:text-xl',
+    label: 'text-[8px]',
+  },
+  inline: {
+    container: 'h-[360px] md:h-[400px] rounded-[32px]',
+    padding: 'px-5 pb-3 pt-2',
+    title: 'text-lg md:text-xl',
+    label: 'text-[8px]',
+  },
+  sidebar: {
+    container: 'h-[120px] md:h-[140px] rounded-2xl',
+    padding: 'px-3 pb-2 pt-1',
+    title: 'text-[9px]',
+    label: 'text-[7px]',
+  },
+  'video-hero': {
+    container: 'min-h-[240px] md:min-h-[340px] rounded-[32px]',
+    padding: 'px-4 pb-3 pt-2',
+    title: 'text-[11px] md:text-xs',
+    label: 'text-[8px]',
+  },
 };
 
 async function trackAdMetric(id: string, type: 'view' | 'click') {
@@ -109,7 +138,7 @@ export default function SponsorSpace({ isPremium, type = 'banner' }: SponsorSpac
         return (
           <iframe
             src={buildYoutubeEmbedUrl(youtubeId, { start })}
-            className="absolute inset-0 w-full h-full pointer-events-none scale-[1.05]"
+            className="absolute inset-0 w-full h-full pointer-events-none"
             allow="autoplay; encrypted-media; fullscreen"
             title={promo.companyName}
           />
@@ -121,7 +150,7 @@ export default function SponsorSpace({ isPremium, type = 'banner' }: SponsorSpac
         return (
           <iframe
             src={`https://player.vimeo.com/video/${vimeoId}?autoplay=1&muted=1&loop=1&background=1`}
-            className="absolute inset-0 w-full h-full pointer-events-none scale-[1.05]"
+            className="absolute inset-0 w-full h-full pointer-events-none"
             allow="autoplay; fullscreen"
             title={promo.companyName}
           />
@@ -151,27 +180,24 @@ export default function SponsorSpace({ isPremium, type = 'banner' }: SponsorSpac
     if (dest) window.open(dest, '_blank');
   };
 
+  const styles = TYPE_STYLES[type];
+
   return (
     <div
       onClick={handleClick}
-      className={`relative w-full ${type === 'inline' ? 'h-[450px]' : 'min-h-[300px] md:min-h-[500px]'} rounded-[50px] overflow-hidden group cursor-pointer shadow-2xl border border-white/5 bg-[#050505] transition-all hover:border-cyan-500/30`}
+      className={`relative w-full ${styles.container} overflow-hidden group cursor-pointer shadow-2xl border border-white/5 bg-[#050505] transition-all hover:border-cyan-500/30`}
     >
       {renderMedia()}
 
-      <div className="absolute inset-0 bg-gradient-to-t from-black via-black/20 to-transparent pointer-events-none" />
+      <div className="absolute bottom-0 left-0 right-0 h-[10%] min-h-[28px] bg-gradient-to-t from-black/90 via-black/40 to-transparent pointer-events-none" />
 
-      <div className="absolute inset-0 flex flex-col justify-end p-12 md:p-16">
-        <motion.div initial={{ opacity: 0, y: 20 }} animate={{ opacity: 1, y: 0 }} className="space-y-6">
-          <h4 className="text-4xl md:text-7xl font-black text-white uppercase italic tracking-tighter drop-shadow-2xl">
-            {promo.companyName}
-          </h4>
-          <div className="flex items-center gap-4">
-            <div className="px-6 py-2 bg-white/10 backdrop-blur-xl border border-white/10 rounded-full">
-              <p className="text-[11px] font-black uppercase tracking-[0.4em] text-white">Socio Patrocinador</p>
-            </div>
-            <div className="w-3 h-3 rounded-full bg-cyan-500 animate-pulse shadow-[0_0_20px_#06b6d4]" />
-          </div>
-        </motion.div>
+      <div className={`absolute bottom-0 left-0 right-0 flex items-end justify-between gap-2 ${styles.padding}`}>
+        <p className={`${styles.title} font-bold text-white/90 uppercase tracking-wide truncate leading-tight`}>
+          {promo.companyName}
+        </p>
+        <span className={`${styles.label} shrink-0 font-bold uppercase tracking-[0.2em] text-white/40`}>
+          Patrocinador
+        </span>
       </div>
     </div>
   );
