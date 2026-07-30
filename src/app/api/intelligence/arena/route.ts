@@ -2,11 +2,16 @@ import { NextResponse } from 'next/server';
 import { GoogleGenerativeAI } from '@google/generative-ai';
 import Groq from 'groq-sdk';
 import {
+  ARENA_DISCLAIMER,
   ARENA_SCORE_LABEL,
+  editorialScore,
   findArenaModel,
   getActiveArenaModels,
   mentionScore,
+  NO_DEBATE,
   NO_RELEASE_CONFIRMED,
+  sanitizeDebate,
+  SPECIALIZED_SCORE_CAP,
   type ArenaModelMeta,
 } from '@/lib/arenaModels';
 import { enrichModelRelease } from '@/lib/releasesWatch';
@@ -72,57 +77,60 @@ function collectSnippets(masterIntel: any, newsLive: any): NewsSnippet[] {
   return items.filter((n) => n.title.length > 5).slice(0, 35);
 }
 
-function buildFallbackRows(snippets: NewsSnippet[]): AiArenaRow[] {
-  const baseScore = 1180;
-  return getActiveArenaModels().map((meta) => {
-    let mentions = 0;
-    let bestTitle = '';
-    let bestUrl: string | undefined;
-
-    for (const snip of snippets) {
-      const blob = `${snip.title} ${snip.summary || ''}`;
-      const hit = mentionScore(blob, meta.aliases);
-      if (hit > 0) {
-        mentions += hit;
-        if (!bestTitle) {
-          bestTitle = snip.title;
-          bestUrl = snip.url;
-        }
+function countMentions(meta: ArenaModelMeta, snippets: NewsSnippet[]) {
+  let mentions = 0;
+  let bestTitle = '';
+  let bestUrl: string | undefined;
+  for (const snip of snippets) {
+    const blob = `${snip.title} ${snip.summary || ''}`;
+    const hit = mentionScore(blob, meta.aliases);
+    if (hit > 0) {
+      mentions += hit;
+      if (!bestTitle) {
+        bestTitle = snip.title;
+        bestUrl = snip.url;
       }
     }
+  }
+  return { mentions, bestTitle, bestUrl };
+}
 
-    const rival = findArenaModel(meta.rivalSlug);
-    const score = baseScore + mentions * 18 + (meta.region === 'CN' ? 5 : 0);
-    const change24h = Number((mentions * 0.4 - 0.5).toFixed(1));
-    const change7d = Number((mentions * 1.2).toFixed(1));
+/** Ranking editorial: piso por release confirmado; menciones solo afinan. Specialized no puede ser #1. */
+function buildEditorialRows(snippets: NewsSnippet[]): AiArenaRow[] {
+  return getActiveArenaModels()
+    .map((meta) => {
+      const { mentions, bestTitle, bestUrl } = countMentions(meta, snippets);
+      const score = editorialScore(meta, mentions);
+      const hasSource = Boolean(bestUrl || meta.releaseSource);
 
-    return {
-      slug: meta.slug,
-      score,
-      change24h,
-      change7d,
-      whatsNew: bestTitle || NO_RELEASE_CONFIRMED,
-      benefits:
-        meta.benefitsConfirmed && meta.benefitsConfirmed.length > 0
-          ? meta.benefitsConfirmed
-          : [
-        meta.license === 'OPEN'
-          ? 'Pesos abiertos: despliegue local y auditoría posible.'
-          : 'Modelo propietario con integración de producto.',
-        `Desarrollado por ${meta.company} (${meta.region}).`,
-        mentions > 0
-          ? 'Momentum detectado en cobertura mediática reciente.'
-              : 'Sin menciones destacadas en el ciclo actual — score estimado.',
-            ],
-      debate:
-        mentions > 0 && rival
-          ? `Sube por cobertura reciente vs ${rival.name}. ${meta.license === 'OPEN' ? 'Ventaja en costo/despliegue local.' : 'Ventaja en producto integrado y escala.'}`
-          : rival
-            ? `Compite directamente con ${rival.name} por adopción ${meta.region === 'CN' ? 'en Asia' : 'global'}.`
-            : 'Posición estable en el ranking HAWKIN Index.',
-      sourceUrl: bestUrl,
-    };
-  }).sort((a, b) => b.score - a.score);
+      let debate = NO_DEBATE;
+      if (hasSource && meta.whatsNewConfirmed) {
+        const rival = findArenaModel(meta.rivalSlug);
+        debate = rival
+          ? `${meta.name}: release Google/editorial confirmado. Rival directo: ${rival.name}. ${meta.specialized ? 'Variante especializada — no ranking global de inteligencia general.' : 'Flagship en su línea; score editorial HAWKIN, no Elo LMSYS.'}`
+          : meta.whatsNewConfirmed.slice(0, 180);
+      }
+
+      return {
+        slug: meta.slug,
+        score,
+        change24h: Number((Math.min(3, mentions * 0.3) - 0.2).toFixed(1)),
+        change7d: Number(Math.min(8, mentions * 0.8).toFixed(1)),
+        whatsNew: meta.whatsNewConfirmed || bestTitle || NO_RELEASE_CONFIRMED,
+        benefits:
+          meta.benefitsConfirmed && meta.benefitsConfirmed.length > 0
+            ? meta.benefitsConfirmed
+            : [
+                meta.license === 'OPEN'
+                  ? 'Pesos abiertos: despliegue local y auditoría posible.'
+                  : 'Modelo propietario con integración de producto.',
+                `Desarrollado por ${meta.company} (${meta.region}).`,
+              ],
+        debate: sanitizeDebate(debate, hasSource),
+        sourceUrl: bestUrl || meta.releaseSource,
+      };
+    })
+    .sort((a, b) => b.score - a.score);
 }
 
 async function scoreWithGemini(snippets: NewsSnippet[]): Promise<AiArenaRow[] | null> {
@@ -131,21 +139,23 @@ async function scoreWithGemini(snippets: NewsSnippet[]): Promise<AiArenaRow[] | 
 
   const slugs = getActiveArenaModels().map((m) => m.slug).join(', ');
   const prompt = `Eres HAWKIN Arena. Analiza SOLO estas noticias REALES de IA.
-Calcula ranking estimado (HAWKIN Index 1000-1450, NO es Elo oficial LMSYS) para modelos: ${slugs}.
-Incluye sí o sí: kimi-k3, deepseek-r1, qwen-3-max, claude-opus-4, gpt-5, gemini-3-6-flash, gemini-3-5-flash-lite, llama-4, grok-4.
-Reglas:
-- NO inventes lanzamientos no mencionados en noticias.
-- Google frontier actual = Gemini 3.6 Flash (NO usar Gemini 2.5 Pro).
-- benefits: 3-5 bullets cortos en español para usuario final.
-- debate: 1 párrafo comparando vs rival directo (USA vs China si aplica).
-- whatsNew: última novedad REAL del titular más relevante.
-- change24h (-5 a +8), change7d (-10 a +15).
+Ranking EDITORIAL estimado (HAWKIN Index 1000-1450). NO es Elo LMSYS / Arena.ai.
+Modelos: ${slugs}.
+
+REGLAS OBLIGATORIAS:
+- Google flagship julio 2026 = gemini-3-6-flash. Debe rankear ARRIBA de gemini-3-5-flash-cyber y gemini-3-5-flash-lite.
+- Cyber y Lite son variantes ESPECIALIZADAS: score máximo 1210. NUNCA #1–#3 global.
+- NO inventes lanzamientos no mencionados.
+- debate: SOLO si hay fuente en las noticias; si no, escribe exactamente: Sin análisis verificado
+- PROHIBIDO: "Sube por cobertura reciente", "quién gana la IA", scores inventados de confianza.
+- whatsNew: solo hechos del texto o "Sin confirmación de release".
+- benefits: 3-5 bullets cortos en español.
 
 Noticias:
 ${JSON.stringify(snippets.slice(0, 22))}
 
 JSON:
-{"models":[{"slug":"kimi-k3","score":1280,"change24h":1.2,"change7d":4.5,"whatsNew":"...","benefits":["..."],"debate":"...","sourceUrl":""}]}`;
+{"models":[{"slug":"gemini-3-6-flash","score":1365,"change24h":0.5,"change7d":2,"whatsNew":"...","benefits":["..."],"debate":"...","sourceUrl":""}]}`;
 
   try {
     const genAI = new GoogleGenerativeAI(apiKey);
@@ -173,12 +183,12 @@ async function scoreWithGroq(snippets: NewsSnippet[]): Promise<AiArenaRow[] | nu
         {
           role: 'system',
           content:
-            'HAWKIN Arena analyst. JSON {"models":[{slug,score,change24h,change7d,whatsNew,benefits[],debate,sourceUrl}]}. Solo hechos de noticias. Incluir Kimi K3 y modelos China.',
+            'HAWKIN Arena editorial. JSON {"models":[{slug,score,change24h,change7d,whatsNew,benefits[],debate,sourceUrl}]}. gemini-3-6-flash > cyber/lite. Specialized max 1210. debate="Sin análisis verificado" si no hay fuente. NO digas Sube por cobertura reciente. NO Elo LMSYS.',
         },
         { role: 'user', content: JSON.stringify(snippets.slice(0, 18)) },
       ],
       model: 'llama-3.3-70b-versatile',
-      temperature: 0.15,
+      temperature: 0.1,
       response_format: { type: 'json_object' },
     });
     const parsed = JSON.parse(completion.choices[0]?.message?.content || '{}');
@@ -205,36 +215,53 @@ function applyReleaseTruth(
   return {
     whatsNew: release.whatsNew,
     benefits,
-    sourceUrl: release.sourceUrl || row.sourceUrl,
+    sourceUrl: release.sourceUrl || row.sourceUrl || meta.releaseSource,
     releaseConfirmed: release.releaseConfirmed,
     needsVerification: release.needsVerification,
   };
 }
 
-function mergeModels(aiRows: AiArenaRow[], snippets: NewsSnippet[]): ArenaModel[] {
-  const sorted = [...aiRows].sort((a, b) => b.score - a.score);
+/** Fuerza score editorial: AI no puede poner Cyber/Lite arriba del flagship Google. */
+function enforceEditorialScore(meta: ArenaModelMeta, aiScore: number, snippets: NewsSnippet[]): number {
+  const { mentions } = countMentions(meta, snippets);
+  const floor = editorialScore(meta, mentions);
+  // Si AI propone score, acotar cerca del piso editorial (±20), specialized capped
+  let score = Math.round((aiScore + floor) / 2);
+  score = Math.max(floor - 15, Math.min(floor + 20, score));
+  if (meta.specialized) score = Math.min(score, SPECIALIZED_SCORE_CAP);
+  // Flagship Google 3.6: mínimo por encima del techo specialized
+  if (meta.slug === 'gemini-3-6-flash') {
+    score = Math.max(score, SPECIALIZED_SCORE_CAP + 40);
+  }
+  return Math.round(Math.min(1450, Math.max(900, score)));
+}
 
-  return sorted
-    .map((row, index) => {
+function mergeModels(aiRows: AiArenaRow[], snippets: NewsSnippet[]): ArenaModel[] {
+  const sorted = [...aiRows]
+    .map((row) => {
       const meta = findArenaModel(row.slug);
       if (!meta || meta.tier !== 'frontier') return null;
       const truth = applyReleaseTruth(meta, row, snippets);
+      const score = enforceEditorialScore(meta, row.score, snippets);
       return {
         ...meta,
-        score: Math.round(Math.min(1500, Math.max(900, row.score))),
-        change24h: Number(row.change24h.toFixed(1)),
-        change7d: Number(row.change7d.toFixed(1)),
+        score,
+        change24h: Number(Number(row.change24h || 0).toFixed(1)),
+        change7d: Number(Number(row.change7d || 0).toFixed(1)),
         scoreLabel: ARENA_SCORE_LABEL,
         whatsNew: truth.whatsNew,
         benefits: truth.benefits,
-        debate: row.debate || 'Análisis en curso.',
+        debate: sanitizeDebate(row.debate, Boolean(truth.sourceUrl)),
         sourceUrl: truth.sourceUrl,
         releaseConfirmed: truth.releaseConfirmed,
         needsVerification: truth.needsVerification,
-        rank: index + 1,
+        rank: 0,
       };
     })
     .filter(Boolean) as ArenaModel[];
+
+  sorted.sort((a, b) => b.score - a.score);
+  return sorted.map((m, i) => ({ ...m, rank: i + 1 }));
 }
 
 function ensureRequiredModels(
@@ -250,6 +277,7 @@ function ensureRequiredModels(
     'claude-opus-4',
     'gemini-3-6-flash',
     'gemini-3-5-flash-lite',
+    'gemini-3-5-flash-cyber',
     'qwen-3-max',
   ];
 
@@ -261,13 +289,13 @@ function ensureRequiredModels(
         const truth = applyReleaseTruth(meta, fb, snippets);
         bySlug.set(slug, {
           ...meta,
-          score: fb.score,
+          score: enforceEditorialScore(meta, fb.score, snippets),
           change24h: fb.change24h,
           change7d: fb.change7d,
           scoreLabel: ARENA_SCORE_LABEL,
           whatsNew: truth.whatsNew,
           benefits: truth.benefits,
-          debate: fb.debate,
+          debate: sanitizeDebate(fb.debate, Boolean(truth.sourceUrl)),
           sourceUrl: truth.sourceUrl,
           releaseConfirmed: truth.releaseConfirmed,
           needsVerification: truth.needsVerification,
@@ -277,7 +305,7 @@ function ensureRequiredModels(
     }
   }
 
-  const merged = [...bySlug.values()].sort((a, b) => b.score - a.score);
+  const merged = Array.from(bySlug.values()).sort((a, b) => b.score - a.score);
   return merged.map((m, i) => ({ ...m, rank: i + 1 })).slice(0, 15);
 }
 
@@ -294,38 +322,49 @@ export async function GET() {
     ]);
 
     const snippets = collectSnippets(masterIntel, newsLive);
-    if (snippets.length === 0) {
-      return NextResponse.json({
-        models: [],
-        updatedAt: new Date().toISOString(),
-        source: 'none',
-        error: true,
-        message: 'Sin datos nuevos',
-      });
-    }
+    // Incluso sin noticias, el ranking editorial de releases confirmados debe mostrarse
+    const fallbackRows = buildEditorialRows(snippets);
 
-    const fallbackRows = buildFallbackRows(snippets);
-    let aiRows = await scoreWithGemini(snippets);
-    let source = 'gemini+feeds';
+    let aiRows: AiArenaRow[] | null = null;
+    let source = 'editorial+releases';
 
-    if (!aiRows || aiRows.length < 8) {
-      aiRows = await scoreWithGroq(snippets);
-      source = 'groq+feeds';
+    if (snippets.length > 0) {
+      aiRows = await scoreWithGemini(snippets);
+      if (aiRows && aiRows.length >= 8) {
+        source = 'editorial+gemini';
+      } else {
+        aiRows = await scoreWithGroq(snippets);
+        source = aiRows && aiRows.length >= 8 ? 'editorial+groq' : 'editorial+releases';
+      }
     }
 
     if (!aiRows || aiRows.length < 8) {
       aiRows = fallbackRows;
-      source = 'news-mentions';
+      source = 'editorial+releases';
     }
 
     const models = ensureRequiredModels(mergeModels(aiRows, snippets), fallbackRows, snippets);
+
+    // Garantía dura: Cyber/Lite nunca #1–#3
+    const top3 = models.slice(0, 3);
+    const specializedInTop3 = top3.some((m) => m.specialized);
+    if (specializedInTop3) {
+      models.sort((a, b) => {
+        if (a.specialized && !b.specialized) return 1;
+        if (!a.specialized && b.specialized) return -1;
+        return b.score - a.score;
+      });
+      models.forEach((m, i) => {
+        m.rank = i + 1;
+      });
+    }
 
     const payload = {
       models,
       updatedAt: new Date().toISOString(),
       source,
       scoreLabel: ARENA_SCORE_LABEL,
-      disclaimer: 'HAWKIN Index (estimado) — no es el Elo oficial de LMSYS Chatbot Arena.',
+      disclaimer: ARENA_DISCLAIMER,
       newsCount: snippets.length,
     };
 
@@ -339,6 +378,7 @@ export async function GET() {
       source: 'error',
       error: true,
       message: 'Sin datos nuevos',
+      disclaimer: ARENA_DISCLAIMER,
     });
   }
 }

@@ -157,6 +157,15 @@ export default function ArenaRanking({
   return (
     <section className={`w-full bg-[#020202] ${compact ? 'py-8' : 'py-12'} border-b border-white/5`}>
       <div className="max-w-7xl mx-auto px-4 sm:px-6">
+        <div className="mb-4 px-3 py-2 rounded-lg border border-amber-500/20 bg-amber-500/[0.06] text-left">
+          <p className="text-[9px] sm:text-[10px] font-black uppercase tracking-widest text-amber-400">
+            {ARENA_SCORE_LABEL}
+          </p>
+          <p className="text-[8px] sm:text-[9px] text-gray-500 mt-0.5 uppercase tracking-wide">
+            NO es Elo LMSYS / Arena.ai oficial · Variantes Cyber/Lite no son ranking de inteligencia general
+          </p>
+        </div>
+
         {showHeader && (
           <div className="flex flex-col sm:flex-row sm:items-end sm:justify-between gap-4 mb-6 border-l-4 border-amber-500 pl-4 sm:pl-6">
             <div>
@@ -170,10 +179,13 @@ export default function ArenaRanking({
                 )}
               </div>
               <h2 className="text-2xl sm:text-3xl md:text-4xl font-black italic tracking-tighter uppercase text-white">
-                Quién lidera la <span className="text-amber-400">IA hoy</span>
+                Ranking editorial <span className="text-amber-400">frontier</span>
               </h2>
-              <p className="text-[9px] text-gray-600 mt-1 uppercase tracking-[0.3em]">
-                {ARENA_SCORE_LABEL} · no es Elo oficial LMSYS
+              <p className="text-[9px] text-gray-500 mt-1 uppercase tracking-[0.2em]">
+                {ARENA_SCORE_LABEL}
+              </p>
+              <p className="text-[8px] text-amber-500/70 mt-1 font-bold uppercase tracking-widest">
+                NO es Elo LMSYS / Arena.ai oficial
               </p>
             </div>
             {!loading && (

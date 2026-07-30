@@ -26,10 +26,10 @@ export const HIS_COMPANY_REGISTRY: HisCompanyMeta[] = [
   },
   {
     id: 'google',
-    name: 'DeepMind',
-    logo: '/logos/DEEPMIND.jpeg',
+    name: 'Google DeepMind',
+    logo: '/logos/google.svg',
     ceo: 'Demis Hassabis',
-    aliases: ['deepmind', 'google deepmind', 'gemini', 'demis hassabis'],
+    aliases: ['deepmind', 'google deepmind', 'google', 'gemini', 'demis hassabis'],
     weights: { innovation: 20, talent: 25, capital: 15, execution: 15, impact: 10, adoption: 10, future: 5 },
   },
   {

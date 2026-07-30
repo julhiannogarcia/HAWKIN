@@ -39,7 +39,10 @@ export default function ArenaPage() {
               HAWKIN <span className="text-amber-400">Arena</span>
             </h1>
             <p className="text-gray-500 mt-2 text-[10px] sm:text-xs uppercase tracking-widest max-w-2xl">
-              Ranking #1–#15 frontier 2026 · HAWKIN Index (estimado) · actualización cada 120s
+              Ranking editorial frontier julio 2026 · HAWKIN Index editorial (estimado)
+            </p>
+            <p className="text-amber-500/80 mt-1 text-[9px] font-black uppercase tracking-widest">
+              NO es Elo LMSYS / Arena.ai oficial
             </p>
           </div>
           <Link

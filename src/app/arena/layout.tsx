@@ -1,12 +1,13 @@
 import type { Metadata } from 'next';
 
 export const metadata: Metadata = {
-  title: 'HAWKIN Arena — Quién lidera la IA hoy',
+  title: 'HAWKIN Arena — Ranking editorial frontier',
   description:
-    'Ranking en vivo de modelos de IA: Claude, GPT, Gemini, Kimi K3, DeepSeek, Qwen, Llama y más. Score HAWKIN Index, beneficios, debate USA vs China y últimas novedades.',
+    'Ranking editorial HAWKIN de modelos frontier 2026. NO es Elo LMSYS / Arena.ai oficial. Gemini 3.6 Flash, Claude, GPT, Kimi, DeepSeek y más.',
   openGraph: {
-    title: 'HAWKIN Arena — Quién lidera la IA hoy',
-    description: 'Ranking global de modelos IA con datos en vivo. Kimi K3, DeepSeek, GPT, Claude y la batalla open-weights USA vs China.',
+    title: 'HAWKIN Arena — Ranking editorial frontier',
+    description:
+      'HAWKIN Index editorial (estimado). NO es Elo LMSYS / Arena.ai oficial. Releases confirmados julio 2026.',
     url: 'https://aihawkin.com/arena',
   },
 };

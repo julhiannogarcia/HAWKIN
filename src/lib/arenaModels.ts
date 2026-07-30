@@ -12,6 +12,10 @@ export type ArenaModelMeta = {
   logo: string;
   aliases: string[];
   rivalSlug: string;
+  /** Piso editorial HAWKIN (no es Elo LMSYS). Mentions solo afinan ±bonus. */
+  editorialBase: number;
+  /** Si true, no puede ocupar #1–#3 global solo por menciones RSS */
+  specialized?: boolean;
   /** Fecha ISO del último release confirmado por HAWKIN (no inventar) */
   releaseDate?: string;
   /** URL fuente oficial del release */
@@ -32,15 +36,16 @@ export const ARENA_ARCHIVED_REGISTRY: ArenaModelMeta[] = [
     license: 'CLOSED',
     founder: 'Demis Hassabis',
     country: 'USA',
-    logo: '/logos/DEEPMIND.jpeg',
+    logo: '/logos/google.svg',
     aliases: ['gemini 2.5 pro', 'gemini 2.5'],
     rivalSlug: 'gemini-3-6-flash',
+    editorialBase: 1100,
     releaseDate: '2025-03-01',
     tier: 'archived',
   },
 ];
 
-/** Frontier IA activo — julio 2026 */
+/** Frontier IA activo — julio 2026. editorialBase = ranking editorial HAWKIN (NO Elo LMSYS). */
 export const ARENA_MODEL_REGISTRY: ArenaModelMeta[] = [
   {
     slug: 'claude-opus-4',
@@ -53,6 +58,7 @@ export const ARENA_MODEL_REGISTRY: ArenaModelMeta[] = [
     logo: '/logos/ANTHROPI.webp',
     aliases: ['claude opus 4', 'claude opus', 'opus 4'],
     rivalSlug: 'gpt-5',
+    editorialBase: 1380,
     tier: 'frontier',
   },
   {
@@ -66,6 +72,7 @@ export const ARENA_MODEL_REGISTRY: ArenaModelMeta[] = [
     logo: '/logos/ANTHROPI.webp',
     aliases: ['claude sonnet 4', 'claude 4 sonnet', 'sonnet 4'],
     rivalSlug: 'gemini-3-6-flash',
+    editorialBase: 1340,
     tier: 'frontier',
   },
   {
@@ -79,6 +86,7 @@ export const ARENA_MODEL_REGISTRY: ArenaModelMeta[] = [
     logo: '/logos/openAI.png',
     aliases: ['gpt-5', 'gpt5', 'openai gpt-5', 'chatgpt-5'],
     rivalSlug: 'claude-opus-4',
+    editorialBase: 1370,
     tier: 'frontier',
   },
   {
@@ -89,15 +97,10 @@ export const ARENA_MODEL_REGISTRY: ArenaModelMeta[] = [
     license: 'CLOSED',
     founder: 'Demis Hassabis',
     country: 'USA',
-    logo: '/logos/DEEPMIND.jpeg',
-    aliases: [
-      'gemini 3.6 flash',
-      'gemini 3.6',
-      'gemini 3.5 flash',
-      'google gemini',
-      'gemini flash',
-    ],
+    logo: '/logos/google.svg',
+    aliases: ['gemini 3.6 flash', 'gemini 3.6'],
     rivalSlug: 'gpt-5',
+    editorialBase: 1365,
     releaseDate: '2026-07-21',
     releaseSource: 'https://deepmind.google/blog/',
     whatsNewConfirmed:
@@ -118,9 +121,11 @@ export const ARENA_MODEL_REGISTRY: ArenaModelMeta[] = [
     license: 'CLOSED',
     founder: 'Demis Hassabis',
     country: 'USA',
-    logo: '/logos/DEEPMIND.jpeg',
-    aliases: ['gemini 3.5 flash-lite', 'gemini 3.5 flash lite', 'flash-lite'],
+    logo: '/logos/google.svg',
+    aliases: ['gemini 3.5 flash-lite', 'gemini 3.5 flash lite', 'flash-lite', 'gemini flash-lite'],
     rivalSlug: 'gemini-3-6-flash',
+    editorialBase: 1180,
+    specialized: true,
     releaseDate: '2026-07-21',
     releaseSource: 'https://deepmind.google/blog/',
     whatsNewConfirmed:
@@ -140,9 +145,11 @@ export const ARENA_MODEL_REGISTRY: ArenaModelMeta[] = [
     license: 'CLOSED',
     founder: 'Demis Hassabis',
     country: 'USA',
-    logo: '/logos/DEEPMIND.jpeg',
+    logo: '/logos/google.svg',
     aliases: ['gemini 3.5 flash cyber', 'gemini cyber', 'flash cyber'],
     rivalSlug: 'claude-sonnet-4',
+    editorialBase: 1170,
+    specialized: true,
     releaseDate: '2026-07-21',
     releaseSource: 'https://deepmind.google/blog/',
     whatsNewConfirmed:
@@ -165,6 +172,7 @@ export const ARENA_MODEL_REGISTRY: ArenaModelMeta[] = [
     logo: '/logos/moonshot-kimi.svg',
     aliases: ['kimi k3', 'kimi k-3', 'moonshot ai', 'moonshot kimi'],
     rivalSlug: 'deepseek-r1',
+    editorialBase: 1310,
     tier: 'frontier',
   },
   {
@@ -178,6 +186,7 @@ export const ARENA_MODEL_REGISTRY: ArenaModelMeta[] = [
     logo: '/logos/deepseek.svg',
     aliases: ['deepseek r1', 'deepseek-r1', 'deepseek reasoning'],
     rivalSlug: 'kimi-k3',
+    editorialBase: 1320,
     tier: 'frontier',
   },
   {
@@ -191,6 +200,7 @@ export const ARENA_MODEL_REGISTRY: ArenaModelMeta[] = [
     logo: '/logos/deepseek.svg',
     aliases: ['deepseek v3', 'deepseek-v3'],
     rivalSlug: 'qwen-3-max',
+    editorialBase: 1260,
     tier: 'frontier',
   },
   {
@@ -204,6 +214,7 @@ export const ARENA_MODEL_REGISTRY: ArenaModelMeta[] = [
     logo: '/logos/alibaba-qwen.svg',
     aliases: ['qwen 3', 'qwen3', 'qwen 3 max', 'alibaba qwen'],
     rivalSlug: 'deepseek-v3',
+    editorialBase: 1280,
     tier: 'frontier',
   },
   {
@@ -217,6 +228,7 @@ export const ARENA_MODEL_REGISTRY: ArenaModelMeta[] = [
     logo: '/logos/META-AI.png',
     aliases: ['llama 4', 'llama4', 'meta llama 4'],
     rivalSlug: 'qwen-3-max',
+    editorialBase: 1290,
     tier: 'frontier',
   },
   {
@@ -230,6 +242,7 @@ export const ARENA_MODEL_REGISTRY: ArenaModelMeta[] = [
     logo: '/logos/XAI.webp',
     aliases: ['grok 4', 'grok4', 'xai grok 4'],
     rivalSlug: 'gpt-5',
+    editorialBase: 1285,
     tier: 'frontier',
   },
   {
@@ -243,6 +256,7 @@ export const ARENA_MODEL_REGISTRY: ArenaModelMeta[] = [
     logo: '/logos/Mistral.png',
     aliases: ['mistral large 2', 'mistral large', 'mixtral'],
     rivalSlug: 'llama-4',
+    editorialBase: 1240,
     tier: 'frontier',
   },
   {
@@ -256,6 +270,7 @@ export const ARENA_MODEL_REGISTRY: ArenaModelMeta[] = [
     logo: '/logos/zhipu.svg',
     aliases: ['glm-4', 'glm 4 plus', 'zhipu', 'chatglm'],
     rivalSlug: 'qwen-3-max',
+    editorialBase: 1220,
     tier: 'frontier',
   },
   {
@@ -269,6 +284,7 @@ export const ARENA_MODEL_REGISTRY: ArenaModelMeta[] = [
     logo: '/logos/bytedance.svg',
     aliases: ['doubao pro', 'doubao', 'bytedance ai', 'seed ai'],
     rivalSlug: 'kimi-k3',
+    editorialBase: 1230,
     tier: 'frontier',
   },
 ];
@@ -313,6 +329,36 @@ export function isModelStale(
   return !hasRecentFeedMention;
 }
 
-export const ARENA_SCORE_LABEL = 'HAWKIN Index (estimado)';
+export const ARENA_SCORE_LABEL = 'HAWKIN Index editorial (estimado)';
+
+export const ARENA_DISCLAIMER =
+  'NO es Elo LMSYS / Arena.ai oficial. Ranking editorial HAWKIN basado en releases confirmados + cobertura verificada.';
+
+export const NO_DEBATE = 'Sin análisis verificado';
 
 export const NO_RELEASE_CONFIRMED = 'Sin confirmación de release';
+
+/** Bonus máximo por menciones RSS — no puede volcar el orden editorial de flagships */
+export const MENTION_BONUS_CAP = 28;
+
+/** Modelos specialized no pueden superar este techo (por debajo del flagship Google 3.6) */
+export const SPECIALIZED_SCORE_CAP = 1210;
+
+export function editorialScore(meta: ArenaModelMeta, mentions: number): number {
+  const bonus = Math.min(MENTION_BONUS_CAP, mentions * 4);
+  let score = meta.editorialBase + bonus;
+  if (meta.specialized) {
+    score = Math.min(score, SPECIALIZED_SCORE_CAP);
+  }
+  return Math.round(Math.min(1450, Math.max(900, score)));
+}
+
+export function sanitizeDebate(debate: string | undefined, hasSource: boolean): string {
+  if (!hasSource) return NO_DEBATE;
+  const t = (debate || '').trim();
+  if (!t) return NO_DEBATE;
+  if (/sube por cobertura reciente/i.test(t)) return NO_DEBATE;
+  if (/posición estable en el ranking/i.test(t)) return NO_DEBATE;
+  if (/compite directamente con/i.test(t) && t.length < 80) return NO_DEBATE;
+  return t;
+}

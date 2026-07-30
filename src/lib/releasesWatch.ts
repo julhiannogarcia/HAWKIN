@@ -6,6 +6,7 @@ import {
   daysSinceRelease,
   isModelStale,
   NO_RELEASE_CONFIRMED,
+  type ArenaModelMeta,
 } from '@/lib/arenaModels';
 
 export type ReleaseVendor = {
@@ -174,7 +175,7 @@ export async function scanOfficialReleases(): Promise<{
 }
 
 export function enrichModelRelease(
-  meta: (typeof ARENA_MODEL_REGISTRY)[0],
+  meta: ArenaModelMeta,
   snippets: { title: string; summary?: string; url?: string }[]
 ) {
   let bestTitle = '';
