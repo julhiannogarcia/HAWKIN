@@ -1,63 +1,52 @@
 import { NextResponse } from "next/server";
-import Parser from 'rss-parser';
+import { formatLiveDate, generateShortId, parseFeed } from '@/lib/newsUtils';
 
-const parser = new Parser();
+export const dynamic = 'force-dynamic';
+export const revalidate = 180;
 
-function generateShortId(text: string) {
-  let hash = 0;
-  for (let i = 0; i < text.length; i++) {
-    const char = text.charCodeAt(i);
-    hash = ((hash << 5) - hash) + char;
-    hash = hash & hash;
-  }
-  return Math.abs(hash).toString(36);
-}
+const FALLBACK = [
+  { id: 's1', title: 'Monitoreo activo: amenazas zero-day en ecosistemas cloud', link: '#', content: 'HAWKIN Shield en vigilancia continua...', source: 'HAWKIN Shield', date: new Date().toISOString(), severity: 'ALTA', impact: 'Riesgo en infraestructura expuesta.', howToAvoid: 'Activar MFA y parches automáticos.' },
+];
 
 export async function GET() {
   try {
-    // Fuentes de ciberseguridad global de alta fidelidad
     const sources = [
       { name: "The Hacker News", url: "https://feeds.feedburner.com/TheHackersNews" },
-      { name: "Threatpost", url: "https://threatpost.com/feed/" },
+      { name: "BleepingComputer", url: "https://www.bleepingcomputer.com/feed/" },
       { name: "Krebs on Security", url: "https://krebsonsecurity.com/feed/" },
-      { name: "SecurityWeek", url: "https://feeds.feedburner.com/securityweek" }
+      { name: "SecurityWeek", url: "https://feeds.feedburner.com/securityweek" },
     ];
 
-    const allThreats: any[] = [];
-
-    const fetchPromises = sources.map(async (source) => {
-      try {
-        const feed = await parser.parseURL(source.url);
-        return feed.items.slice(0, 5).map(item => {
-          const uniqueId = generateShortId(item.link || item.title || "");
-          const severity = item.title?.toLowerCase().includes('critical') || item.content?.toLowerCase().includes('critical') ? 'CRÍTICA' : 'ALTA';
-          
+    const batches = await Promise.all(
+      sources.map(async (source) => {
+        const feed = await parseFeed(source.url);
+        return (feed.items || []).slice(0, 6).map((item) => {
+          const text = `${item.title || ''} ${item.contentSnippet || ''}`.toLowerCase();
+          const severity = text.includes('critical') || text.includes('zero-day') ? 'CRÍTICA' : 'ALTA';
           return {
-            id: uniqueId,
+            id: generateShortId(item.link || item.title || ""),
             title: item.title,
             link: item.link,
-            content: item.contentSnippet?.substring(0, 150) + "...",
+            content: (item.contentSnippet?.substring(0, 150) || 'Amenaza detectada...') + '...',
             source: source.name,
             date: item.pubDate || new Date().toISOString(),
-            severity: severity,
-            impact: "Vulnerabilidad detectada en sistemas remotos.",
-            howToAvoid: "Actualizar sistemas y aplicar parches de seguridad de inmediato."
+            dateLabel: formatLiveDate(item.pubDate),
+            severity,
+            impact: "Posible exposición de datos o acceso no autorizado.",
+            howToAvoid: "Actualizar software, rotar claves y revisar accesos.",
           };
         });
-      } catch (e) {
-        console.error(`Error fetching from ${source.name}`, e);
-        return [];
-      }
-    });
+      })
+    );
 
-    const results = await Promise.all(fetchPromises);
-    results.forEach(batch => allThreats.push(...batch));
-
-    // Ordenar por fecha (más reciente primero)
+    const allThreats = batches.flat();
     allThreats.sort((a, b) => new Date(b.date).getTime() - new Date(a.date).getTime());
 
-    return NextResponse.json({ threats: allThreats });
-  } catch (error) {
-    return NextResponse.json({ error: "Fallo al sincronizar Radar Shield" }, { status: 500 });
+    return NextResponse.json({
+      threats: allThreats.length ? allThreats : FALLBACK,
+      refreshedAt: new Date().toISOString(),
+    });
+  } catch {
+    return NextResponse.json({ threats: FALLBACK, refreshedAt: new Date().toISOString() });
   }
 }
