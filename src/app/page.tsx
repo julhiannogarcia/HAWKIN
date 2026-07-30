@@ -20,6 +20,7 @@ const AIWarRoom = dynamic(() => import('@/components/intelligence/AIWarRoom'), {
 const SecurityShield = dynamic(() => import('@/components/intelligence/SecurityShield'), { ssr: false });
 const TradingIntelligence = dynamic(() => import('@/components/intelligence/TradingIntelligence'), { ssr: false });
 const CommandCenterTop10 = dynamic(() => import('@/components/intelligence/CommandCenterTop10'), { ssr: false });
+const ArenaRanking = dynamic(() => import('@/components/arena/ArenaRanking'), { ssr: false });
 const LiveStatusBar = dynamic(() => import('@/components/intelligence/LiveStatusBar'), { ssr: false });
 
 export default function Home() {
@@ -54,6 +55,8 @@ export default function Home() {
         <GlobalAIPulse />
 
         <HISRanking limit={6} showViewAllLink />
+
+        <ArenaRanking limit={5} compact showViewAllLink />
 
         <AIWarRoom />
         

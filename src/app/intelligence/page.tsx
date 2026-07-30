@@ -13,6 +13,7 @@ const CEORadar = dynamic(() => import('@/components/intelligence/CEORadar'), { s
 const AIWarRoom = dynamic(() => import('@/components/intelligence/AIWarRoom'), { ssr: false });
 const ExecutiveBrief = dynamic(() => import('@/components/intelligence/ExecutiveBrief'), { ssr: false });
 const MarketTalentTerminal = dynamic(() => import('@/components/intelligence/MarketTalentTerminal'), { ssr: false });
+const ArenaRanking = dynamic(() => import('@/components/arena/ArenaRanking'), { ssr: false });
 const LiveStatusBar = dynamic(() => import('@/components/intelligence/LiveStatusBar'), { ssr: false });
 
 export default function Page() {
@@ -43,6 +44,8 @@ export default function Page() {
         </div>
 
         <HISRanking />
+
+        <ArenaRanking limit={5} compact showViewAllLink />
 
         <div className="mt-4 space-y-0">
           <CEORadar />

@@ -1,177 +1,39 @@
 'use client';
 
-import React, { useState } from 'react';
+import React, { useState, useEffect, useCallback } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
-import { 
-  Target, Users, Globe, Zap, Activity, User, 
+import {
+  Target, Users, Globe, Zap, Activity,
   X, ShieldAlert, BarChart3, Clock, TrendingUp,
-  Brain, Rocket, ShieldCheck
+  Brain, Rocket, ShieldCheck, LoaderCircle, RefreshCw,
 } from 'lucide-react';
 
-const CEOS = [
-  { 
-    id: 1, name: "Sam Altman", role: "CEO @ OPENAI", company: "OpenAI",
-    influence: 98, momentum: "+4.2", confidence: 95,
-    photo: "/sam-altman.jpg",
-    logo: "/logos/openAI.png",
-    lastMove: 'Alianza global con Apple Intelligence. Despliegue de GPT-4o.', color: '#10a37f',
-    dossier: {
-      vision: 95, execution: 90, risk_tolerance: 99,
-      market_status: "+5.4% ▲",
-      timeline: [
-        "2024-06: Alianza global con Apple Intelligence.",
-        "2024-05: Despliegue de GPT-4o multimodal.",
-        "2023-11: Crisis interna y retorno victorioso."
-      ]
-    }
-  },
-  { 
-    id: 2, name: "Jensen Huang", role: "CEO @ NVIDIA", company: "NVIDIA",
-    influence: 99, momentum: "+5.5", confidence: 98,
-    photo: "https://unavatar.io/twitter/nvidia",
-    logo: "/logos/NVIDIA.jpeg",
-    lastMove: 'Anuncio de arquitectura Vera Rubin. Dominio absoluto de mercado.', color: '#76b900',
-    dossier: {
-      vision: 98, execution: 99, risk_tolerance: 85,
-      market_status: "+12.1% ▲",
-      timeline: [
-        "2024-06: Anuncio de arquitectura Vera Rubin.",
-        "2024-05: Supera récord histórico en capitalización.",
-        "2024-03: Presentación de chips Blackwell."
-      ]
-    }
-  },
-  { 
-    id: 3, name: "Elon Musk", role: "FOUNDER @ xAI", company: "xAI",
-    influence: 96, momentum: "+6.1", confidence: 90,
-    photo: "https://unavatar.io/twitter/elonmusk",
-    logo: "/logos/XAI.webp",
-    lastMove: 'Fusión de capacidades xAI con Starlink. Mega-clúster en Memphis.', color: '#ffffff',
-    dossier: {
-      vision: 99, execution: 88, risk_tolerance: 100,
-      market_status: "+2.8% ▲",
-      timeline: [
-        "2024-05: Levantamiento de $6B para xAI.",
-        "2024-04: Fusión de capacidades con Starlink.",
-        "2023-11: Lanzamiento del modelo Grok."
-      ]
-    }
-  },
-  { 
-    id: 4, name: "Demis Hassabis", role: "CEO @ Google DeepMind", company: "DeepMind",
-    influence: 95, momentum: "+3.8", confidence: 92,
-    photo: "https://commons.wikimedia.org/wiki/Special:FilePath/Demis_Hassabis_Royal_Society.jpg",
-    logo: "/logos/DEEPMIND.jpeg",
-    lastMove: 'Avances en biología computacional (AlphaFold 3).', color: '#4285F4',
-    dossier: {
-      vision: 94, execution: 92, risk_tolerance: 80,
-      market_status: "+1.2% ▲",
-      timeline: [
-        "2024-05: Lanzamiento de AlphaFold 3.",
-        "2024-02: Integración Gemini 1.5 Pro.",
-        "2023-12: Unificación Google Brain + DeepMind."
-      ]
-    }
-  },
-  { 
-    id: 5, name: "Dario Amodei", role: "CEO @ Anthropic", company: "Anthropic",
-    influence: 93, momentum: "+4.5", confidence: 89,
-    photo: "https://images.weserv.nl/?url=https://upload.wikimedia.org/wikipedia/commons/thumb/e/e4/Dario_Amodei_at_TechCrunch_Disrupt_2023_01_%28cropped%29.jpg/960px-Dario_Amodei_at_TechCrunch_Disrupt_2023_01_%28cropped%29.jpg&w=400&h=400&fit=cover",
-    logo: "/logos/ANTHROPI.webp",
-    lastMove: 'Lanzamiento de Claude 3.5 Sonnet superando benchmarks.', color: '#d97757',
-    dossier: {
-      vision: 92, execution: 94, risk_tolerance: 75,
-      market_status: "+8.5% ▲",
-      timeline: [
-        "2024-06: Claude 3.5 Sonnet establece nuevo estándar.",
-        "2024-03: Lanzamiento familia Claude 3.",
-        "2023-09: Inversión de $4B por Amazon."
-      ]
-    }
-  },
-  { 
-    id: 6, name: "Satya Nadella", role: "CEO @ Microsoft", company: "Microsoft",
-    influence: 97, momentum: "+2.1", confidence: 96,
-    photo: "https://commons.wikimedia.org/wiki/Special:FilePath/MS-Exec-Nadella-Satya-2017-08-31-22_(cropped).jpg",
-    logo: "/logos/MICROSOFT.png",
-    lastMove: 'Integración agresiva de Copilot en todo el ecosistema Windows.', color: '#00a4ef',
-    dossier: {
-      vision: 96, execution: 97, risk_tolerance: 88,
-      market_status: "+4.1% ▲",
-      timeline: [
-        "2024-05: Copilot+ PCs revolucionan hardware.",
-        "2024-01: Microsoft supera a Apple en valor.",
-        "2023-11: Consolidación de alianza con OpenAI."
-      ]
-    }
-  },
-  { 
-    id: 7, name: "Mark Zuckerberg", role: "CEO @ Meta", company: "Meta",
-    influence: 94, momentum: "+5.0", confidence: 93,
-    photo: "https://unavatar.io/twitter/finkd",
-    logo: "/logos/META-AI.png",
-    lastMove: 'Llama 3 Open Source disrumpiendo el modelo de negocio cerrado.', color: '#0668E1',
-    dossier: {
-      vision: 93, execution: 95, risk_tolerance: 92,
-      market_status: "+15.6% ▲",
-      timeline: [
-        "2024-04: Llama 3 domina el ecosistema open-source.",
-        "2024-02: GPU Cluster de 350k H100 anunciado.",
-        "2023-07: Lanzamiento disruptivo de Llama 2."
-      ]
-    }
-  },
-  { 
-    id: 8, name: "Sundar Pichai", role: "CEO @ Alphabet", company: "Alphabet",
-    influence: 95, momentum: "+1.5", confidence: 91,
-    photo: "https://unavatar.io/twitter/sundarpichai",
-    logo: "/logos/DEEPMIND.jpeg",
-    lastMove: 'Reestructuración interna para acelerar Gemini.', color: '#4285F4',
-    dossier: {
-      vision: 90, execution: 85, risk_tolerance: 82,
-      market_status: "+3.9% ▲",
-      timeline: [
-        "2024-05: AI Overviews en Google Search.",
-        "2024-02: Lanzamiento de Gemini 1.5 Pro.",
-        "2023-12: Unificación total de divisiones IA."
-      ]
-    }
-  },
-  { 
-    id: 9, name: "Ilya Sutskever", role: "FOUNDER @ SSI", company: "SSI",
-    influence: 92, momentum: "+8.0", confidence: 85,
-    photo: "https://unavatar.io/twitter/ilyasut",
-    logo: "/logos/openAI.png",
-    lastMove: 'Fundación de Safe Superintelligence Inc. tras salida de OpenAI.', color: '#888888',
-    dossier: {
-      vision: 100, execution: 85, risk_tolerance: 95,
-      market_status: "STEALTH",
-      timeline: [
-        "2024-06: Fundación de Safe Superintelligence Inc.",
-        "2024-05: Salida oficial de OpenAI.",
-        "2023-11: Protagonista de crisis de gobernanza."
-      ]
-    }
-  },
-  { 
-    id: 10, name: "Alexandr Wang", role: "CEO @ Scale AI", company: "Scale AI",
-    influence: 90, momentum: "+4.0", confidence: 88,
-    photo: "https://unavatar.io/twitter/alexandr_wang",
-    logo: "/logos/SCALE-AI.svg",
-    lastMove: 'Levantamiento de $1B en Series F para dominio de datos.', color: '#aa00ff',
-    dossier: {
-      vision: 91, execution: 96, risk_tolerance: 90,
-      market_status: "+60% VAL",
-      timeline: [
-        "2024-05: Ronda Series F de $1B.",
-        "2024-03: Contrato masivo con Pentágono.",
-        "2023-10: Lanzamiento de Scale Donovan."
-      ]
-    }
-  }
-];
+type CeoView = {
+  id: string;
+  name: string;
+  role: string;
+  company: string;
+  influence: number;
+  momentum: string;
+  confidence: number;
+  photo: string;
+  logo: string;
+  lastMove: string;
+  color: string;
+  dossier: {
+    vision: number;
+    execution: number;
+    risk_tolerance: number;
+    market_status: string;
+    timeline: string[];
+  };
+};
 
-function DossierPanel({ ceo, isOpen, onClose }: { ceo: any, isOpen: boolean, onClose: () => void }) {
+function formatTimeHHMM(date: Date) {
+  return date.toLocaleTimeString('es-PE', { hour: '2-digit', minute: '2-digit', hour12: false });
+}
+
+function DossierPanel({ ceo, isOpen, onClose }: { ceo: CeoView | null, isOpen: boolean, onClose: () => void }) {
   if (!ceo) return null;
 
   return (
@@ -295,27 +157,78 @@ function CEOImage({ src, alt, logo }: { src: string, alt: string, logo?: string 
 }
 
 export default function CEORadar() {
-  const [selectedCEO, setSelectedCEO] = useState<any>(null);
+  const [selectedCEO, setSelectedCEO] = useState<CeoView | null>(null);
+  const [ceos, setCeos] = useState<CeoView[]>([]);
+  const [loading, setLoading] = useState(true);
+  const [fetchError, setFetchError] = useState(false);
+  const [lastUpdated, setLastUpdated] = useState<Date | null>(null);
+
+  const fetchCeos = useCallback(async () => {
+    try {
+      const res = await fetch('/api/intelligence/ceo-radar', { cache: 'no-store' });
+      if (!res.ok) throw new Error('API error');
+      const data = await res.json();
+      if (!Array.isArray(data.ceos) || data.ceos.length === 0) {
+        setFetchError(true);
+        return;
+      }
+      setCeos(data.ceos);
+      setLastUpdated(data.updatedAt ? new Date(data.updatedAt) : new Date());
+      setFetchError(false);
+    } catch {
+      setFetchError(true);
+    } finally {
+      setLoading(false);
+    }
+  }, []);
+
+  useEffect(() => {
+    fetchCeos();
+    const interval = setInterval(fetchCeos, 120_000);
+    return () => clearInterval(interval);
+  }, [fetchCeos]);
 
   return (
-    <section className="w-full bg-[#020202] border-y border-white/5 py-24 relative overflow-hidden font-sans">
-      <div className="max-w-7xl mx-auto px-6 relative z-10 text-left">
+    <section className="w-full bg-[#020202] border-y border-white/5 py-16 sm:py-20 relative overflow-hidden font-sans">
+      <div className="max-w-7xl mx-auto px-4 sm:px-6 relative z-10 text-left">
         
-        <div className="flex flex-col md:flex-row justify-between items-end mb-16 gap-8 border-l-4 border-cyan-500 pl-8">
+        <div className="flex flex-col md:flex-row justify-between items-end mb-10 gap-4 border-l-4 border-cyan-500 pl-6">
            <div>
               <div className="flex items-center gap-3 mb-2">
                 <Users size={16} className="text-cyan-500" />
                 <span className="text-[10px] font-black text-cyan-500 uppercase tracking-[0.4em]">Influence & Momentum</span>
+                {lastUpdated && !fetchError && (
+                  <span className="text-[9px] font-bold text-gray-600 uppercase">Actualizado: {formatTimeHHMM(lastUpdated)}</span>
+                )}
               </div>
-              <h2 className="text-4xl md:text-5xl font-black italic tracking-tighter uppercase leading-none text-white">
+              <h2 className="text-3xl sm:text-4xl md:text-5xl font-black italic tracking-tighter uppercase leading-none text-white">
                  CEO <span className="text-cyan-400">Radar.</span>
               </h2>
-              <p className="text-gray-500 mt-4 text-[10px] font-black uppercase tracking-[0.5em]">Líderes que controlan el futuro tecnológico</p>
+              <p className="text-gray-500 mt-3 text-[10px] font-black uppercase tracking-[0.5em]">Líderes desde titulares en vivo</p>
            </div>
+           {!loading && (
+             <button onClick={fetchCeos} className="flex items-center gap-1 text-[9px] font-black uppercase text-gray-600 hover:text-cyan-400">
+               <RefreshCw size={12} /> Actualizar
+             </button>
+           )}
         </div>
 
-        <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-5 gap-4 md:gap-6">
-          {CEOS.map((ceo, index) => (
+        {loading && (
+          <div className="flex justify-center py-16 gap-3 text-gray-600">
+            <LoaderCircle className="animate-spin text-cyan-500" size={24} />
+            <span className="text-xs uppercase tracking-widest">Cargando CEOs…</span>
+          </div>
+        )}
+
+        {!loading && fetchError && (
+          <div className="py-12 text-center border border-white/5 rounded-2xl">
+            <p className="text-sm font-bold text-gray-500 uppercase tracking-widest">Sin datos nuevos</p>
+          </div>
+        )}
+
+        {!loading && !fetchError && (
+        <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-5 gap-3 md:gap-5">
+          {ceos.map((ceo, index) => (
             <motion.div 
               key={ceo.id}
               initial={{ opacity: 0, y: 20 }}
@@ -360,6 +273,7 @@ export default function CEORadar() {
             </motion.div>
           ))}
         </div>
+        )}
       </div>
 
       <DossierPanel 
