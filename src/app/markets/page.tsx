@@ -1,11 +1,14 @@
 'use client';
 
+import dynamic from 'next/dynamic';
 import Header from '@/components/Header';
 import Footer from '@/components/Footer';
 import GlobalTicker from '@/components/Ticker';
 import TradingIntelligence from '@/components/intelligence/TradingIntelligence';
 import Link from 'next/link';
 import { ArrowRight } from 'lucide-react';
+
+const SponsorSpace = dynamic(() => import('@/components/SponsorSpace'), { ssr: false });
 
 export default function MarketsPage() {
   return (
@@ -26,6 +29,9 @@ export default function MarketsPage() {
         >
           Abrir terminal Gold completo <ArrowRight size={14} />
         </Link>
+      </div>
+      <div className="max-w-7xl mx-auto px-6 pb-12">
+        <SponsorSpace isPremium={false} type="banner" />
       </div>
       <TradingIntelligence />
       <Footer />

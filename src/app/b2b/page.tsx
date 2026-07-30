@@ -1,6 +1,7 @@
 'use client';
 
 import React, { useState, useEffect, useMemo, useRef } from 'react';
+import dynamic from 'next/dynamic';
 import Header from '@/components/Header';
 import Footer from '@/components/Footer';
 import GlobalTicker from '@/components/Ticker';
@@ -11,6 +12,8 @@ import {
   LoaderCircle, Radio, LayoutDashboard, ShoppingBag, Target,
   Sparkles, Calendar, Globe, Mail, CloudUpload, TriangleAlert, CircleCheck, Lock
 } from 'lucide-react';
+
+const SponsorSpace = dynamic(() => import('@/components/SponsorSpace'), { ssr: false });
 
 // =====================================================================
 // COMPONENTE DE PAYPAL - VERSION DEFINITIVA ANTI-BLOQUEO
@@ -199,6 +202,12 @@ export default function B2BPage() {
             {step === 'config' ? 'Inyectar' : step === 'checkout' ? 'Verificar' : 'Misión'} <span className="bg-gradient-to-r from-blue-400 to-blue-600 bg-clip-text text-transparent">Pauta.</span>
           </h1>
         </section>
+
+        {step === 'config' && (
+          <div className="max-w-4xl mx-auto mb-16">
+            <SponsorSpace isPremium={false} type="inline" />
+          </div>
+        )}
 
         <AnimatePresence mode="wait">
           

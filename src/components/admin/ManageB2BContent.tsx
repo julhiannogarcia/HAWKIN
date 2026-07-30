@@ -10,6 +10,7 @@ import {
 import { motion, AnimatePresence } from 'framer-motion';
 import AdMediaPreview from '@/components/admin/AdMediaPreview';
 import { validateBannerUrl, isVideoUrl } from '@/lib/adMediaUtils';
+import { ALL_PLACEMENTS, PLACEMENT_ZONES } from '@/lib/adPlacements';
 
 export default function ManageAds() {
   // Estado para creación/edición
@@ -91,6 +92,49 @@ export default function ManageAds() {
       .catch(() => {});
   }, []);
 
+  const handlePublishAllZones = async () => {
+    if (!companyName || !bannerUrl) {
+      setError('Completa nombre y banner antes de publicar en las 3 zonas.');
+      return;
+    }
+    const validation = validateBannerUrl(bannerUrl);
+    if (!validation.valid) {
+      setError(validation.message);
+      return;
+    }
+
+    setIsUploading(true);
+    try {
+      for (const zone of ALL_PLACEMENTS) {
+        await fetch('/api/admin/b2b', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({
+            companyName,
+            bannerUrl,
+            targetUrl,
+            placement: zone,
+            status: 'ACTIVE',
+            isGlobal,
+            targetCountry: isGlobal ? null : targetCountry,
+            startDate: startDate || new Date().toISOString().split('T')[0],
+            endDate: endDate || undefined,
+          }),
+        });
+      }
+      setSuccess('Campaña publicada en las 3 zonas (Banner, Inline, Sidebar).');
+      resetForm();
+      fetchCampaigns();
+      setTimeout(() => setSuccess(''), 5000);
+    } catch (e: any) {
+      setError(e.message || 'Error al publicar en múltiples zonas.');
+    } finally {
+      setIsUploading(false);
+    }
+  };
+
+  const selectedZone = PLACEMENT_ZONES[placement];
+
   const handleSave = async () => {
     if (!companyName || !bannerUrl || !placement) {
       setError('Socio, el nombre de empresa, banner y ubicación son obligatorios.');
@@ -102,6 +146,11 @@ export default function ManageAds() {
     if (!validation.valid) {
       setError(validation.message);
       setTimeout(() => setError(''), 4000);
+      return;
+    }
+
+    if (status === 'ACTIVE' && !validation.valid) {
+      setError('No puedes activar una campaña con URL incompatible. Corrige la vista previa primero.');
       return;
     }
 
@@ -257,6 +306,11 @@ export default function ManageAds() {
                                 <option value="NEWS_FEED">Native Radar</option>
                                 <option value="SIDEBAR">Sidebar Táctico</option>
                             </select>
+                            {selectedZone && (
+                              <p className="text-[8px] text-gray-600 mt-2 uppercase tracking-widest">
+                                Aparece en: {selectedZone.pages.join(', ')}
+                              </p>
+                            )}
                          </div>
                          <div>
                             <label className="text-[8px] font-black text-gray-600 uppercase tracking-widest mb-2 block">Alcance</label>
@@ -350,17 +404,28 @@ export default function ManageAds() {
              </div>
 
              <div className="pt-12 border-t border-white/5 flex flex-col md:flex-row items-center justify-between gap-8">
-                <div className="flex items-center gap-6">
-                   <div className={`p-4 rounded-2xl border ${status === 'ACTIVE' ? 'bg-green-500/10 border-green-500/20 text-green-500' : 'bg-yellow-500/10 border-yellow-500/20 text-yellow-500'} flex items-center gap-3`}>
-                      <Activity size={16} className={status === 'ACTIVE' ? 'animate-pulse' : ''} />
-                      <span className="text-[10px] font-black uppercase tracking-widest">{status}</span>
+                <div className="flex flex-col gap-4">
+                   <div className="flex items-center gap-6">
+                      <div className={`p-4 rounded-2xl border ${status === 'ACTIVE' ? 'bg-green-500/10 border-green-500/20 text-green-500' : 'bg-yellow-500/10 border-yellow-500/20 text-yellow-500'} flex items-center gap-3`}>
+                         <Activity size={16} className={status === 'ACTIVE' ? 'animate-pulse' : ''} />
+                         <span className="text-[10px] font-black uppercase tracking-widest">{status}</span>
+                      </div>
+                      <button 
+                        onClick={() => setStatus(status === 'ACTIVE' ? 'PAUSED' : 'ACTIVE')}
+                        className="text-[9px] font-black text-gray-500 uppercase hover:text-white transition-all underline"
+                      >
+                         Alternar Estado
+                      </button>
                    </div>
-                   <button 
-                     onClick={() => setStatus(status === 'ACTIVE' ? 'PENDING' : 'ACTIVE')}
-                     className="text-[9px] font-black text-gray-500 uppercase hover:text-white transition-all underline"
-                   >
-                      Alternar Estado
-                   </button>
+                   {!editId && (
+                     <button
+                       onClick={handlePublishAllZones}
+                       disabled={isProcessing}
+                       className="text-[9px] font-black uppercase tracking-widest text-purple-400 hover:text-purple-300 underline text-left"
+                     >
+                       Publicar en las 3 zonas con un clic
+                     </button>
+                   )}
                 </div>
                 
                 <button 
@@ -466,6 +531,9 @@ export default function ManageAds() {
                     )}
                     <div className="absolute top-4 left-4 flex flex-col gap-2">
                        <span className="text-[7px] font-black bg-blue-600 text-white px-3 py-1 rounded-full uppercase shadow-xl">{ad.placement}</span>
+                       <span className="text-[7px] font-black bg-gray-800 text-gray-300 px-3 py-1 rounded-full uppercase">
+                         {(PLACEMENT_ZONES[ad.placement]?.pages || []).join(' · ')}
+                       </span>
                        <span className={`text-[7px] font-black ${ad.isGlobal ? 'bg-purple-600' : 'bg-gray-700'} text-white px-3 py-1 rounded-full uppercase shadow-xl`}>
                           {ad.isGlobal ? 'GLOBAL' : `LOCAL (${ad.targetCountry})`}
                        </span>

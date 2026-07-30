@@ -1,11 +1,14 @@
 'use client';
 
+import dynamic from 'next/dynamic';
 import Header from '@/components/Header';
 import Footer from '@/components/Footer';
 import GlobalTicker from '@/components/Ticker';
 import NewsCard from '@/components/NewsCard';
 import { useEffect, useState } from 'react';
 import { LoaderCircle, AlertTriangle } from 'lucide-react';
+
+const SponsorSpace = dynamic(() => import('@/components/SponsorSpace'), { ssr: false });
 
 export default function RumorsPage() {
   const [news, setNews] = useState<any[]>([]);
@@ -39,6 +42,10 @@ export default function RumorsPage() {
           <p className="text-gray-500 uppercase tracking-widest text-xs max-w-2xl">
             Filtrado en vivo de leaks, rumores de CEOs, IA y tech. Marcado como inteligencia no verificada.
           </p>
+        </div>
+
+        <div className="mb-12">
+          <SponsorSpace isPremium={false} type="banner" />
         </div>
 
         {loading ? (

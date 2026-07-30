@@ -78,6 +78,11 @@ export default function AdminVision() {
 
   return (
     <main className="min-h-screen bg-[#010101] text-white flex flex-col xl:flex-row">
+      <div className="w-full bg-amber-500/10 border-b border-amber-500/30 px-6 py-3 text-center">
+        <p className="text-[10px] font-black uppercase tracking-widest text-amber-400">
+          Datos de demostración — Para métricas reales usa /admin y /admin/financial
+        </p>
+      </div>
       
       {/* SIDEBAR DE MANDO */}
       <nav className="w-full xl:w-80 bg-black border-r border-white/5 p-8 flex flex-col gap-12">
