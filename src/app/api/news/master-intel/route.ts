@@ -86,7 +86,7 @@ export async function GET() {
          const needed = 10 - merged.length;
          merged = [...merged, ...MASTER_FALLBACK.topNews.slice(0, needed)];
       }
-      return NextResponse.json({ ...cachedIntel, topNews: merged.slice(0, 10), lastUpdate: getPeruTime() });
+      return NextResponse.json({ ...cachedIntel, topNews: merged.slice(0, 10), lastUpdate: getPeruTime(), updatedAt: new Date(lastUpdate).toISOString() });
     }
 
     const apiKey = process.env.GROQ_API_KEY;
@@ -149,7 +149,8 @@ export async function GET() {
     const response = {
       ...intelReport,
       topNews: finalTopNews.slice(0, 10),
-      lastUpdate: getPeruTime()
+      lastUpdate: getPeruTime(),
+      updatedAt: new Date().toISOString(),
     };
 
     // Actualizar Caché Global
@@ -160,6 +161,6 @@ export async function GET() {
 
   } catch (error) {
     console.error("CRITICAL API ERR:", error);
-    return NextResponse.json({ ...MASTER_FALLBACK, lastUpdate: getPeruTime() });
+    return NextResponse.json({ ...MASTER_FALLBACK, lastUpdate: getPeruTime(), updatedAt: new Date().toISOString(), error: true });
   }
 }
