@@ -1,10 +1,14 @@
 import { NextResponse } from 'next/server';
-import { enrichWithGemini } from '@/lib/geminiNews';
+import { summarizeWithGemini } from '@/lib/geminiNews';
+import { isVideoUrl, getYoutubeEmbedId, getVimeoEmbedId, buildYoutubeEmbedUrl } from '@/lib/adMediaUtils';
 import {
   formatLiveDate,
   generateShortId,
   parseFeed,
-  resolveNewsImage,
+  resolveVerifiedNewsImage,
+  extractSourceName,
+  isValidNewsUrl,
+  trimExcerpt,
 } from '@/lib/newsUtils';
 
 export const dynamic = 'force-dynamic';
@@ -35,8 +39,8 @@ const KEY_CEOS = [
   'pichai', 'wenfeng', 'zhilin', 'kai-fu', 'robin li',
 ];
 const HIGH_IMPACT = [
-  'agi', 'gpt', 'gemini', 'gemini 3.6', 'gemini 3.5', 'claude', 'blackwell', 'robot', 'chips', 'funding',
-  'llm', 'breaking', 'billion', 'ceo', 'kimi', 'deepseek', 'qwen', 'chinese ai', 'flash cyber',
+  'agi', 'gpt', 'gemini', 'gemini 3.6', 'gemini 3.5', 'claude', 'blackwell',
+  'llm', 'breaking', 'kimi', 'deepseek', 'qwen', 'chinese ai', 'flash cyber',
 ];
 
 function scoreItem(text: string) {
@@ -49,6 +53,24 @@ function scoreItem(text: string) {
   return score;
 }
 
+function cleanTitle(raw: string): string {
+  const parts = raw.split(' - ');
+  if (parts.length > 1 && parts[parts.length - 1].length < 60) {
+    return parts.slice(0, -1).join(' - ').trim();
+  }
+  return raw.trim();
+}
+
+function videoEmbedFromUrl(url: string): string | null {
+  if (!isVideoUrl(url)) return null;
+  const yt = getYoutubeEmbedId(url);
+  if (yt) return buildYoutubeEmbedUrl(yt, {});
+  const vimeo = getVimeoEmbedId(url);
+  if (vimeo) return `https://player.vimeo.com/video/${vimeo}`;
+  if (/\.(mp4|webm)(\?|$)/i.test(url)) return url;
+  return null;
+}
+
 export async function GET() {
   try {
     const feedResults = await Promise.all(FEEDS.map((url) => parseFeed(url)));
@@ -56,6 +78,7 @@ export async function GET() {
 
     const seen = new Set<string>();
     const uniqueItems = allRawItems.filter((item) => {
+      if (!isValidNewsUrl(item.link)) return false;
       const title = item.title?.toLowerCase().trim();
       if (!title || seen.has(title)) return false;
       seen.add(title);
@@ -75,65 +98,82 @@ export async function GET() {
         news: [],
         status: 'Sin datos nuevos',
         refreshedAt: new Date().toISOString(),
-        cacheTTL: '120s',
         error: true,
       });
     }
 
     const processed = await Promise.all(
       ranked.map(async ({ item, titanScore }, index) => {
-        const uniqueId = generateShortId(item.link || item.title || '');
-        const title = item.title?.split(' - ')[0] || 'Señal detectada';
-        const snippet = item.contentSnippet || '';
-        let excerpt = snippet.substring(0, 220) || '';
-        let category = titanScore >= 40 ? 'BREAKING' : 'INTEL IA';
-        let intelLevel = String(Math.min(9.9, 6 + titanScore / 15));
-        let displayTitle = title;
+        const url = item.link!;
+        const rawTitle = item.title || '';
+        const displayTitle = cleanTitle(rawTitle);
+        const snippet = (item.contentSnippet || '').trim();
+        const source = extractSourceName(item);
+        const pubDate = item.pubDate || new Date().toISOString();
 
-        if (index < 8 && excerpt) {
-          const gemini = await enrichWithGemini(title, snippet);
-          if (gemini?.summary) excerpt = gemini.summary;
-          if (gemini?.category) category = gemini.category;
-          if (gemini?.importance) intelLevel = String(gemini.importance);
-          if (gemini?.title) displayTitle = gemini.title;
+        let excerpt = trimExcerpt(snippet, 280);
+        if (index < 6 && snippet.length > 40) {
+          const gemini = await summarizeWithGemini(displayTitle, snippet);
+          if (gemini && 'summary' in gemini) {
+            excerpt = trimExcerpt(gemini.summary, 280);
+          }
         }
+
+        const image =
+          index < 10
+            ? await resolveVerifiedNewsImage(item as Record<string, unknown>, url)
+            : extractRssImageSync(item as Record<string, unknown>);
 
         const titleLower = `${displayTitle} ${snippet}`.toLowerCase();
-        if (titleLower.includes('gemini 3.6') || titleLower.includes('gemini 3.5 flash')) {
-          category = 'BREAKING';
-        }
+        const category =
+          titleLower.includes('gemini 3.6') || titleLower.includes('gemini 3.5 flash') || titanScore >= 40
+            ? 'BREAKING'
+            : 'INTEL';
+
+        const videoEmbed = videoEmbedFromUrl(url);
 
         return {
-          id: uniqueId,
+          id: generateShortId(url),
           title: displayTitle,
           category,
-          excerpt: excerpt || snippet.substring(0, 120),
-          author: item.creator || item.author || 'Radar Global',
-          date: formatLiveDate(item.pubDate),
-          timestamp: new Date(item.pubDate || Date.now()).getTime(),
-          image: resolveNewsImage(item as Record<string, unknown>, title, 'radar'),
-          url: item.link,
-          source: item.creator || item.author || 'RSS',
-          intelLevel,
+          excerpt: excerpt || trimExcerpt(snippet, 120) || displayTitle,
+          date: formatLiveDate(pubDate),
+          pubDate,
+          timestamp: new Date(pubDate).getTime(),
+          image,
+          url,
+          source,
           isBreaking: titanScore >= 40,
-          isFallback: false,
+          videoEmbed,
+          verified: true,
         };
       })
     );
 
+    const verified = processed.filter((n) => n.title && n.url && n.source);
+
     return NextResponse.json({
-      news: processed.slice(0, 30),
-      status: 'HAWKIN Live Radar',
+      news: verified.slice(0, 30),
+      status: verified.length > 0 ? 'HAWKIN Live Radar' : 'Sin datos nuevos',
       refreshedAt: new Date().toISOString(),
       cacheTTL: '120s',
+      error: verified.length === 0,
     });
   } catch {
     return NextResponse.json({
       news: [],
       status: 'Sin datos nuevos',
       refreshedAt: new Date().toISOString(),
-      cacheTTL: '0s',
       error: true,
     });
   }
+}
+
+function extractRssImageSync(item: Record<string, unknown>): string | null {
+  const enclosure = item.enclosure as { url?: string; type?: string } | undefined;
+  if (enclosure?.url && (!enclosure.type || enclosure.type.startsWith('image'))) {
+    const u = enclosure.url;
+    return u.includes('unsplash.com') ? null : u;
+  }
+  return null;
 }

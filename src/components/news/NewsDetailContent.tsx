@@ -50,10 +50,6 @@ export default function NewsDetailContent({ newsId }: NewsDetailContentProps) {
 
         if (found) {
           setNews(found);
-          // Métricas inyectadas para la Red TITAN
-          setLikes(Math.floor(Math.random() * 850) + 200);
-          setDislikes(Math.floor(Math.random() * 12));
-          setViews(Math.floor(Math.random() * 15000) + 4000);
         }
       } catch (e) {
         console.error("Error loading news detail:", e);
@@ -122,13 +118,19 @@ export default function NewsDetailContent({ newsId }: NewsDetailContentProps) {
           
           {/* COLUMNA IZQUIERDA: CUERPO DEL REPORTE */}
           <div className="lg:col-span-8 space-y-12 text-left">
-            <div className="relative aspect-video w-full rounded-[50px] overflow-hidden border border-white/5 bg-gray-900 shadow-2xl">
-               <img 
-                 src={news.image || "https://images.unsplash.com/photo-1451187580459-43490279c0fa?auto=format&fit=crop&q=80&w=1200"} 
-                 className="w-full h-full object-cover opacity-70 group-hover:opacity-100 transition-opacity duration-700"
-                 alt=""
-               />
-               <div className="absolute inset-0 bg-gradient-to-t from-black via-transparent to-transparent" />
+            <div className="relative aspect-video w-full rounded-lg overflow-hidden border border-white/10 bg-[#050505]">
+               {news.image && !news.image.includes('unsplash.com') ? (
+                 <img 
+                   src={news.image} 
+                   className="w-full h-full object-cover"
+                   alt=""
+                 />
+               ) : (
+                 <div className="absolute inset-0 flex flex-col items-center justify-center px-4 text-center">
+                   <span className="text-xs font-semibold uppercase tracking-widest text-gray-500">{news.source || 'Fuente'}</span>
+                   <span className="text-[10px] text-gray-700 mt-1">Sin imagen del artículo</span>
+                 </div>
+               )}
             </div>
 
             {/* PANEL DE MÉTRICAS ESTRATÉGICAS */}
@@ -143,15 +145,8 @@ export default function NewsDetailContent({ newsId }: NewsDetailContentProps) {
                <div className="flex items-center gap-4">
                   <div className="w-10 h-10 rounded-xl bg-white/5 flex items-center justify-center text-cyan-500 border border-white/10"><Eye size={18} /></div>
                   <div className="flex flex-col">
-                    <span className="text-[7px] font-black text-gray-600 uppercase tracking-widest">Intercepciones</span>
-                    <span className="text-[10px] font-black uppercase tracking-widest text-white">{views.toLocaleString()}</span>
-                  </div>
-               </div>
-               <div className="flex items-center gap-4">
-                  <div className="w-10 h-10 rounded-xl bg-white/5 flex items-center justify-center text-cyan-500 border border-white/10"><TrendingUp size={18} /></div>
-                  <div className="flex flex-col">
-                    <span className="text-[7px] font-black text-gray-600 uppercase tracking-widest">Origen</span>
-                    <span className="text-[10px] font-black uppercase tracking-widest text-white">{news.source || 'Intel Hub'}</span>
+                    <span className="text-[7px] font-black text-gray-600 uppercase tracking-widest">Fuente</span>
+                    <span className="text-[10px] font-black uppercase tracking-widest text-white">{news.source || 'RSS'}</span>
                   </div>
                </div>
             </div>
@@ -174,7 +169,7 @@ export default function NewsDetailContent({ newsId }: NewsDetailContentProps) {
                         <p key={i}>{para}</p>
                       ))
                     ) : (
-                      <p>Nuestro sistema está procesando datos adicionales para este reporte. Los indicadores sugieren un cambio estructural en el ecosistema de {news.category || 'tecnología de frontera'}. Se recomienda vigilancia continua sobre esta señal.</p>
+                      <p className="text-gray-500 italic">Sin contenido adicional. Consulta el artículo original para el texto completo.</p>
                     )}
                   </div>
                </div>
@@ -195,19 +190,14 @@ export default function NewsDetailContent({ newsId }: NewsDetailContentProps) {
                    <div className="h-px bg-white/5" />
                 </div>
 
-                {/* NIVEL DE INTELIGENCIA */}
                 <div className="p-6 bg-black/40 border border-white/5 rounded-3xl space-y-4">
                    <div className="flex justify-between items-center">
-                     <span className="text-[9px] font-black text-gray-500 uppercase">Impacto Alpha</span>
-                     <span className="text-xs font-black text-cyan-500 italic">{news.intelLevel || '8.5'}/10</span>
+                     <span className="text-[9px] font-black text-gray-500 uppercase">Verificación</span>
+                     <span className="text-xs font-black text-cyan-500 italic">Fuente RSS</span>
                    </div>
-                   <div className="h-1.5 w-full bg-white/5 rounded-full overflow-hidden">
-                     <motion.div 
-                       initial={{ width: 0 }}
-                       animate={{ width: `${(Number(news.intelLevel) || 8.5) * 10}%` }}
-                       className="h-full bg-gradient-to-r from-cyan-600 to-blue-400" 
-                     />
-                   </div>
+                   <p className="text-[10px] text-gray-600 leading-relaxed">
+                     Resumen basado en el extracto del feed. Sin scores de confianza inventados.
+                   </p>
                 </div>
 
                 {/* BOTÓN AL ENLACE REAL */}

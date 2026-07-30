@@ -1,91 +1,93 @@
 'use client';
 
-import { motion } from 'framer-motion';
-import Link from 'next/link';
-import { Clock, Lock } from 'lucide-react';
+import { ExternalLink } from 'lucide-react';
+import { isVideoUrl } from '@/lib/adMediaUtils';
 
 interface NewsCardProps {
   id: string;
   title: string;
   excerpt?: string;
   category?: string;
-  isLocked?: boolean;
-  image?: string;
+  image?: string | null;
   date?: string;
-  author?: string;
   source?: string;
   url?: string;
+  videoEmbed?: string | null;
 }
 
-export default function NewsCard({ 
-  id, 
-  title, 
-  excerpt = "Analizando impacto tecnológico...", 
-  category = "RADAR", 
-  isLocked = false, 
-  image, 
-  date = "Recién lanzado", 
-  author = "HAWKIN Intel",
-  source,
-  url
+export default function NewsCard({
+  title,
+  excerpt = '',
+  category = 'INTEL',
+  image,
+  date = '',
+  source = 'RSS',
+  url,
+  videoEmbed,
 }: NewsCardProps) {
-  
-  const CardContent = (
-    <motion.div 
-      whileHover={{ y: -8 }}
-      className="glass-card group cursor-pointer relative overflow-hidden h-full flex flex-col p-0 border-white/5 hover:border-cyan-500/40 transition-all duration-500"
-    >
-      <div className="relative h-48 w-full overflow-hidden bg-gray-900">
-        <img 
-          src={image || "https://images.unsplash.com/photo-1451187580459-43490279c0fa?auto=format&fit=crop&q=80&w=800"} 
-          alt={title}
-          className="w-full h-full object-cover transition-transform duration-700 group-hover:scale-110 opacity-80 group-hover:opacity-100"
-        />
-        <div className="absolute inset-0 bg-gradient-to-t from-black/90 via-black/20 to-transparent" />
-        
-        <div className="absolute top-4 left-4">
-          <span className={`text-[8px] font-black uppercase tracking-widest text-white px-3 py-1 rounded-full shadow-lg ${
-            category === 'GOLD' || category === 'GOLD INTEL' ? 'bg-[#FFD700] text-black' : 'bg-cyan-600'
-          }`}>
-            {category}
+  const hasVideo = Boolean(videoEmbed && isVideoUrl(url || videoEmbed || ''));
+  const hasImage = Boolean(image && !image.includes('unsplash.com'));
+
+  return (
+    <article className="flex flex-col h-full bg-[#0a0a0a] border border-white/10 rounded-lg overflow-hidden hover:border-white/20 transition-colors">
+      {/* Media */}
+      <div className="relative aspect-[16/9] bg-[#050505] border-b border-white/5">
+        {hasVideo && videoEmbed ? (
+          videoEmbed.includes('youtube') || videoEmbed.includes('vimeo') ? (
+            <iframe
+              src={videoEmbed}
+              className="absolute inset-0 w-full h-full"
+              allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture"
+              title={title}
+              loading="lazy"
+            />
+          ) : (
+            <video src={videoEmbed} className="w-full h-full object-cover" controls muted playsInline />
+          )
+        ) : hasImage ? (
+          <img src={image!} alt="" className="w-full h-full object-cover" loading="lazy" />
+        ) : (
+          <div className="absolute inset-0 flex flex-col items-center justify-center px-4 text-center">
+            <span className="text-[10px] font-semibold uppercase tracking-widest text-gray-500">
+              {source}
+            </span>
+            <span className="text-[9px] text-gray-700 mt-1">Sin imagen del artículo</span>
+          </div>
+        )}
+        {category === 'BREAKING' && (
+          <span className="absolute top-2 left-2 text-[9px] font-bold uppercase tracking-wider bg-red-600 text-white px-2 py-0.5 rounded">
+            Breaking
           </span>
-        </div>
+        )}
       </div>
 
-      <div className="p-7 flex flex-col flex-1">
-        <div className="flex items-center gap-3 text-[9px] font-black text-gray-500 uppercase tracking-widest mb-4">
-          <Clock size={12} className="text-cyan-500" /> {date} {source && `• ${source}`}
-        </div>
-        
-        <h3 className="text-xl font-black mb-4 leading-tight group-hover:text-cyan-400 transition-colors line-clamp-2 italic uppercase tracking-tighter">
-          {title}
-        </h3>
-        
-        <p className={`text-gray-400 text-xs leading-relaxed line-clamp-3 font-light ${isLocked ? 'blur-[0.5px] select-none opacity-40' : ''}`}>
-          {excerpt}
-        </p>
+      {/* Content */}
+      <div className="flex flex-col flex-1 p-4 gap-3">
+        <h3 className="text-base font-semibold text-white leading-snug line-clamp-3">{title}</h3>
 
-        <div className="mt-auto pt-8 flex justify-between items-center border-t border-white/5 mt-6">
-          <div className="flex items-center gap-3 text-[9px] font-black text-white uppercase tracking-[0.3em]">
-            {isLocked ? 'Acceso Socio' : 'Analizar'} <span className="text-cyan-400">→</span>
-          </div>
-          {isLocked && (
-            <div className="w-8 h-8 rounded-full bg-white/5 flex items-center justify-center border border-white/10 group-hover:border-cyan-500/30 transition-all">
-              <Lock size={12} className="text-gray-500 group-hover:text-cyan-400" />
-            </div>
+        {excerpt && (
+          <p className="text-sm text-gray-400 leading-relaxed line-clamp-3">{excerpt}</p>
+        )}
+
+        <div className="mt-auto pt-3 border-t border-white/5 flex items-center justify-between gap-3">
+          <p className="text-[11px] text-gray-500">
+            <span className="font-medium text-gray-400">{source}</span>
+            {date && <span className="text-gray-600"> · {date}</span>}
+          </p>
+
+          {url && (
+            <a
+              href={url}
+              target="_blank"
+              rel="noopener noreferrer"
+              className="inline-flex items-center gap-1 shrink-0 text-[11px] font-semibold uppercase tracking-wide text-cyan-400 hover:text-cyan-300"
+            >
+              Ver original
+              <ExternalLink size={12} />
+            </a>
           )}
         </div>
       </div>
-
-      {isLocked && (
-        <div className="absolute bottom-0 left-0 w-full h-1 bg-gradient-to-r from-transparent via-cyan-500/50 to-transparent opacity-0 group-hover:opacity-100 transition-opacity" />
-      )}
-    </motion.div>
-  );
-
-  return (
-    <Link href={`/news/${id}`}>
-      {CardContent}
-    </Link>
+    </article>
   );
 }

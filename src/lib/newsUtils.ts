@@ -46,9 +46,92 @@ export function extractRssImage(item: Record<string, unknown>): string | null {
 
   const content = String(item.content || item['content:encoded'] || '');
   const imgMatch = content.match(/<img[^>]+src=["']([^"']+)["']/i);
-  if (imgMatch?.[1]) return imgMatch[1];
+  if (imgMatch?.[1] && !imgMatch[1].includes('pixel')) return imgMatch[1];
 
   return null;
+}
+
+const ogImageCache = new Map<string, string | null>();
+
+export async function fetchOgImage(pageUrl: string): Promise<string | null> {
+  if (!pageUrl?.startsWith('http')) return null;
+  if (ogImageCache.has(pageUrl)) return ogImageCache.get(pageUrl) ?? null;
+
+  try {
+    const res = await fetch(pageUrl, {
+      headers: { 'User-Agent': 'Mozilla/5.0 (compatible; HAWKIN/1.0)' },
+      signal: AbortSignal.timeout(4500),
+      redirect: 'follow',
+    });
+    if (!res.ok) {
+      ogImageCache.set(pageUrl, null);
+      return null;
+    }
+    const html = (await res.text()).slice(0, 120_000);
+    const match =
+      html.match(/property=["']og:image["'][^>]*content=["']([^"']+)["']/i) ||
+      html.match(/content=["']([^"']+)["'][^>]*property=["']og:image["']/i) ||
+      html.match(/name=["']twitter:image["'][^>]*content=["']([^"']+)["']/i);
+
+    const image = match?.[1]?.trim() || null;
+    if (image && !image.includes('unsplash.com')) {
+      ogImageCache.set(pageUrl, image);
+      return image;
+    }
+    ogImageCache.set(pageUrl, null);
+    return null;
+  } catch {
+    ogImageCache.set(pageUrl, null);
+    return null;
+  }
+}
+
+/** Imagen verificada: RSS → og:image. Sin Unsplash ni stock. */
+export async function resolveVerifiedNewsImage(
+  item: Record<string, unknown>,
+  pageUrl?: string
+): Promise<string | null> {
+  const fromFeed = extractRssImage(item);
+  if (fromFeed && !fromFeed.includes('unsplash.com') && !fromFeed.endsWith('.gif')) {
+    return fromFeed;
+  }
+  if (pageUrl) {
+    return fetchOgImage(pageUrl);
+  }
+  return null;
+}
+
+export function extractSourceName(item: { title?: string; link?: string; creator?: string; author?: string }): string {
+  const title = item.title || '';
+  const dashParts = title.split(' - ');
+  if (dashParts.length > 1) {
+    const source = dashParts[dashParts.length - 1].trim();
+    if (source.length > 1 && source.length < 80) return source;
+  }
+  if (item.creator && typeof item.creator === 'string') return item.creator;
+  if (item.author && typeof item.author === 'string') return item.author;
+  try {
+    const host = new URL(item.link || '').hostname.replace(/^www\./, '');
+    return host || 'RSS';
+  } catch {
+    return 'RSS';
+  }
+}
+
+export function isValidNewsUrl(url?: string): url is string {
+  if (!url?.startsWith('http')) return false;
+  try {
+    const u = new URL(url);
+    return u.protocol === 'http:' || u.protocol === 'https:';
+  } catch {
+    return false;
+  }
+}
+
+export function trimExcerpt(text: string, max = 280): string {
+  const clean = text.replace(/\s+/g, ' ').trim();
+  if (clean.length <= max) return clean;
+  return clean.slice(0, max).replace(/\s+\S*$/, '') + '…';
 }
 
 export function topicImage(title: string, sig: string, kind: 'radar' | 'gold' | 'rumor' = 'radar') {
