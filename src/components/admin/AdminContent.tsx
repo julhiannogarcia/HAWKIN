@@ -2,29 +2,24 @@
 
 import React, { useState, useEffect } from 'react';
 import {
-  Users,
-  UserPlus,
-  CreditCard,
-  DollarSign,
-  Target,
-  Newspaper,
-  Activity,
-  TrendingUp,
-  BarChart,
-  FileText,
-  Eye,
+  Users, CreditCard, DollarSign, Target, Newspaper, Activity, TrendingUp, BarChart, FileText, Eye,
 } from 'lucide-react';
 
 export default function AdminContent() {
   const [stats, setStats] = useState<any>(null);
+  const [auditLogs, setAuditLogs] = useState<any[]>([]);
   const [loading, setLoading] = useState(true);
 
   useEffect(() => {
     const loadData = async () => {
       try {
-        const res = await fetch('/api/admin/stats');
-        const data = await res.json();
-        setStats(data);
+        const [statsRes, auditRes] = await Promise.all([
+          fetch('/api/admin/stats'),
+          fetch('/api/admin/audit'),
+        ]);
+        setStats(await statsRes.json());
+        const logs = await auditRes.json();
+        setAuditLogs(Array.isArray(logs) ? logs.slice(0, 8) : []);
       } catch (e) {
         console.error(e);
       } finally {
@@ -134,25 +129,25 @@ export default function AdminContent() {
 
         <div className="p-10 bg-white/[0.01] border border-white/5 rounded-[40px] space-y-8">
           <h3 className="text-sm font-black uppercase tracking-widest text-gray-400 flex items-center gap-3">
-            <FileText size={16} className="text-purple-500" /> Estado del Sistema
+            <FileText size={16} className="text-purple-500" /> Últimos Eventos (Audit Log)
           </h3>
-          <div className="space-y-4 text-[10px] font-bold uppercase tracking-widest text-gray-400">
-            <p>
-              • Las secciones <span className="text-white">Traffic</span>, <span className="text-white">Vision</span> y{' '}
-              <span className="text-white">Financial</span> aún usan datos de demostración.
-            </p>
-            <p>
-              • Esta pantalla y <span className="text-white">/admin/b2b</span> ya leen datos reales de tu base de datos.
-            </p>
-            <p>
-              • Los clics e impresiones de publicidad se registran cuando alguien ve o hace clic en un anuncio en la web.
-            </p>
-          </div>
-          <a
-            href="/admin/audit"
-            className="block w-full py-4 bg-white/5 rounded-2xl text-[10px] font-black uppercase text-gray-400 hover:text-white transition-colors text-center"
-          >
-            Ver auditoría real (pagos y eventos)
+          {auditLogs.length === 0 ? (
+            <p className="text-[10px] text-gray-600 uppercase tracking-widest text-center py-6">Sin eventos registrados aún</p>
+          ) : (
+            <div className="space-y-3">
+              {auditLogs.map((log) => (
+                <div key={log.id} className="flex justify-between items-center p-4 bg-black/40 border border-white/5 rounded-xl">
+                  <div>
+                    <p className="text-xs font-black text-white">{log.action}</p>
+                    <p className="text-[9px] text-gray-500 truncate max-w-md">{log.details || '—'}</p>
+                  </div>
+                  <span className="text-[9px] text-gray-600 uppercase">{new Date(log.createdAt).toLocaleString()}</span>
+                </div>
+              ))}
+            </div>
+          )}
+          <a href="/admin/audit" className="block w-full py-4 bg-white/5 rounded-2xl text-[10px] font-black uppercase text-gray-400 hover:text-white transition-colors text-center">
+            Ver auditoría completa
           </a>
         </div>
       </div>

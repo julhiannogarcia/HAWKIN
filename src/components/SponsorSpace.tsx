@@ -2,7 +2,7 @@
 
 import { motion } from 'framer-motion';
 import { useState, useEffect, useRef } from 'react';
-import { getSecureImageUrl, getVimeoEmbedId, getYoutubeEmbedId, getYoutubeStartSeconds, buildYoutubeEmbedUrl, isVideoUrl } from '@/lib/adMediaUtils';
+import { getSecureImageUrl, getVimeoEmbedId, getYoutubeEmbedId, getYoutubeStartSeconds, buildYoutubeEmbedUrl, isVideoUrl, isSocialMediaUrl } from '@/lib/adMediaUtils';
 
 interface SponsorSpaceProps {
   isPremium: boolean;
@@ -79,12 +79,27 @@ export default function SponsorSpace({ isPremium, type = 'banner' }: SponsorSpac
 
   if (isPremium || loading || !promo) return null;
 
-  const finalUrl = isVideoUrl(promo.bannerUrl) ? promo.bannerUrl : getSecureImageUrl(promo.bannerUrl);
+  const finalUrl = isVideoUrl(promo.bannerUrl) || isSocialMediaUrl(promo.bannerUrl)
+    ? promo.bannerUrl
+    : getSecureImageUrl(promo.bannerUrl);
   const isVideo = isVideoUrl(promo.bannerUrl);
+  const isSocial = isSocialMediaUrl(promo.bannerUrl);
 
   const renderMedia = () => {
     if (mediaError) {
       return <div className="absolute inset-0 bg-gradient-to-br from-gray-900 to-black" />;
+    }
+
+    if (isSocial) {
+      return (
+        <div className="absolute inset-0 bg-gradient-to-br from-purple-900/60 via-black to-cyan-900/40 flex items-center justify-center">
+          <div className="text-center space-y-4 px-8">
+            <p className="text-6xl">📱</p>
+            <p className="text-xl font-black text-white uppercase italic">Ver en redes sociales</p>
+            <p className="text-[10px] text-cyan-400 uppercase tracking-widest">Toca para abrir el enlace</p>
+          </div>
+        </div>
+      );
     }
 
     if (isVideo) {
@@ -132,7 +147,8 @@ export default function SponsorSpace({ isPremium, type = 'banner' }: SponsorSpac
 
   const handleClick = () => {
     trackAdMetric(promo.id, 'click');
-    if (promo.targetUrl) window.open(promo.targetUrl, '_blank');
+    const dest = isSocial ? promo.bannerUrl : promo.targetUrl;
+    if (dest) window.open(dest, '_blank');
   };
 
   return (

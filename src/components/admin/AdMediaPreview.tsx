@@ -1,7 +1,16 @@
 'use client';
 
-import { CloudUpload } from 'lucide-react';
-import { buildYoutubeEmbedUrl, getSecureImageUrl, getVimeoEmbedId, getYoutubeEmbedId, getYoutubeStartSeconds, isVideoUrl } from '@/lib/adMediaUtils';
+import { CloudUpload, ExternalLink } from 'lucide-react';
+import {
+  buildYoutubeEmbedUrl,
+  getMediaType,
+  getSecureImageUrl,
+  getVimeoEmbedId,
+  getYoutubeEmbedId,
+  getYoutubeStartSeconds,
+  isSocialMediaUrl,
+  isVideoUrl,
+} from '@/lib/adMediaUtils';
 
 interface AdMediaPreviewProps {
   url: string;
@@ -20,6 +29,21 @@ export default function AdMediaPreview({
         <div className="text-center space-y-3">
           <CloudUpload className="text-gray-800 mx-auto" size={40} />
           <p className="text-[9px] font-black text-gray-700 uppercase tracking-widest">{emptyLabel}</p>
+        </div>
+      </div>
+    );
+  }
+
+  const mediaType = getMediaType(url);
+
+  if (mediaType === 'social') {
+    return (
+      <div className={`${className} flex items-center justify-center bg-gradient-to-br from-purple-900/40 to-black`}>
+        <div className="text-center space-y-4 p-8">
+          <ExternalLink className="text-cyan-400 mx-auto" size={48} />
+          <p className="text-sm font-black text-white uppercase italic">Enlace de red social</p>
+          <p className="text-[9px] text-gray-400 font-bold break-all max-w-xs">{url}</p>
+          <p className="text-[8px] text-cyan-500 uppercase tracking-widest">Se abrirá al hacer clic</p>
         </div>
       </div>
     );
@@ -58,7 +82,7 @@ export default function AdMediaPreview({
     return (
       <div className={className}>
         <video controls muted playsInline className="absolute inset-0 w-full h-full object-cover">
-          <source src={url} type="video/mp4" />
+          <source src={url.startsWith('/') ? url : url} type="video/mp4" />
         </video>
       </div>
     );

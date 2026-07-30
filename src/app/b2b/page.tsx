@@ -5,11 +5,11 @@ import Header from '@/components/Header';
 import Footer from '@/components/Footer';
 import GlobalTicker from '@/components/Ticker';
 import { motion, AnimatePresence } from 'framer-motion';
-import { 
-  ShieldCheck, LoaderCircle, MessageCircle, Radio, 
-  LayoutDashboard, ShoppingBag, Target, Tv, Eye, ExternalLink, Play,
-  Sparkles, Calendar, Globe, MapPin, Zap, ChevronRight, Mail, CloudUpload, 
-  UserCheck, CreditCard, Info, TriangleAlert, CircleCheck, Lock
+import AdMediaPreview from '@/components/admin/AdMediaPreview';
+import { validateBannerUrl } from '@/lib/adMediaUtils';
+import {
+  LoaderCircle, Radio, LayoutDashboard, ShoppingBag, Target,
+  Sparkles, Calendar, Globe, Mail, CloudUpload, TriangleAlert, CircleCheck, Lock
 } from 'lucide-react';
 
 // =====================================================================
@@ -152,6 +152,11 @@ export default function B2BPage() {
       alert("Completa el Nombre de Empresa y el Link del Banner.");
       return;
     }
+    const validation = validateBannerUrl(bannerUrl);
+    if (!validation.valid) {
+      alert(validation.message);
+      return;
+    }
     setStep('checkout');
     window.scrollTo({ top: 0, behavior: 'smooth' });
   };
@@ -275,11 +280,12 @@ export default function B2BPage() {
                            </div>
                         </div>
                         <div className="space-y-6">
-                           <div className="w-full aspect-video bg-black rounded-[40px] border-2 border-dashed border-white/10 flex items-center justify-center overflow-hidden relative group">
-                              {bannerUrl ? <img src={bannerUrl} className="w-full h-full object-cover" alt="" /> : <div className="text-center opacity-20"><CloudUpload size={60} className="mx-auto" /><p className="text-[10px] font-black uppercase">Vista previa</p></div>}
-                              <div className="absolute inset-0 bg-gradient-to-t from-black/80 via-transparent to-transparent z-10" />
-                              <div className="absolute bottom-6 left-8 z-20"><p className="text-lg font-black uppercase italic text-white">{companyName || 'TU MARCA'}</p><p className="text-[8px] font-black text-blue-500 uppercase tracking-[0.4em]">Socio Patrocinador</p></div>
-                           </div>
+                           <AdMediaPreview url={bannerUrl} className="w-full aspect-video bg-black rounded-[40px] border-2 border-dashed border-white/10 relative overflow-hidden" />
+                           {bannerUrl && (
+                             <p className={`text-[9px] font-bold uppercase tracking-widest ${validateBannerUrl(bannerUrl).valid ? 'text-green-500' : 'text-red-400'}`}>
+                               {validateBannerUrl(bannerUrl).message}
+                             </p>
+                           )}
                         </div>
                      </div>
                      <div className="pt-10 flex flex-col md:flex-row justify-between items-center gap-8 border-t border-white/5">
@@ -316,7 +322,8 @@ export default function B2BPage() {
                <div className="w-40 h-40 bg-green-500 rounded-[60px] flex items-center justify-center text-black shadow-[0_0_100px_rgba(34,197,94,0.4)] animate-bounce"><CircleCheck size={80} /></div>
                <div className="space-y-4">
                   <h2 className="text-7xl font-black uppercase italic tracking-tighter text-white leading-none">Misión Éxito.</h2>
-                  <p className="text-green-500 text-xl font-bold uppercase tracking-[0.5em]">Tu pauta ID {paypalOrderId} está activa en el imperio.</p>
+                  <p className="text-green-500 text-xl font-bold uppercase tracking-[0.5em]">Pago recibido — ID {paypalOrderId}</p>
+                  <p className="text-gray-400 text-sm max-w-lg">Tu anuncio está en cola de revisión. Lo activaremos en /admin/b2b en las próximas horas.</p>
                </div>
             </motion.div>
           )}

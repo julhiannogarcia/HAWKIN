@@ -9,7 +9,7 @@ import {
 } from 'lucide-react';
 import { motion, AnimatePresence } from 'framer-motion';
 import AdMediaPreview from '@/components/admin/AdMediaPreview';
-import { isVideoUrl } from '@/lib/adMediaUtils';
+import { validateBannerUrl, isVideoUrl } from '@/lib/adMediaUtils';
 
 export default function ManageAds() {
   // Estado para creación/edición
@@ -32,6 +32,44 @@ export default function ManageAds() {
   const [isProcessing, setIsUploading] = useState(false);
   const [error, setError] = useState('');
   const [success, setSuccess] = useState('');
+
+  const [uploading, setUploading] = useState(false);
+
+  const bannerValidation = bannerUrl ? validateBannerUrl(bannerUrl) : null;
+
+  const handleFileUpload = async (e: React.ChangeEvent<HTMLInputElement>) => {
+    const file = e.target.files?.[0];
+    if (!file) return;
+    setUploading(true);
+    try {
+      const form = new FormData();
+      form.append('file', file);
+      const res = await fetch('/api/admin/upload', { method: 'POST', body: form });
+      const data = await res.json();
+      if (!res.ok) throw new Error(data.error || 'Error al subir');
+      setBannerUrl(data.url);
+      setSuccess('Archivo subido correctamente.');
+      setTimeout(() => setSuccess(''), 3000);
+    } catch (err: any) {
+      setError(err.message);
+      setTimeout(() => setError(''), 4000);
+    } finally {
+      setUploading(false);
+    }
+  };
+
+  const toggleCampaignStatus = async (id: string, newStatus: string) => {
+    try {
+      const res = await fetch('/api/admin/b2b', {
+        method: 'PATCH',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ id, status: newStatus }),
+      });
+      if (res.ok) fetchCampaigns();
+    } catch (e) {
+      console.error(e);
+    }
+  };
 
   const fetchCampaigns = async () => {
     try {
@@ -57,6 +95,13 @@ export default function ManageAds() {
     if (!companyName || !bannerUrl || !placement) {
       setError('Socio, el nombre de empresa, banner y ubicación son obligatorios.');
       setTimeout(() => setError(''), 3000);
+      return;
+    }
+
+    const validation = validateBannerUrl(bannerUrl);
+    if (!validation.valid) {
+      setError(validation.message);
+      setTimeout(() => setError(''), 4000);
       return;
     }
 
@@ -273,9 +318,19 @@ export default function ManageAds() {
                             type="text" 
                             value={bannerUrl}
                             onChange={(e) => setBannerUrl(e.target.value)}
-                            placeholder="https://..."
+                            placeholder="YouTube, Vimeo, MP4, JPG/PNG, Instagram..."
                             className="w-full bg-black border border-white/10 rounded-2xl p-4 text-[10px] font-bold text-white outline-none focus:border-cyan-500 transition-all"
                          />
+                         <label className="mt-3 flex items-center gap-3 cursor-pointer text-[9px] font-black uppercase tracking-widest text-cyan-500 hover:text-cyan-400">
+                            <CloudUpload size={14} />
+                            {uploading ? 'Subiendo...' : 'Subir archivo desde PC (JPG/PNG/MP4)'}
+                            <input type="file" accept="image/*,video/mp4,video/webm" className="hidden" onChange={handleFileUpload} disabled={uploading} />
+                         </label>
+                         {bannerValidation && (
+                           <p className={`text-[9px] font-bold uppercase tracking-widest mt-2 ${bannerValidation.valid ? 'text-green-500' : 'text-red-400'}`}>
+                             {bannerValidation.message}
+                           </p>
+                         )}
                       </div>
                       <div>
                          <label className="text-[8px] font-black text-gray-600 uppercase tracking-widest mb-2 block">URL de Destino (Clic del Usuario)</label>
@@ -447,14 +502,35 @@ export default function ManageAds() {
                        )}
                     </div>
 
-                    <div className="mt-auto grid grid-cols-2 gap-4 border-t border-white/5 pt-6">
-                       <div>
-                          <p className="text-[7px] font-black text-gray-700 uppercase tracking-widest mb-1">Vistas</p>
-                          <p className="text-lg font-black text-white font-mono">{ad.views || 0}</p>
+                    <div className="mt-auto space-y-4 border-t border-white/5 pt-6">
+                       <div className="grid grid-cols-2 gap-4">
+                          <div>
+                             <p className="text-[7px] font-black text-gray-700 uppercase tracking-widest mb-1">Vistas</p>
+                             <p className="text-lg font-black text-white font-mono">{ad.views || 0}</p>
+                          </div>
+                          <div className="text-right">
+                             <p className="text-[7px] font-black text-gray-700 uppercase tracking-widest mb-1">Clics</p>
+                             <p className="text-lg font-black text-cyan-400 font-mono">{ad.clicks || 0}</p>
+                          </div>
                        </div>
-                       <div className="text-right">
-                          <p className="text-[7px] font-black text-gray-700 uppercase tracking-widest mb-1">Clics</p>
-                          <p className="text-lg font-black text-cyan-400 font-mono">{ad.clicks || 0}</p>
+                       <div className="flex flex-wrap gap-2">
+                          {ad.status === 'PAID' && (
+                            <button onClick={() => toggleCampaignStatus(ad.id, 'ACTIVE')} className="px-3 py-1.5 bg-green-600/20 text-green-400 text-[8px] font-black uppercase rounded-full border border-green-500/30 hover:bg-green-600 hover:text-white transition-all">
+                              Aprobar y Publicar
+                            </button>
+                          )}
+                          {ad.status === 'ACTIVE' ? (
+                            <button onClick={() => toggleCampaignStatus(ad.id, 'PAUSED')} className="px-3 py-1.5 bg-yellow-600/20 text-yellow-400 text-[8px] font-black uppercase rounded-full border border-yellow-500/30">
+                              Pausar
+                            </button>
+                          ) : ad.status === 'PAUSED' || ad.status === 'PENDING' ? (
+                            <button onClick={() => toggleCampaignStatus(ad.id, 'ACTIVE')} className="px-3 py-1.5 bg-green-600/20 text-green-400 text-[8px] font-black uppercase rounded-full border border-green-500/30">
+                              Activar
+                            </button>
+                          ) : null}
+                          <span className={`px-3 py-1.5 text-[8px] font-black uppercase rounded-full ${ad.status === 'ACTIVE' ? 'bg-green-500/10 text-green-500' : ad.status === 'PAID' ? 'bg-blue-500/10 text-blue-400' : 'bg-gray-500/10 text-gray-500'}`}>
+                            {ad.status}
+                          </span>
                        </div>
                     </div>
                  </div>

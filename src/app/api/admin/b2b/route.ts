@@ -1,16 +1,25 @@
 import { NextResponse } from "next/server";
 import { prisma } from "@/lib/prisma";
 
+async function logAudit(action: string, details?: string) {
+  try {
+    await prisma.auditLog.create({
+      data: { action, details, userName: 'Admin', status: 'SUCCESS' },
+    });
+  } catch {
+    // no bloquear operación principal
+  }
+}
+
 export async function POST(req: Request) {
   try {
-    const { 
-      companyName, bannerUrl, targetUrl, 
-      placement, startDate, endDate, 
+    const {
+      companyName, bannerUrl, targetUrl,
+      placement, startDate, endDate,
       status, targetCountry, isGlobal,
       paypalOrderId, paymentVerified
     } = await req.json();
 
-    // Si es una reserva con pago (desde página B2B pública)
     if (paypalOrderId && paymentVerified) {
       const sDate = new Date(startDate);
       const eDate = new Date(endDate);
@@ -26,15 +35,16 @@ export async function POST(req: Request) {
           isGlobal: !!isGlobal,
           startDate: sDate,
           endDate: eDate,
-          status: "PAID", // Marcamos como pagado
+          status: "PAID",
           paymentVerified: true,
           paypalOrderId,
         }
       });
+
+      await logAudit('B2B_CAMPAIGN_PAID', `Campaña ${campaign.companyName} pagada vía PayPal ${paypalOrderId}`);
       return NextResponse.json(campaign);
     }
 
-    // Si es inyección manual desde Admin
     if (!companyName || !bannerUrl || !placement) {
       return NextResponse.json({ error: "Faltan datos obligatorios para la campaña" }, { status: 400 });
     }
@@ -54,16 +64,17 @@ export async function POST(req: Request) {
         startDate: sDate,
         endDate: eDate,
         status: status || "ACTIVE",
-        paymentVerified: true, // Manual admin siempre verificado
+        paymentVerified: true,
       }
     });
 
+    await logAudit('B2B_CAMPAIGN_CREATED', `Campaña ${companyName} creada manualmente`);
     return NextResponse.json(campaign);
   } catch (error: any) {
-    console.error("DEBUG - B2B CREATION ERROR:", error);
-    return NextResponse.json({ 
-      error: "DATABASE_CONNECTION_ERROR", 
-      message: `${error.code || 'ERROR'}: ${error.message || 'Error desconocido al inyectar pauta.'}`
+    console.error("B2B CREATION ERROR:", error);
+    return NextResponse.json({
+      error: "DATABASE_CONNECTION_ERROR",
+      message: error.message || 'Error al crear campaña.'
     }, { status: 500 });
   }
 }
@@ -100,13 +111,27 @@ export async function PUT(req: Request) {
       }
     });
 
+    await logAudit('B2B_CAMPAIGN_UPDATED', `Campaña ${campaign.companyName} → ${status}`);
     return NextResponse.json(campaign);
   } catch (error: any) {
-    console.error("DEBUG - B2B UPDATE ERROR:", error);
-    return NextResponse.json({ 
-      error: "DATABASE_UPDATE_ERROR", 
-      message: `${error.code || 'ERROR'}: ${error.message || 'Error al actualizar la pauta.'}`
-    }, { status: 500 });
+    return NextResponse.json({ error: "DATABASE_UPDATE_ERROR", message: error.message }, { status: 500 });
+  }
+}
+
+export async function PATCH(req: Request) {
+  try {
+    const { id, status } = await req.json();
+    if (!id || !status) return NextResponse.json({ error: "ID y status requeridos" }, { status: 400 });
+
+    const campaign = await prisma.adCampaign.update({
+      where: { id },
+      data: { status },
+    });
+
+    await logAudit('B2B_CAMPAIGN_STATUS', `${campaign.companyName} → ${status}`);
+    return NextResponse.json(campaign);
+  } catch (error: any) {
+    return NextResponse.json({ error: error.message }, { status: 500 });
   }
 }
 
@@ -115,13 +140,12 @@ export async function DELETE(req: Request) {
     const { id } = await req.json();
     if (!id) return NextResponse.json({ error: "ID requerido" }, { status: 400 });
 
-    await prisma.adCampaign.delete({
-      where: { id }
-    });
+    const existing = await prisma.adCampaign.findUnique({ where: { id } });
+    await prisma.adCampaign.delete({ where: { id } });
 
+    await logAudit('B2B_CAMPAIGN_DELETED', `Eliminada: ${existing?.companyName}`);
     return NextResponse.json({ status: "success" });
   } catch (error) {
-    console.error("Error deleting campaign:", error);
     return NextResponse.json({ error: "Error al eliminar la pauta" }, { status: 500 });
   }
 }

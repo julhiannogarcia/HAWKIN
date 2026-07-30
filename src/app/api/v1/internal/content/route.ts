@@ -9,10 +9,14 @@ export async function GET(req: Request) {
   const placement = searchParams.get('placement');
 
   try {
+    const now = new Date();
+
     const ads = await prisma.adCampaign.findMany({
       where: {
-        status: { in: ['ACTIVE', 'PAID'] },
+        status: 'ACTIVE',
         placement: placement || undefined,
+        startDate: { lte: now },
+        endDate: { gte: now },
       },
       orderBy: { createdAt: 'desc' },
     });
