@@ -14,7 +14,16 @@ export async function GET() {
     
     // Active campaigns
     const activeAds = await prisma.adCampaign.count({
-      where: { status: 'ACTIVE' }
+      where: { status: { in: ['ACTIVE', 'PAID'] } }
+    });
+
+    const adMetrics = await prisma.adCampaign.aggregate({
+      _sum: { views: true, clicks: true },
+    });
+
+    const adRevenue = await prisma.revenueMetric.aggregate({
+      where: { type: 'ADVERTISING' },
+      _sum: { amount: true },
     });
 
     // Subscriptions
@@ -23,6 +32,9 @@ export async function GET() {
     });
 
     const revenue = revenueMetrics._sum.amount || 0;
+    const totalAdViews = adMetrics._sum.views || 0;
+    const totalAdClicks = adMetrics._sum.clicks || 0;
+    const ctr = totalAdViews > 0 ? ((totalAdClicks / totalAdViews) * 100).toFixed(1) : '0.0';
 
     return NextResponse.json({
       totalUsers: userCount,
@@ -32,7 +44,11 @@ export async function GET() {
       activeSubscriptions: activeSubscriptions,
       revenue: `USD $${revenue.toLocaleString()}`,
       rawRevenue: revenue,
-      mrr: revenue * 0.1 // Base calculation if we derive MRR from DB (requires better subscription logic later)
+      adRevenue: adRevenue._sum.amount || 0,
+      totalAdViews,
+      totalAdClicks,
+      adCtr: `${ctr}%`,
+      mrr: revenue * 0.1 // Estimado hasta conectar Stripe completo
     });
   } catch (error) {
     console.error("Stats API Error:", error);

@@ -1,7 +1,8 @@
 'use client';
 
 import { motion } from 'framer-motion';
-import { useState, useEffect } from 'react';
+import { useState, useEffect, useRef } from 'react';
+import { getSecureImageUrl, getVimeoEmbedId, getYoutubeEmbedId, getYoutubeStartSeconds, buildYoutubeEmbedUrl, isVideoUrl } from '@/lib/adMediaUtils';
 
 interface SponsorSpaceProps {
   isPremium: boolean;
@@ -9,44 +10,58 @@ interface SponsorSpaceProps {
 }
 
 const TYPE_MAP: Record<string, string> = {
-  'banner': 'TOP_BANNER',
-  'inline': 'NEWS_FEED',
-  'sidebar': 'SIDEBAR',
-  'video-hero': 'TOP_BANNER'
+  banner: 'TOP_BANNER',
+  inline: 'NEWS_FEED',
+  sidebar: 'SIDEBAR',
+  'video-hero': 'TOP_BANNER',
 };
+
+async function trackAdMetric(id: string, type: 'view' | 'click') {
+  if (!id || id.startsWith('fallback') || id.startsWith('err-') || id.includes('default')) return;
+  try {
+    await fetch('/api/v1/internal/content/track', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ id, type }),
+    });
+  } catch {
+    // Silencioso: no bloquear la experiencia del usuario
+  }
+}
 
 export default function SponsorSpace({ isPremium, type = 'banner' }: SponsorSpaceProps) {
   const [promo, setPromo] = useState<any>(null);
   const [loading, setLoading] = useState(true);
   const [mediaError, setMediaError] = useState(false);
+  const viewTracked = useRef(false);
 
   useEffect(() => {
     if (isPremium) return;
 
     const fetchPromo = async () => {
       try {
-        const zone = TYPE_MAP[type] || "TOP_BANNER";
-        // Nueva ruta indetectable para AdBlockers
+        const zone = TYPE_MAP[type] || 'TOP_BANNER';
         const res = await fetch(`/api/v1/internal/content?placement=${zone}`);
         const data = await res.json();
-        
+
         if (Array.isArray(data) && data.length > 0) {
           setPromo(data[Math.floor(Math.random() * data.length)]);
         } else {
-          // Fallback institucional maestro (IMAGEN LOCAL O UNPLASH GARANTIZADA)
           setPromo({
-            id: "fallback",
-            companyName: "HAWKIN ACADEMY",
-            bannerUrl: "https://images.unsplash.com/photo-1639762681485-074b7f938ba0?auto=format&fit=crop&q=80&w=2000",
-            targetUrl: "/academy"
+            id: 'fallback',
+            companyName: 'HAWKIN ACADEMY',
+            bannerUrl:
+              'https://images.unsplash.com/photo-1639762681485-074b7f938ba0?auto=format&fit=crop&q=80&w=2000',
+            targetUrl: '/academy',
           });
         }
-      } catch (e) {
+      } catch {
         setPromo({
-          id: "error",
-          companyName: "HAWKIN INTELLIGENCE",
-          bannerUrl: "https://images.unsplash.com/photo-1451187580459-43490279c0fa?auto=format&fit=crop&q=80&w=2000",
-          targetUrl: "/"
+          id: 'error',
+          companyName: 'HAWKIN INTELLIGENCE',
+          bannerUrl:
+            'https://images.unsplash.com/photo-1451187580459-43490279c0fa?auto=format&fit=crop&q=80&w=2000',
+          targetUrl: '/',
         });
       } finally {
         setLoading(false);
@@ -56,20 +71,16 @@ export default function SponsorSpace({ isPremium, type = 'banner' }: SponsorSpac
     fetchPromo();
   }, [isPremium, type]);
 
-  if (isPremium || !promo) return null;
+  useEffect(() => {
+    if (!promo?.id || viewTracked.current) return;
+    viewTracked.current = true;
+    trackAdMetric(promo.id, 'view');
+  }, [promo?.id]);
 
-  // PROXY DE IMAGEN PARA EVITAR BLOQUEOS DE HOTLINKING (FONDO NEGRO)
-  const getSecureUrl = (url: string) => {
-    if (!url) return '';
-    if (url.includes('youtube.com') || url.includes('vimeo.com') || url.match(/\.(mp4|webm|ogg)$/i)) return url;
-    if (url.startsWith('/') || url.startsWith('logos/')) return url.startsWith('/') ? url : `/${url}`;
-    
-    // Forzamos el paso por proxy para cualquier link externo (como el de Pepsi)
-    return `https://images.weserv.nl/?url=${encodeURIComponent(url)}&w=1920&fit=cover`;
-  };
+  if (isPremium || loading || !promo) return null;
 
-  const finalUrl = getSecureUrl(promo.bannerUrl);
-  const isVideo = finalUrl.match(/\.(mp4|webm|ogg)$/i) || finalUrl.includes('vimeo') || finalUrl.includes('youtube');
+  const finalUrl = isVideoUrl(promo.bannerUrl) ? promo.bannerUrl : getSecureImageUrl(promo.bannerUrl);
+  const isVideo = isVideoUrl(promo.bannerUrl);
 
   const renderMedia = () => {
     if (mediaError) {
@@ -77,28 +88,31 @@ export default function SponsorSpace({ isPremium, type = 'banner' }: SponsorSpac
     }
 
     if (isVideo) {
-      if (finalUrl.includes('vimeo.com')) {
-        const id = finalUrl.split('/').pop()?.split('?')[0];
+      const youtubeId = getYoutubeEmbedId(promo.bannerUrl);
+      if (youtubeId) {
+        const start = getYoutubeStartSeconds(promo.bannerUrl);
         return (
-          <iframe 
-            src={`https://player.vimeo.com/video/${id}?autoplay=1&muted=1&loop=1&background=1`}
+          <iframe
+            src={buildYoutubeEmbedUrl(youtubeId, { start })}
             className="absolute inset-0 w-full h-full pointer-events-none scale-[1.05]"
-            frameBorder="0" allow="autoplay; fullscreen"
+            allow="autoplay; encrypted-media; fullscreen"
+            title={promo.companyName}
           />
         );
       }
-      if (finalUrl.includes('youtube.com') || finalUrl.includes('youtu.be')) {
-        let id = '';
-        if (finalUrl.includes('v=')) id = finalUrl.split('v=')[1].split('&')[0];
-        else id = finalUrl.split('/').pop() || '';
+
+      const vimeoId = getVimeoEmbedId(promo.bannerUrl);
+      if (vimeoId) {
         return (
-          <iframe 
-            src={`https://www.youtube.com/embed/${id}?autoplay=1&mute=1&loop=1&playlist=${id}&controls=0&showinfo=0&rel=0&modestbranding=1`}
+          <iframe
+            src={`https://player.vimeo.com/video/${vimeoId}?autoplay=1&muted=1&loop=1&background=1`}
             className="absolute inset-0 w-full h-full pointer-events-none scale-[1.05]"
-            frameBorder="0" allow="autoplay; fullscreen"
+            allow="autoplay; fullscreen"
+            title={promo.companyName}
           />
         );
       }
+
       return (
         <video autoPlay loop muted playsInline className="absolute inset-0 w-full h-full object-cover">
           <source src={finalUrl} type="video/mp4" />
@@ -107,37 +121,41 @@ export default function SponsorSpace({ isPremium, type = 'banner' }: SponsorSpac
     }
 
     return (
-      <img 
-        src={finalUrl} 
-        className="absolute inset-0 w-full h-full object-cover opacity-90 group-hover:opacity-100 transition-all duration-[10s] group-hover:scale-105" 
-        alt={promo.companyName} 
+      <img
+        src={finalUrl}
+        className="absolute inset-0 w-full h-full object-cover opacity-90 group-hover:opacity-100 transition-all duration-[10s] group-hover:scale-105"
+        alt={promo.companyName}
         onError={() => setMediaError(true)}
       />
     );
   };
 
+  const handleClick = () => {
+    trackAdMetric(promo.id, 'click');
+    if (promo.targetUrl) window.open(promo.targetUrl, '_blank');
+  };
+
   return (
-    <div 
-      onClick={() => promo.targetUrl && window.open(promo.targetUrl, '_blank')}
+    <div
+      onClick={handleClick}
       className={`relative w-full ${type === 'inline' ? 'h-[450px]' : 'min-h-[300px] md:min-h-[500px]'} rounded-[50px] overflow-hidden group cursor-pointer shadow-2xl border border-white/5 bg-[#050505] transition-all hover:border-cyan-500/30`}
     >
       {renderMedia()}
-      
-      {/* CAPA DE SOMBRA PARA VISIBILIDAD DE TEXTO */}
+
       <div className="absolute inset-0 bg-gradient-to-t from-black via-black/20 to-transparent pointer-events-none" />
-      
+
       <div className="absolute inset-0 flex flex-col justify-end p-12 md:p-16">
-         <motion.div initial={{ opacity: 0, y: 20 }} animate={{ opacity: 1, y: 0 }} className="space-y-6">
-            <h4 className="text-4xl md:text-7xl font-black text-white uppercase italic tracking-tighter drop-shadow-2xl">
-               {promo.companyName}
-            </h4>
-            <div className="flex items-center gap-4">
-               <div className="px-6 py-2 bg-white/10 backdrop-blur-xl border border-white/10 rounded-full">
-                  <p className="text-[11px] font-black uppercase tracking-[0.4em] text-white">Socio Patrocinador</p>
-               </div>
-               <div className="w-3 h-3 rounded-full bg-cyan-500 animate-pulse shadow-[0_0_20px_#06b6d4]" />
+        <motion.div initial={{ opacity: 0, y: 20 }} animate={{ opacity: 1, y: 0 }} className="space-y-6">
+          <h4 className="text-4xl md:text-7xl font-black text-white uppercase italic tracking-tighter drop-shadow-2xl">
+            {promo.companyName}
+          </h4>
+          <div className="flex items-center gap-4">
+            <div className="px-6 py-2 bg-white/10 backdrop-blur-xl border border-white/10 rounded-full">
+              <p className="text-[11px] font-black uppercase tracking-[0.4em] text-white">Socio Patrocinador</p>
             </div>
-         </motion.div>
+            <div className="w-3 h-3 rounded-full bg-cyan-500 animate-pulse shadow-[0_0_20px_#06b6d4]" />
+          </div>
+        </motion.div>
       </div>
     </div>
   );

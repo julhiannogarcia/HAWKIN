@@ -8,6 +8,8 @@ import {
   CircleAlert, CircleCheckBig, Activity
 } from 'lucide-react';
 import { motion, AnimatePresence } from 'framer-motion';
+import AdMediaPreview from '@/components/admin/AdMediaPreview';
+import { isVideoUrl } from '@/lib/adMediaUtils';
 
 export default function ManageAds() {
   // Estado para creación/edición
@@ -25,6 +27,7 @@ export default function ManageAds() {
 
   // Estado de UI
   const [campaigns, setCampaigns] = useState<any[]>([]);
+  const [adStats, setAdStats] = useState<any>(null);
   const [loading, setLoading] = useState(true);
   const [isProcessing, setIsUploading] = useState(false);
   const [error, setError] = useState('');
@@ -44,6 +47,10 @@ export default function ManageAds() {
 
   useEffect(() => {
     fetchCampaigns();
+    fetch('/api/admin/stats')
+      .then((res) => res.json())
+      .then((data) => setAdStats(data))
+      .catch(() => {});
   }, []);
 
   const handleSave = async () => {
@@ -282,16 +289,7 @@ export default function ManageAds() {
                       </div>
                    </div>
 
-                   <div className="w-full aspect-video bg-black rounded-[40px] border border-dashed border-white/10 flex items-center justify-center relative overflow-hidden group">
-                      {bannerUrl ? (
-                         <img src={bannerUrl} className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-700" alt="Preview" />
-                      ) : (
-                         <div className="text-center space-y-3">
-                            <CloudUpload className="text-gray-800 mx-auto" size={40} />
-                            <p className="text-[9px] font-black text-gray-700 uppercase tracking-widest">Vista previa del anuncio</p>
-                         </div>
-                      )}
-                   </div>
+                   <AdMediaPreview url={bannerUrl} />
                 </div>
 
              </div>
@@ -341,19 +339,44 @@ export default function ManageAds() {
         )}
       </AnimatePresence>
 
-      {/* ESTADÍSTICAS RÁPIDAS B2B */}
+      {/* ESTADÍSTICAS RÁPIDAS B2B (datos reales) */}
       <div className="grid grid-cols-1 md:grid-cols-4 gap-6">
          {[
-           { label: 'Revenue Proyectado', value: 'S/ 48,250', icon: <DollarSign className="text-green-500" /> },
-           { label: 'Campañas Activas', value: campaigns.filter(c => c.status === 'ACTIVE').length.toString(), icon: <Target className="text-blue-500" /> },
-           { label: 'Alcance Global', value: '18.5M', icon: <Activity className="text-cyan-500" /> },
-           { label: 'CTR Plus+', value: '6.2%', icon: <Sparkles className="text-purple-500" /> },
+           {
+             label: 'Ingresos por Ads',
+             value: `USD $${(adStats?.adRevenue ?? 0).toLocaleString()}`,
+             icon: <DollarSign className="text-green-500" />,
+             real: 'Pagos B2B verificados',
+           },
+           {
+             label: 'Campañas Activas',
+             value: campaigns.filter((c) => c.status === 'ACTIVE' || c.status === 'PAID').length.toString(),
+             icon: <Target className="text-blue-500" />,
+             real: 'Desde tu base de datos',
+           },
+           {
+             label: 'Impresiones Totales',
+             value: campaigns.reduce((sum, c) => sum + (c.views || 0), 0).toLocaleString(),
+             icon: <Activity className="text-cyan-500" />,
+             real: 'Se cuentan al mostrar el anuncio',
+           },
+           {
+             label: 'CTR Real',
+             value: (() => {
+               const views = campaigns.reduce((sum, c) => sum + (c.views || 0), 0);
+               const clicks = campaigns.reduce((sum, c) => sum + (c.clicks || 0), 0);
+               return views > 0 ? `${((clicks / views) * 100).toFixed(1)}%` : '0.0%';
+             })(),
+             icon: <Sparkles className="text-purple-500" />,
+             real: 'Clics ÷ impresiones',
+           },
          ].map((stat, i) => (
            <div key={i} className="p-8 rounded-[40px] bg-[#080808] border border-white/5 flex items-center gap-6 hover:border-blue-500/20 transition-all group">
               <div className="p-4 bg-black/40 rounded-2xl border border-white/5 group-hover:rotate-12 transition-transform">{stat.icon}</div>
               <div>
                  <p className="text-[8px] font-black text-gray-700 uppercase tracking-widest leading-none">{stat.label}</p>
                  <p className="text-2xl font-black text-white mt-1 italic uppercase tracking-tighter">{stat.value}</p>
+                 <p className="text-[7px] font-bold text-gray-600 uppercase tracking-widest mt-2">{stat.real}</p>
               </div>
            </div>
          ))}
@@ -376,8 +399,16 @@ export default function ManageAds() {
                 layout
                 className={`glass-card group relative p-0 overflow-hidden flex flex-col h-full transition-all duration-500 ${editId === ad.id ? 'border-blue-500 shadow-[0_0_50px_rgba(37,99,235,0.2)]' : 'border-white/5 hover:border-blue-500/40'}`}
               >
-                 <div className="h-48 bg-gray-900 relative">
-                    <img src={ad.bannerUrl} className="w-full h-full object-cover opacity-60 group-hover:scale-110 transition-transform duration-[2s]" alt="" />
+                 <div className="h-48 bg-gray-900 relative overflow-hidden">
+                    {isVideoUrl(ad.bannerUrl) ? (
+                      <AdMediaPreview
+                        url={ad.bannerUrl}
+                        className="absolute inset-0 w-full h-full bg-black"
+                        emptyLabel=""
+                      />
+                    ) : (
+                      <img src={ad.bannerUrl} className="w-full h-full object-cover opacity-60 group-hover:scale-110 transition-transform duration-[2s]" alt="" />
+                    )}
                     <div className="absolute top-4 left-4 flex flex-col gap-2">
                        <span className="text-[7px] font-black bg-blue-600 text-white px-3 py-1 rounded-full uppercase shadow-xl">{ad.placement}</span>
                        <span className={`text-[7px] font-black ${ad.isGlobal ? 'bg-purple-600' : 'bg-gray-700'} text-white px-3 py-1 rounded-full uppercase shadow-xl`}>
@@ -418,12 +449,12 @@ export default function ManageAds() {
 
                     <div className="mt-auto grid grid-cols-2 gap-4 border-t border-white/5 pt-6">
                        <div>
-                          <p className="text-[7px] font-black text-gray-700 uppercase tracking-widest mb-1">Clicks</p>
-                          <p className="text-lg font-black text-white font-mono">{ad.clicks || 0}</p>
+                          <p className="text-[7px] font-black text-gray-700 uppercase tracking-widest mb-1">Vistas</p>
+                          <p className="text-lg font-black text-white font-mono">{ad.views || 0}</p>
                        </div>
                        <div className="text-right">
-                          <p className="text-[7px] font-black text-gray-700 uppercase tracking-widest mb-1">Status</p>
-                          <p className={`text-xs font-black uppercase ${ad.status === 'ACTIVE' ? 'text-green-500' : 'text-yellow-500'}`}>{ad.status}</p>
+                          <p className="text-[7px] font-black text-gray-700 uppercase tracking-widest mb-1">Clics</p>
+                          <p className="text-lg font-black text-cyan-400 font-mono">{ad.clicks || 0}</p>
                        </div>
                     </div>
                  </div>
