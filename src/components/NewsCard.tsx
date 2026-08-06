@@ -1,6 +1,6 @@
 'use client';
 
-import { ExternalLink } from 'lucide-react';
+import { ExternalLink, AlertTriangle } from 'lucide-react';
 import { isVideoUrl } from '@/lib/adMediaUtils';
 
 interface NewsCardProps {
@@ -13,6 +13,9 @@ interface NewsCardProps {
   source?: string;
   url?: string;
   videoEmbed?: string | null;
+  isCeoRumor?: boolean;
+  badge?: string;
+  disclaimer?: string;
 }
 
 export default function NewsCard({
@@ -24,13 +27,23 @@ export default function NewsCard({
   source = 'RSS',
   url,
   videoEmbed,
+  isCeoRumor = false,
+  badge,
+  disclaimer,
 }: NewsCardProps) {
   const hasVideo = Boolean(videoEmbed && isVideoUrl(url || videoEmbed || ''));
   const hasImage = Boolean(image && !image.includes('unsplash.com'));
+  const isRumor = category === 'RUMOR' || Boolean(badge?.includes('RUMOR'));
+  const rumorLabel = badge || (isCeoRumor ? 'RUMOR · CEO' : isRumor ? 'RUMOR' : null);
 
   return (
-    <article className="flex flex-col h-full bg-[#0a0a0a] border border-white/10 rounded-lg overflow-hidden hover:border-white/20 transition-colors">
-      {/* Media */}
+    <article
+      className={`flex flex-col h-full bg-[#0a0a0a] border rounded-lg overflow-hidden transition-colors ${
+        isRumor
+          ? 'border-amber-500/30 hover:border-amber-500/50'
+          : 'border-white/10 hover:border-white/20'
+      }`}
+    >
       <div className="relative aspect-[16/9] bg-[#050505] border-b border-white/5">
         {hasVideo && videoEmbed ? (
           videoEmbed.includes('youtube') || videoEmbed.includes('vimeo') ? (
@@ -54,19 +67,36 @@ export default function NewsCard({
             <span className="text-[9px] text-gray-700 mt-1">Sin imagen del artículo</span>
           </div>
         )}
-        {category === 'BREAKING' && (
+
+        {rumorLabel && (
+          <span className="absolute top-2 left-2 inline-flex items-center gap-1 text-[10px] font-black uppercase tracking-wider bg-amber-500 text-black px-2.5 py-1 rounded shadow">
+            <AlertTriangle size={11} />
+            {rumorLabel}
+          </span>
+        )}
+
+        {!isRumor && category === 'BREAKING' && (
           <span className="absolute top-2 left-2 text-[9px] font-bold uppercase tracking-wider bg-red-600 text-white px-2 py-0.5 rounded">
             Breaking
           </span>
         )}
       </div>
 
-      {/* Content */}
       <div className="flex flex-col flex-1 p-4 gap-3">
+        {isRumor && (
+          <p className="text-[10px] font-bold uppercase tracking-widest text-amber-500/90">
+            No confirmado · no es noticia verificada
+          </p>
+        )}
+
         <h3 className="text-base font-semibold text-white leading-snug line-clamp-3">{title}</h3>
 
         {excerpt && (
           <p className="text-sm text-gray-400 leading-relaxed line-clamp-3">{excerpt}</p>
+        )}
+
+        {disclaimer && (
+          <p className="text-[10px] text-amber-700/80 italic">{disclaimer}</p>
         )}
 
         <div className="mt-auto pt-3 border-t border-white/5 flex items-center justify-between gap-3">

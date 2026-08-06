@@ -50,9 +50,12 @@ export default function Page() {
           <AIWarRoom />
         </div>
 
-        <div className="mt-8 p-4 border border-white/5 rounded-xl text-center">
+        <div className="mt-8 p-4 border border-white/5 rounded-xl text-center space-y-1">
           <p className="text-[9px] text-gray-600 uppercase tracking-widest">
-            Executive Brief y Market Terminal — disponibles próximamente con datos verificados
+            Executive Brief · Global AI Pulse · Market Talent Terminal
+          </p>
+          <p className="text-[9px] text-gray-700 uppercase tracking-widest">
+            Retirados — solo se muestran módulos con datos verificados
           </p>
         </div>
 
