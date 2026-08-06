@@ -62,6 +62,22 @@ function absoluteUrl(maybeRelative: string, base: string): string | null {
   }
 }
 
+function isUsableArticleUrl(candidate: string): boolean {
+  if (!candidate.startsWith('http')) return false;
+  try {
+    const u = new URL(candidate);
+    const host = u.hostname.replace(/^www\./, '');
+    if (host.includes('news.google.com')) return false;
+    if (host.includes('google.com')) return false;
+    if (host.includes('googleusercontent.com')) return false;
+    if (host.includes('gstatic.com')) return false;
+    if (/\.(jpg|jpeg|png|gif|webp|svg|ico)(\?|$)/i.test(u.pathname)) return false;
+    return u.protocol === 'http:' || u.protocol === 'https:';
+  } catch {
+    return false;
+  }
+}
+
 /** Resuelve redirects de Google News al artículo real. */
 export async function resolveArticleUrl(pageUrl: string): Promise<string> {
   if (!pageUrl?.startsWith('http')) return pageUrl;
@@ -79,28 +95,25 @@ export async function resolveArticleUrl(pageUrl: string): Promise<string> {
       redirect: 'follow',
     });
 
-    if (res.url && !res.url.includes('news.google.com')) {
+    if (res.url && isUsableArticleUrl(res.url)) {
       articleUrlCache.set(pageUrl, res.url);
       return res.url;
     }
 
-    const html = (await res.text()).slice(0, 200_000);
+    const html = (await res.text()).slice(0, 220_000);
     const patterns = [
-      /data-n-au=["'](https?:\/\/[^"']+)["']/i,
-      /<link[^>]+rel=["']canonical["'][^>]+href=["'](https?:\/\/[^"']+)["']/i,
-      /href=["'](https?:\/\/(?!news\.google\.com|www\.google\.com|accounts\.google\.com)[^"'\s]+)["']/i,
+      /data-n-au=["'](https?:\/\/[^"']+)["']/gi,
+      /<a[^>]+href=["'](https?:\/\/[^"']+)["'][^>]*>/gi,
     ];
 
     for (const re of patterns) {
-      const m = html.match(re);
-      const candidate = m?.[1]?.trim();
-      if (
-        candidate &&
-        !candidate.includes('news.google.com') &&
-        !candidate.includes('google.com/search')
-      ) {
-        articleUrlCache.set(pageUrl, candidate);
-        return candidate;
+      let m: RegExpExecArray | null;
+      while ((m = re.exec(html)) !== null) {
+        const candidate = m[1]?.trim();
+        if (candidate && isUsableArticleUrl(candidate)) {
+          articleUrlCache.set(pageUrl, candidate);
+          return candidate;
+        }
       }
     }
   } catch {

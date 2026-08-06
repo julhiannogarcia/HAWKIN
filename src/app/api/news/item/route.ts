@@ -81,7 +81,17 @@ export async function GET(req: Request) {
   const originalUrl = found.url || '';
   let articleUrl = originalUrl;
   try {
-    if (originalUrl) articleUrl = await resolveArticleUrl(originalUrl);
+    if (originalUrl) {
+      const resolved = await resolveArticleUrl(originalUrl);
+      // Solo sustituir si parece artículo real (no CDN de imagen)
+      if (
+        resolved &&
+        !resolved.includes('googleusercontent.com') &&
+        !/\.(jpg|jpeg|png|gif|webp)(\?|$)/i.test(resolved)
+      ) {
+        articleUrl = resolved;
+      }
+    }
   } catch {
     articleUrl = originalUrl;
   }
