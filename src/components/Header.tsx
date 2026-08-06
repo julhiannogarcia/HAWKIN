@@ -16,6 +16,7 @@ export default function Header() {
     { name: 'Inicio', href: '/' },
     { name: 'Radar', href: '/radar', special: true, color: 'text-cyan-400' },
     { name: 'Arena', href: '/arena', special: true, color: 'text-amber-400' },
+    { name: 'Rumores', href: '/rumors', special: true, color: 'text-amber-500' },
     { name: 'Shield', href: '/shield', special: true, color: 'text-purple-500' },
     { name: 'Donación', href: '/donacion', special: true, color: 'text-pink-500' },
     { name: 'B2B', href: '/b2b' },

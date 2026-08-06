@@ -35,7 +35,7 @@ export default function LiveStatusBar() {
   }, []);
 
   useEffect(() => {
-    fetch('/api/admin/stats')
+    fetch('/api/status', { cache: 'no-store' })
       .then((res) => (res.ok ? res.json() : null))
       .then((data) => {
         if (!data || data.error) return;

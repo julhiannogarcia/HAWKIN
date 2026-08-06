@@ -10,8 +10,16 @@ export async function middleware(request: NextRequest) {
   const { pathname } = request.nextUrl;
 
   const isAdminPage = pathname.startsWith('/admin') && pathname !== '/admin/login';
+
+  // POST público: envío de campañas B2B y upload de creativos desde /b2b
+  const isPublicAdminPost =
+    request.method === 'POST' &&
+    (pathname === '/api/admin/b2b' || pathname === '/api/admin/upload');
+
   const isAdminApi =
-    pathname.startsWith('/api/admin') && !pathname.startsWith('/api/admin/auth');
+    pathname.startsWith('/api/admin') &&
+    !pathname.startsWith('/api/admin/auth') &&
+    !isPublicAdminPost;
 
   if (!isAdminPage && !isAdminApi) {
     return NextResponse.next();
