@@ -3,14 +3,14 @@
 import { use } from 'react';
 import IntelDetail from '@/components/news/IntelDetail';
 
-export default function NewsPage({ params }: { params: Promise<{ id: string }> }) {
+export default function RumorDetailPage({ params }: { params: Promise<{ id: string }> }) {
   const { id } = use(params);
   return (
     <IntelDetail
       itemId={id}
-      feedHint="live"
-      backHref="/radar"
-      backLabel="Volver al Radar"
+      feedHint="rumors"
+      backHref="/rumors"
+      backLabel="Volver a Rumores"
     />
   );
 }

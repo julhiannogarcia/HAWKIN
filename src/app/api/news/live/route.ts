@@ -111,16 +111,17 @@ export async function GET() {
         const source = extractSourceName(item);
         const pubDate = item.pubDate || new Date().toISOString();
 
-        let excerpt = trimExcerpt(snippet, 280);
+        const fullSnippet = trimExcerpt(snippet, 900);
+        let excerpt = trimExcerpt(snippet, 320);
         if (index < 6 && snippet.length > 40) {
           const gemini = await summarizeWithGemini(displayTitle, snippet);
           if (gemini && 'summary' in gemini) {
-            excerpt = trimExcerpt(gemini.summary, 280);
+            excerpt = trimExcerpt(gemini.summary, 420);
           }
         }
 
         const image =
-          index < 10
+          index < 16
             ? await resolveVerifiedNewsImage(item as Record<string, unknown>, url)
             : extractRssImageSync(item as Record<string, unknown>);
 
@@ -137,6 +138,7 @@ export async function GET() {
           title: displayTitle,
           category,
           excerpt: excerpt || trimExcerpt(snippet, 120) || displayTitle,
+          body: fullSnippet || excerpt || displayTitle,
           date: formatLiveDate(pubDate),
           pubDate,
           timestamp: new Date(pubDate).getTime(),

@@ -106,24 +106,23 @@ export async function GET(req: Request) {
         const ceo = matchCeo(`${title} ${snippet}`);
         const source = extractSourceName(item);
 
-        let excerpt = trimExcerpt(snippet, 280);
-        if (index < 6 && snippet.length > 40) {
+        const fullSnippet = trimExcerpt(snippet, 900);
+        let excerpt = trimExcerpt(snippet, 320);
+        if (index < 8 && snippet.length > 40) {
           const gemini = await summarizeWithGemini(title, snippet);
           if (gemini && 'summary' in gemini) {
-            excerpt = trimExcerpt(gemini.summary, 280);
+            excerpt = trimExcerpt(gemini.summary, 420);
           }
         }
 
-        const image =
-          index < 10
-            ? await resolveVerifiedNewsImage(item as Record<string, unknown>, url)
-            : null;
+        const image = await resolveVerifiedNewsImage(item as Record<string, unknown>, url);
 
         return {
           id: generateShortId(url),
           title,
           category: 'RUMOR',
-          excerpt: excerpt || trimExcerpt(snippet, 120) || title,
+          excerpt: excerpt || trimExcerpt(snippet, 160) || title,
+          body: fullSnippet || excerpt || title,
           date: formatLiveDate(item.pubDate),
           pubDate: item.pubDate || new Date().toISOString(),
           image,

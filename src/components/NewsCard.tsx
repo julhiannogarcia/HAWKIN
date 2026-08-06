@@ -1,7 +1,10 @@
 'use client';
 
-import { ExternalLink, AlertTriangle } from 'lucide-react';
+import Link from 'next/link';
+import { AlertTriangle } from 'lucide-react';
+import EditorialMedia from '@/components/news/EditorialMedia';
 import { isVideoUrl } from '@/lib/adMediaUtils';
+import { useState } from 'react';
 
 interface NewsCardProps {
   id: string;
@@ -16,9 +19,12 @@ interface NewsCardProps {
   isCeoRumor?: boolean;
   badge?: string;
   disclaimer?: string;
+  /** Destino interno HAWKIN. Default: rumor → /rumors/id, else → /news/id */
+  detailHref?: string;
 }
 
 export default function NewsCard({
+  id,
   title,
   excerpt = '',
   category = 'INTEL',
@@ -30,42 +36,41 @@ export default function NewsCard({
   isCeoRumor = false,
   badge,
   disclaimer,
+  detailHref,
 }: NewsCardProps) {
-  const hasVideo = Boolean(videoEmbed && isVideoUrl(url || videoEmbed || ''));
-  const hasImage = Boolean(image && !image.includes('unsplash.com'));
+  const [imgFailed, setImgFailed] = useState(false);
   const isRumor = category === 'RUMOR' || Boolean(badge?.includes('RUMOR'));
   const rumorLabel = badge || (isCeoRumor ? 'RUMOR · CEO' : isRumor ? 'RUMOR' : null);
+  const href = detailHref || (isRumor ? `/rumors/${id}` : `/news/${id}`);
+  const hasVideo = Boolean(videoEmbed && isVideoUrl(url || videoEmbed || ''));
+  const hasImage = Boolean(image && !image.includes('unsplash.com') && !imgFailed);
 
   return (
-    <article
-      className={`flex flex-col h-full bg-[#0a0a0a] border rounded-lg overflow-hidden transition-colors ${
+    <Link
+      href={href}
+      className={`flex flex-col h-full bg-[#0c0c0c] border rounded-xl overflow-hidden transition-colors group ${
         isRumor
-          ? 'border-amber-500/30 hover:border-amber-500/50'
-          : 'border-white/10 hover:border-white/20'
+          ? 'border-amber-500/30 hover:border-amber-500/55'
+          : 'border-white/10 hover:border-cyan-500/35'
       }`}
     >
-      <div className="relative aspect-[16/9] bg-[#050505] border-b border-white/5">
+      <div className="relative aspect-[16/9] border-b border-white/5 overflow-hidden">
         {hasVideo && videoEmbed ? (
-          videoEmbed.includes('youtube') || videoEmbed.includes('vimeo') ? (
-            <iframe
-              src={videoEmbed}
-              className="absolute inset-0 w-full h-full"
-              allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture"
-              title={title}
-              loading="lazy"
-            />
-          ) : (
-            <video src={videoEmbed} className="w-full h-full object-cover" controls muted playsInline />
-          )
-        ) : hasImage ? (
-          <img src={image!} alt="" className="w-full h-full object-cover" loading="lazy" />
-        ) : (
-          <div className="absolute inset-0 flex flex-col items-center justify-center px-4 text-center">
-            <span className="text-[10px] font-semibold uppercase tracking-widest text-gray-500">
-              {source}
+          <div className="absolute inset-0 bg-[#111] flex items-center justify-center">
+            <span className="text-[10px] font-black uppercase tracking-widest text-white/60">
+              Video · abrir para ver
             </span>
-            <span className="text-[9px] text-gray-700 mt-1">Sin imagen del artículo</span>
           </div>
+        ) : hasImage ? (
+          <img
+            src={image!}
+            alt=""
+            className="w-full h-full object-cover group-hover:scale-[1.02] transition-transform duration-500"
+            loading="lazy"
+            onError={() => setImgFailed(true)}
+          />
+        ) : (
+          <EditorialMedia source={source} />
         )}
 
         {rumorLabel && (
@@ -85,39 +90,32 @@ export default function NewsCard({
       <div className="flex flex-col flex-1 p-4 gap-3">
         {isRumor && (
           <p className="text-[10px] font-bold uppercase tracking-widest text-amber-500/90">
-            No confirmado · no es noticia verificada
+            No confirmado · leer en HAWKIN
           </p>
         )}
 
-        <h3 className="text-base font-semibold text-white leading-snug line-clamp-3">{title}</h3>
+        <h3 className="text-base font-semibold text-white leading-snug line-clamp-3 group-hover:text-cyan-100">
+          {title}
+        </h3>
 
         {excerpt && (
           <p className="text-sm text-gray-400 leading-relaxed line-clamp-3">{excerpt}</p>
         )}
 
         {disclaimer && (
-          <p className="text-[10px] text-amber-700/80 italic">{disclaimer}</p>
+          <p className="text-[10px] text-amber-700/80 italic line-clamp-2">{disclaimer}</p>
         )}
 
         <div className="mt-auto pt-3 border-t border-white/5 flex items-center justify-between gap-3">
-          <p className="text-[11px] text-gray-500">
+          <p className="text-[11px] text-gray-500 truncate">
             <span className="font-medium text-gray-400">{source}</span>
             {date && <span className="text-gray-600"> · {date}</span>}
           </p>
-
-          {url && (
-            <a
-              href={url}
-              target="_blank"
-              rel="noopener noreferrer"
-              className="inline-flex items-center gap-1 shrink-0 text-[11px] font-semibold uppercase tracking-wide text-cyan-400 hover:text-cyan-300"
-            >
-              Ver original
-              <ExternalLink size={12} />
-            </a>
-          )}
+          <span className="shrink-0 text-[10px] font-bold uppercase tracking-widest text-cyan-500/80 group-hover:text-cyan-400">
+            Leer →
+          </span>
         </div>
       </div>
-    </article>
+    </Link>
   );
 }

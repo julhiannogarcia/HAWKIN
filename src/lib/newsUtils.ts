@@ -52,29 +52,99 @@ export function extractRssImage(item: Record<string, unknown>): string | null {
 }
 
 const ogImageCache = new Map<string, string | null>();
+const articleUrlCache = new Map<string, string>();
+
+function absoluteUrl(maybeRelative: string, base: string): string | null {
+  try {
+    return new URL(maybeRelative, base).href;
+  } catch {
+    return null;
+  }
+}
+
+/** Resuelve redirects de Google News al artículo real. */
+export async function resolveArticleUrl(pageUrl: string): Promise<string> {
+  if (!pageUrl?.startsWith('http')) return pageUrl;
+  if (!pageUrl.includes('news.google.com')) return pageUrl;
+  if (articleUrlCache.has(pageUrl)) return articleUrlCache.get(pageUrl)!;
+
+  try {
+    const res = await fetch(pageUrl, {
+      headers: {
+        'User-Agent':
+          'Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/120.0.0.0 Safari/537.36',
+        Accept: 'text/html,application/xhtml+xml',
+      },
+      signal: AbortSignal.timeout(6000),
+      redirect: 'follow',
+    });
+
+    if (res.url && !res.url.includes('news.google.com')) {
+      articleUrlCache.set(pageUrl, res.url);
+      return res.url;
+    }
+
+    const html = (await res.text()).slice(0, 200_000);
+    const patterns = [
+      /data-n-au=["'](https?:\/\/[^"']+)["']/i,
+      /<link[^>]+rel=["']canonical["'][^>]+href=["'](https?:\/\/[^"']+)["']/i,
+      /href=["'](https?:\/\/(?!news\.google\.com|www\.google\.com|accounts\.google\.com)[^"'\s]+)["']/i,
+    ];
+
+    for (const re of patterns) {
+      const m = html.match(re);
+      const candidate = m?.[1]?.trim();
+      if (
+        candidate &&
+        !candidate.includes('news.google.com') &&
+        !candidate.includes('google.com/search')
+      ) {
+        articleUrlCache.set(pageUrl, candidate);
+        return candidate;
+      }
+    }
+  } catch {
+    // keep original
+  }
+
+  articleUrlCache.set(pageUrl, pageUrl);
+  return pageUrl;
+}
 
 export async function fetchOgImage(pageUrl: string): Promise<string | null> {
   if (!pageUrl?.startsWith('http')) return null;
   if (ogImageCache.has(pageUrl)) return ogImageCache.get(pageUrl) ?? null;
 
   try {
-    const res = await fetch(pageUrl, {
-      headers: { 'User-Agent': 'Mozilla/5.0 (compatible; HAWKIN/1.0)' },
-      signal: AbortSignal.timeout(4500),
+    const articleUrl = await resolveArticleUrl(pageUrl);
+    const res = await fetch(articleUrl, {
+      headers: {
+        'User-Agent':
+          'Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/120.0.0.0 Safari/537.36',
+        Accept: 'text/html,application/xhtml+xml',
+      },
+      signal: AbortSignal.timeout(5500),
       redirect: 'follow',
     });
     if (!res.ok) {
       ogImageCache.set(pageUrl, null);
       return null;
     }
-    const html = (await res.text()).slice(0, 120_000);
+    const html = (await res.text()).slice(0, 150_000);
     const match =
-      html.match(/property=["']og:image["'][^>]*content=["']([^"']+)["']/i) ||
-      html.match(/content=["']([^"']+)["'][^>]*property=["']og:image["']/i) ||
-      html.match(/name=["']twitter:image["'][^>]*content=["']([^"']+)["']/i);
+      html.match(/property=["']og:image(?::secure_url)?["'][^>]*content=["']([^"']+)["']/i) ||
+      html.match(/content=["']([^"']+)["'][^>]*property=["']og:image(?::secure_url)?["']/i) ||
+      html.match(/name=["']twitter:image(?::src)?["'][^>]*content=["']([^"']+)["']/i) ||
+      html.match(/content=["']([^"']+)["'][^>]*name=["']twitter:image(?::src)?["']/i);
 
-    const image = match?.[1]?.trim() || null;
-    if (image && !image.includes('unsplash.com')) {
+    const raw = match?.[1]?.trim() || null;
+    const image = raw ? absoluteUrl(raw, articleUrl) : null;
+    if (
+      image &&
+      !image.includes('unsplash.com') &&
+      !image.includes('googleusercontent.com/proxy') &&
+      !image.endsWith('.svg')
+    ) {
       ogImageCache.set(pageUrl, image);
       return image;
     }
@@ -86,13 +156,18 @@ export async function fetchOgImage(pageUrl: string): Promise<string | null> {
   }
 }
 
-/** Imagen verificada: RSS → og:image. Sin Unsplash ni stock. */
+/** Imagen verificada: RSS → og:image (sigue redirects Google News). Sin Unsplash. */
 export async function resolveVerifiedNewsImage(
   item: Record<string, unknown>,
   pageUrl?: string
 ): Promise<string | null> {
   const fromFeed = extractRssImage(item);
-  if (fromFeed && !fromFeed.includes('unsplash.com') && !fromFeed.endsWith('.gif')) {
+  if (
+    fromFeed &&
+    !fromFeed.includes('unsplash.com') &&
+    !fromFeed.endsWith('.gif') &&
+    !fromFeed.includes('pixel')
+  ) {
     return fromFeed;
   }
   if (pageUrl) {

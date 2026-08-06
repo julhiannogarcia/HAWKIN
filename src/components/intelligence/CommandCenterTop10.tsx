@@ -1,7 +1,7 @@
 'use client';
 
 import React, { useState, useEffect, useCallback } from 'react';
-import { Target, Zap, LoaderCircle, RefreshCw, ExternalLink } from 'lucide-react';
+import { Target, LoaderCircle, RefreshCw } from 'lucide-react';
 
 type NewsItem = {
   id: string;
@@ -84,9 +84,7 @@ export default function CommandCenterTop10() {
             {items.map((item, index) => (
               <a
                 key={item.id}
-                href={item.url || '#'}
-                target={item.url ? '_blank' : undefined}
-                rel={item.url ? 'noopener noreferrer' : undefined}
+                href={`/news/${item.id}`}
                 className="p-4 bg-white/[0.02] border border-white/5 rounded-2xl hover:bg-white/[0.04] transition-all flex flex-col justify-between group min-h-[140px]"
               >
                 <div>
@@ -100,7 +98,7 @@ export default function CommandCenterTop10() {
                 </div>
                 <div className="flex items-center justify-between pt-3 mt-3 border-t border-white/5">
                   <span className="text-[8px] font-black text-gray-600 uppercase truncate max-w-[70%]">{item.source || 'RSS'}</span>
-                  {item.url && <ExternalLink size={10} className="text-gray-600 shrink-0" />}
+                  <span className="text-[8px] font-black text-yellow-500/70 uppercase">Leer →</span>
                 </div>
               </a>
             ))}
