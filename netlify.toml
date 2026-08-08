@@ -8,6 +8,19 @@
 [build.environment]
   NODE_VERSION = "20"
 
+# HAWKIN / STORE (SPA Vite) en https://aihawkin.com/store
+# Archivos estáticos en public/store; rutas cliente → index.html
+[[redirects]]
+  from = "/store"
+  to = "/store/"
+  status = 301
+
+[[redirects]]
+  from = "/store/*"
+  to = "/store/index.html"
+  status = 200
+  force = false
+
 # Scan diario de releases oficiales vs catálogo Arena (08:00 UTC)
 [[scheduled.functions]]
   path = "/api/intelligence/releases-watch?cron=1"
